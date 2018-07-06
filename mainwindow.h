@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class TcpServerClients;
+
 namespace Ui {
 class MainWindow;
 }
@@ -17,6 +19,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    TcpServerClients* m_serverClient;
 };
 
 #endif // MAINWINDOW_H
