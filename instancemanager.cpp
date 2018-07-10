@@ -39,6 +39,8 @@ void InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString name)
 {
     qDebug() << "Creation new process";
 
+    //Check the name does not already exist
+
     QProcess* process = new QProcess(this);
     process->start("D:/Users/sapiensc/Documents/build-InstanceTest-Desktop_Qt_5_11_0_MinGW_32bit-Release/release/InstanceTest.exe");
 

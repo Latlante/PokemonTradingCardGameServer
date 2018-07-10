@@ -43,6 +43,9 @@ void ThreadClient::run()
     exec();
 }
 
+/************************************************************
+*****       	  FONCTIONS SLOTS PRIVEES				*****
+************************************************************/
 void ThreadClient::onReadyRead_TcpSocket()
 {
     QByteArray message = m_tcpSocket->readAll();

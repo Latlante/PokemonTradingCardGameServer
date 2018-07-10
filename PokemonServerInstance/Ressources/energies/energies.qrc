@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+		<file>db/db_energies.csv</file>
+        <file>cards/3.png</file>
+        <file>cards/4.png</file>
+        <file>cards/5.png</file>
+        <file>cards/8.png</file>
+        <file>cards/10.png</file>
+        <file>cards/12.png</file>
+        <file>cards/14.png</file>
+    </qresource>
+</RCC>

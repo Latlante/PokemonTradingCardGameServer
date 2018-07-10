@@ -1,0 +1,8 @@
+V1.0: modèle de base
+
+V1.1:
+ - Revu des id des actions
+ - Ajout d'un argument pour les actions (avant: 1, maintenant: 2)
+ - Ajout d'une colonne de dégat pour différencier les dégats infligés de ceux affichés
+ - Revu des id des éléments
+ - Ajout d'une colonne pour la faiblesse et une pour la résistance afin de savoir si on a un coef de 2 ou une différence de 30 dans les dégats
