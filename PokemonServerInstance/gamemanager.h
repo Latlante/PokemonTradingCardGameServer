@@ -31,6 +31,8 @@ public:
 
     //Preparation de la partie
     void initGame();
+    unsigned short numberMaxOfPlayers();
+    void setNumberMaxOfPlayers(unsigned short max);
     Player* addNewPlayer(QString name, QList<AbstractCard*> listCards);
     void selectFirstPlayer();
     void setInitReady();
@@ -89,6 +91,7 @@ private:
     static const int m_NUMBER_FIRST_CARDS;
     static const int m_NUMBER_REWARDS;
     static GameManager *m_instance;
+    unsigned short m_numberMaxOfPlayers;
 	QList<Player*> m_listPlayers;
     short m_indexCurrentPlayer;
     Player* m_playerAttacking;

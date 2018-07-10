@@ -2,7 +2,6 @@
 
 #include <QDebug>
 #include <QEventLoop>
-#include "src_Controler/ctrlpopups.h"
 #include "src_Models/modellistenergies.h"
 #include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
@@ -10,7 +9,7 @@
 #include "src_Packets/packethand.h"
 #include "src_Packets/packetrewards.h"
 #include "src_Packets/packettrash.h"
-#include "utils.h"
+#include "common/utils.h"
 
 const int GameManager::m_NUMBER_FIRST_CARDS = 7;
 const int GameManager::m_NUMBER_REWARDS = 6;
@@ -22,6 +21,7 @@ GameManager::GameManager(QObject *parent) :
     m_forcedValueHeadOrTail(false),
     m_nextValueHeadOrTail(0),
 #endif
+    m_numberMaxOfPlayers(0),
 	m_listPlayers(QList<Player*>()),
     m_indexCurrentPlayer(-1),
     m_playerAttacking(nullptr),
@@ -159,16 +159,31 @@ void GameManager::initGame()
     }
 }
 
+unsigned short GameManager::numberMaxOfPlayers()
+{
+    return m_numberMaxOfPlayers;
+}
+
+void GameManager::setNumberMaxOfPlayers(unsigned short max)
+{
+    m_numberMaxOfPlayers = max;
+}
+
 Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
 {
 #ifdef TRACAGE_PRECIS
     qDebug() << __PRETTY_FUNCTION__;
 #endif
-	Player* newPlayer = new Player(name, listCards);
+    Player* newPlayer = nullptr;
 
-    connect(newPlayer, &Player::endOfTurn, this, &GameManager::onEndOfTurn_Player);
+    if(m_listPlayers.count() < numberMaxOfPlayers())
+    {
+        newPlayer = new Player(name, listCards);
 
-	m_listPlayers.append(newPlayer);
+        connect(newPlayer, &Player::endOfTurn, this, &GameManager::onEndOfTurn_Player);
+
+        m_listPlayers.append(newPlayer);
+    }
 
     return newPlayer;
 }

@@ -44,7 +44,7 @@ void Controller::onMessageReceived_Communication(QByteArray message)
         {
         case 31:        //select card
             jsonResponse = selectCardPerPlayer(jsonReceived["name"].toString(),
-                                               jsonReceived[cards].toArray());
+                                               jsonReceived["cards"].toArray());
             break;
         }
 

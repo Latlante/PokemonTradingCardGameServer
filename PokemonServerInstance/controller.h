@@ -18,10 +18,15 @@ public:
 
 signals:
 
+private slots:
+    void onMessageReceived_Communication(QByteArray message);
+
 private:
     StdListenerWritter* m_communication;
     GameManager* m_gameManager;
     Log m_log;
+
+    QJsonObject selectCardPerPlayer(const QString& namePlayer, QJsonArray tabCards);
 };
 
 #endif // CONTROLLER_H

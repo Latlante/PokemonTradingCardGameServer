@@ -2,21 +2,20 @@
 #include <QTextStream>
 #include <iostream>
 
+#include "controller.h"
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
     if(argc >= 4)
     {
-
+        Controller ctrl(argv[1], argv[2], argv[3]);
     }
-
-    QTextStream sin(stdin);
-    QTextStream sout(stdout);
-
-    sout << "argc: " << argc << endl;
-    for(int i=0;i<argc;++i)
-        sout << "argv: " <<  argv[i] << endl;
+    else
+    {
+        a.quit();
+    }
 
     return a.exec();
 }
