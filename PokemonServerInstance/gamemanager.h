@@ -22,10 +22,13 @@ public:
     static void deleteInstance();
     static GameManager* instance();
 	
+    bool moveACard(const QString& namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, unsigned int indexCardOrigin = 0, unsigned int indexCardDestination = 0);
+
     //Accesseurs
     Player* currentPlayer();
     Player* playerAttacked();
     Player* playerAt(int index);
+    Player* playerByName(const QString& name);
     ConstantesQML::StepGame gameStatus();
     void setGameStatus(ConstantesQML::StepGame step);
 
@@ -75,6 +78,7 @@ signals:
     void headOrTailAsked();
     void selectionDisplayFinished();
 
+    void debug(QString);
     void movingCardAnimationStartAsked();
 
 private slots:

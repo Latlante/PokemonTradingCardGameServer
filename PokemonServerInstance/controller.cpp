@@ -5,8 +5,8 @@
 #include <QJsonObject>
 
 #include "gamemanager.h"
-#include "player.h"
 #include "common/database.h"
+#include "common/utils.h"
 #include "src_Communication/stdlistenerwritter.h"
 #include "src_Log/log.h"
 #include "src_Cards/abstractcard.h"
@@ -18,9 +18,6 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     m_log(Log(nameGame))
 {
     connect(m_communication, &StdListenerWritter::messageReceived, this, &Controller::onMessageReceived_Communication);
-
-    //m_gameManager->addNewPlayer(player1);
-    //m_gameManager->addNewPlayer(player2);
 
     m_log.write("Creation of the game");
     m_log.write("Players: " + player1 + " versus " + player2);
@@ -44,8 +41,19 @@ void Controller::onMessageReceived_Communication(QByteArray message)
         {
         case 31:        //select card
             jsonResponse = selectCardPerPlayer(jsonReceived["name"].toString(),
-                                               jsonReceived[cards].toArray());
+                                               jsonReceived["cards"].toArray());
             break;
+
+        case 32:
+            jsonResponse = moveACard(jsonReceived["name"].toString(),
+                                     static_cast<Player::EnumPacket>(jsonReceived["idPacketOrigin"].toInt()),
+                                     static_cast<Player::EnumPacket>(jsonReceived["idPacketDestination"].toInt()),
+                                     jsonReceived["idCardOrigin"].toInt(),
+                                     jsonReceived["idCardDestination"].toInt());
+            break;
+
+        default:
+            m_log(__PRETTY_FUNCTION__ + ", error with the phase:" + QString::number(phase));
         }
 
     }
@@ -92,13 +100,13 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
     }
 
     //Check the packet is ok
-    if(listCards.count() < 60)
+    if(listCards.count() < MAXCARDS_DECK)
     {
         jsonResponse["result"] = "ko";
         jsonResponse["error"] = "No enough card in packet";
         m_log.write(__PRETTY_FUNCTION__ + ", error for " + namePlayer + ": No enough card in packet");
     }
-    else if(listCards.count() > 60)
+    else if(listCards.count() > MAXCARDS_DECK)
     {
         jsonResponse["result"] = "ko";
         jsonResponse["error"] = "Too many cards in packet";
@@ -120,4 +128,21 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
             m_log.write(__PRETTY_FUNCTION__ + ", error for " + namePlayer + ": Too many players in the game");
         }
     }
+}
+
+QJsonObject Controller::moveACard(const QString &namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination)
+{
+    QJsonObject jsonResponse;
+
+    if(m_gameManager->moveACard(namePlayer, packetOrigin, packetDestination, indexCardOrigin, indexCardDestination))
+    {
+        jsonResponse["result"] = "ok";
+    }
+    else
+    {
+        jsonResponse["result"] = "ko";
+        jsonResponse["error"] = "error during the move of the card";
+    }
+
+    return jsonResponse;
 }

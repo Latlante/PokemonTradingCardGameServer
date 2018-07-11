@@ -68,6 +68,39 @@ GameManager* GameManager::instance()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
+bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, unsigned int indexCardOrigin, unsigned int indexCardDestination)
+{
+    bool success = false;
+    Player* play = playerByName(namePlayer);
+
+    if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Fight))
+        success = play->moveCardFromBenchToFight(play->bench()->card(indexCardOrigin));
+    else if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Trash))
+        success = play->moveCardFromBenchToTrash(indexCardOrigin);
+    else if((packetOrigin == Player::PCK_Deck) && (packetDestination == Player::PCK_Hand))
+        success = play->moveCardFromDeckToHand(play->deck()->card(indexCardOrigin));
+    else if((packetOrigin == Player::PCK_Deck) && (packetDestination == Player::PCK_Rewards))
+        success = play->moveCardFromDeckToReward(play->deck()->card(indexCardOrigin));
+    else if((packetOrigin == Player::PCK_Fight) && (packetDestination == Player::PCK_Trash))
+        success = play->moveCardFromFightToTrash(indexCardOrigin);
+    else if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Bench))
+        success = play->moveCardFromHandToBench(indexCardOrigin, indexCardDestination);
+    else if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Deck))
+        success = play->moveCardFromHandToDeck(play->hand()->card(indexCardOrigin));
+    else if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Fight))
+        success = play->moveCardFromHandToFight(indexCardOrigin);
+    else if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Trash))
+        success = play->moveCardFromHandToTrash(play->hand()->card(indexCardOrigin));
+    else if((packetOrigin == Player::PCK_Rewards) && (packetDestination == Player::PCK_Hand))
+        success = play->moveCardFromRewardToHand(play->rewards()->card(indexCardOrigin));
+    else if((packetOrigin == Player::PCK_Trash) && (packetDestination == Player::PCK_Hand))
+        success = play->moveCardFromHandToFight(play->trash()->card(indexCardOrigin));
+    else
+        emit debug(__PRETTY_FUNCTION__ + "move not developp yet");
+
+    return success;
+}
+
 //ACCESSEURS
 Player* GameManager::currentPlayer()
 {
@@ -90,7 +123,7 @@ Player* GameManager::playerAt(int index)
 #ifdef TRACAGE_PRECIS
     qDebug() << __PRETTY_FUNCTION__;
 #endif
-    Player* play = NULL;
+    Player* play = nullptr;
 
     if((index >= 0) && (index < m_listPlayers.count()))
     {
@@ -102,6 +135,27 @@ Player* GameManager::playerAt(int index)
     }
 
     return play;
+}
+
+Player* GameManager::playerByName(const QString &name)
+{
+    Player* playToReturn = nullptr;
+    int index = 0;
+
+    while((play == nullptr) && (index < m_listPlayers.count()))
+    {
+        Player* play = m_listPlayers[index];
+        if((play != nullptr) && (play->name() == name))
+        {
+            playToReturn = play;
+        }
+        else
+        {
+            index++;
+        }
+    }
+
+    return playToReturn;
 }
 
 ConstantesQML::StepGame GameManager::gameStatus()

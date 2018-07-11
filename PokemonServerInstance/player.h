@@ -23,6 +23,16 @@ class Player : public QObject
     Q_PROPERTY(bool canPlay READ canPlay WRITE setCanPlay NOTIFY canPlayChanged)
 	
 public:
+    enum EnumPacket
+    {
+        PCK_Bench = 0,
+        PCK_Deck,
+        PCK_Fight,
+        PCK_Hand,
+        PCK_Rewards,
+        PCK_Trash
+    };
+
 	Player(QString name, QList<AbstractCard*> listCards, QObject *parent = NULL);
 	~Player();
 
@@ -52,9 +62,9 @@ public:
 
     bool moveCardFromDeckToHand(AbstractCard* cardDeckToMove = nullptr);
     bool moveCardFromDeckToReward(AbstractCard* cardDeckToMove = nullptr);
-    Q_INVOKABLE bool moveCardFromHandToBench(int indexHand, int indexBench);
+    bool moveCardFromHandToBench(int indexHand, int indexBench);
     bool moveCardFromHandToDeck(AbstractCard* cardHandToMove);
-    Q_INVOKABLE bool moveCardFromHandToFight(int indexHand);
+    bool moveCardFromHandToFight(int indexHand);
     bool moveCardFromHandToTrash(AbstractCard *cardHandToMove);
     bool moveCardFromBenchToFight(CardPokemon *pokemonToMove);
     bool moveCardFromBenchToTrash(int index);

@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "player.h"
+
 class GameManager;
 class Log;
 class StdListenerWritter;
@@ -27,6 +29,7 @@ private:
     Log m_log;
 
     QJsonObject selectCardPerPlayer(const QString& namePlayer, QJsonArray tabCards);
+    QJsonObject moveACard(const QString& namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination);
 };
 
 #endif // CONTROLLER_H
