@@ -1,7 +1,6 @@
 #include "player.h"
 
 #include <QDebug>
-#include <QQmlEngine>
 #include "src_Cards/abstractcard.h"
 #include "src_Cards/cardaction.h"
 #include "src_Cards/cardenergy.h"
@@ -43,10 +42,6 @@ Player::~Player()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void Player::declareQML()
-{
-    qmlRegisterUncreatableType<Player>("model", 1, 0, "Player", "Player error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
@@ -58,37 +53,31 @@ const QString Player::name()
 
 BenchArea* Player::bench()
 {
-    QQmlEngine::setObjectOwnership(m_bench, QQmlEngine::CppOwnership);
     return m_bench;
 }
 
 PacketDeck* Player::deck()
 {
-    QQmlEngine::setObjectOwnership(m_deck, QQmlEngine::CppOwnership);
-	return m_deck;
+    return m_deck;
 }
 
 FightArea* Player::fight()
 {
-    QQmlEngine::setObjectOwnership(m_fight, QQmlEngine::CppOwnership);
     return m_fight;
 }
 
 PacketHand* Player::hand()
 {
-    QQmlEngine::setObjectOwnership(m_hand, QQmlEngine::CppOwnership);
-	return m_hand;
+    return m_hand;
 }
 
 PacketRewards* Player::rewards()
 {
-    QQmlEngine::setObjectOwnership(m_rewards, QQmlEngine::CppOwnership);
     return m_rewards;
 }
 
 PacketTrash* Player::trash()
 {
-    QQmlEngine::setObjectOwnership(m_trash, QQmlEngine::CppOwnership);
     return m_trash;
 }
 
@@ -162,13 +151,18 @@ void Player::setInitReady(bool ready)
     }
 }
 
-void Player::checkIfInitReady()
+bool Player::setInitReadyIfReady()
 {
+    bool success = false;
+
     if(fight()->countCard() > 0)
     {
         setInitReady(true);
         setCanPlay(false);
+        success = true;
     }
+
+    return success;
 }
 
 bool Player::canPlay()

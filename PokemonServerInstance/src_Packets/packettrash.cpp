@@ -14,10 +14,6 @@ PacketTrash::~PacketTrash()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void PacketTrash::declareQML()
-{
-    qmlRegisterUncreatableType<PacketTrash>("model", 1, 0, "PacketTrash", "PacketTrash error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

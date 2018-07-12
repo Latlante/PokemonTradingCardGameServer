@@ -22,11 +22,6 @@ AbstractPacket::~AbstractPacket()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-void AbstractPacket::declareQML()
-{
-    qmlRegisterUncreatableType<AbstractPacket>("model", 1, 0, "AbstractPacket", "AbstractPacket cannot be created.");
-}
-
 QString AbstractPacket::name()
 {
     return m_name;

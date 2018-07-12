@@ -1,11 +1,16 @@
 #include "log.h"
 
 #include <QDateTime>
+#include <QFile>
 
-Log::Log(QString name, QObject *parent) :
-    QObject(parent),
-    m_file(QFile("Logs/log_" + name + ".txt"))
+Log::Log(QString name) :
+    m_file(new QFile("Logs/log_" + name + ".txt"))
 {
+}
+
+Log::~Log()
+{
+    delete m_file;
 }
 
 /************************************************************
@@ -13,9 +18,10 @@ Log::Log(QString name, QObject *parent) :
 ************************************************************/
 void Log::write(QString message)
 {
-    if(m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+    if(m_file->open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
     {
-        m_file.write(QDateTime::currentDateTime().toString("dd/MM - HH:mm:ss.zzz") + ": " + message);
-        m_file.close();
+        QString textToWrite = QDateTime::currentDateTime().toString("dd/MM - HH:mm:ss.zzz") + ": " + message;
+        m_file->write(textToWrite.toLatin1());
+        m_file->close();
     }
 }

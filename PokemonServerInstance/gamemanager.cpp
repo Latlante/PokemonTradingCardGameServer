@@ -74,7 +74,7 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
     Player* play = playerByName(namePlayer);
 
     if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Fight))
-        success = play->moveCardFromBenchToFight(play->bench()->card(indexCardOrigin));
+        success = play->moveCardFromBenchToFight(play->bench()->cardPok(indexCardOrigin));
     else if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Trash))
         success = play->moveCardFromBenchToTrash(indexCardOrigin);
     else if((packetOrigin == Player::PCK_Deck) && (packetDestination == Player::PCK_Hand))
@@ -94,9 +94,9 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
     else if((packetOrigin == Player::PCK_Rewards) && (packetDestination == Player::PCK_Hand))
         success = play->moveCardFromRewardToHand(play->rewards()->card(indexCardOrigin));
     else if((packetOrigin == Player::PCK_Trash) && (packetDestination == Player::PCK_Hand))
-        success = play->moveCardFromHandToFight(play->trash()->card(indexCardOrigin));
+        success = play->moveCardFromHandToFight(indexCardOrigin);
     else
-        emit debug(__PRETTY_FUNCTION__ + "move not developp yet");
+        emit debug(QString(__PRETTY_FUNCTION__) + "move not developp yet");
 
     return success;
 }
@@ -142,7 +142,7 @@ Player* GameManager::playerByName(const QString &name)
     Player* playToReturn = nullptr;
     int index = 0;
 
-    while((play == nullptr) && (index < m_listPlayers.count()))
+    while((playToReturn == nullptr) && (index < m_listPlayers.count()))
     {
         Player* play = m_listPlayers[index];
         if((play != nullptr) && (play->name() == name))
@@ -255,11 +255,16 @@ void GameManager::selectFirstPlayer()
 #endif
 }
 
-void GameManager::setInitReady()
+void GameManager::setInitReady(Player *playerReady)
 {
 #ifdef TRACAGE_PRECIS
     qDebug() << __PRETTY_FUNCTION__;
 #endif
+    if(playerReady != nullptr)
+    {
+        playerReady->setInitReadyIfReady();
+    }
+
     bool everyoneIsReady = true;
 
     foreach(Player* playerReady, m_listPlayers)

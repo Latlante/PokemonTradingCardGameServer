@@ -35,16 +35,14 @@ public:
 
 	Player(QString name, QList<AbstractCard*> listCards, QObject *parent = NULL);
 	~Player();
-
-    static void declareQML();
 	
-    Q_INVOKABLE const QString name();
-    Q_INVOKABLE BenchArea* bench();
-    Q_INVOKABLE PacketDeck* deck();
-    Q_INVOKABLE FightArea* fight();
-    Q_INVOKABLE PacketHand* hand();
-    Q_INVOKABLE PacketRewards* rewards();
-    Q_INVOKABLE PacketTrash* trash();
+    const QString name();
+    BenchArea* bench();
+    PacketDeck* deck();
+    FightArea* fight();
+    PacketHand* hand();
+    PacketRewards* rewards();
+    PacketTrash* trash();
 	
 	void newTurn();
     void turnFinished();
@@ -55,7 +53,7 @@ public:
 
     bool initReady();
     void setInitReady(bool ready);
-    Q_INVOKABLE void checkIfInitReady();
+    bool setInitReadyIfReady();
 
     bool canPlay();
     void setCanPlay(bool status);

@@ -12,14 +12,12 @@ public:
     CardAction(unsigned short id, const QString& name, const QString& description, AbstractAction* action);
     CardAction(const CardAction& card);
     ~CardAction();
-
-    static void declareQML();
 	
-    Q_INVOKABLE AbstractCard::Enum_typeOfCard type() override;
-    Q_INVOKABLE QUrl image() override;
+    AbstractCard::Enum_typeOfCard type() override;
+    QUrl image() override;
     AbstractCard* clone() override;
 
-    Q_INVOKABLE const QString description();
+    const QString description();
     AbstractAction* action();
 	
     void executeAction(CardPokemon* pokemonAttached);

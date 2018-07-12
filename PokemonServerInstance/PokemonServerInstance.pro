@@ -14,6 +14,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+Debug:OBJECTS_DIR = debug/obj/
+Debug:MOC_DIR = debug/moc/
+
+Release:OBJECTS_DIR = release/obj/
+Release:MOC_DIR = release/moc/
+
 SOURCES += \
         main.cpp \
     common/constantesqml.cpp \
@@ -69,12 +75,7 @@ SOURCES += \
     src_Cards/cardaction.cpp \
     src_Cards/cardenergy.cpp \
     src_Cards/cardpokemon.cpp \
-    src_Models/factorymainpageloader.cpp \
-    src_Models/listplayers.cpp \
     src_Models/modellistenergies.cpp \
-    src_Models/modelpopupselectcardinpacket.cpp \
-    src_Models/modelpopupselectenergyinpokemon.cpp \
-    src_Models/modelselectingcards.cpp \
     src_Packets/abstractpacket.cpp \
     src_Packets/abstractpacketdynamic.cpp \
     src_Packets/abstractpacketstatic.cpp \
@@ -145,12 +146,7 @@ HEADERS += \
     src_Cards/cardaction.h \
     src_Cards/cardenergy.h \
     src_Cards/cardpokemon.h \
-    src_Models/factorymainpageloader.h \
-    src_Models/listplayers.h \
     src_Models/modellistenergies.h \
-    src_Models/modelpopupselectcardinpacket.h \
-    src_Models/modelpopupselectenergyinpokemon.h \
-    src_Models/modelselectingcards.h \
     src_Packets/abstractpacket.h \
     src_Packets/abstractpacketdynamic.h \
     src_Packets/abstractpacketstatic.h \

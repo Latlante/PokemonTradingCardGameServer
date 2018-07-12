@@ -18,10 +18,6 @@ PacketHand::~PacketHand()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void PacketHand::declareQML()
-{
-    qmlRegisterUncreatableType<PacketHand>("model", 1, 0, "PacketHand", "PacketHand error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

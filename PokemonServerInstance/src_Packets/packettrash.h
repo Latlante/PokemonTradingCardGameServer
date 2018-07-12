@@ -10,8 +10,6 @@ class PacketTrash : public AbstractPacketDynamic
 public:
     PacketTrash(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~PacketTrash();
-
-    static void declareQML();
 	
     int maxCards() const override;
 

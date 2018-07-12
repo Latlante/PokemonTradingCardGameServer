@@ -1,5 +1,4 @@
 #include "modellistenergies.h"
-#include <QtQml/qqml.h>
 
 ModelListEnergies::ModelListEnergies(QObject *parent) :
     QAbstractListModel(parent),
@@ -17,10 +16,6 @@ ModelListEnergies::~ModelListEnergies()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void ModelListEnergies::declareQML()
-{
-    qmlRegisterUncreatableType<ModelListEnergies>("model", 1, 0, "ModelListEnergies", "ModelListEnergies error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

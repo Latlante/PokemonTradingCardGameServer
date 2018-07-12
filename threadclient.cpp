@@ -11,6 +11,7 @@
 
 #include "authentification.h"
 #include "instancemanager.h"
+#include "Share/constantesshared.h"
 
 ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
     QThread(parent),
@@ -39,6 +40,7 @@ void ThreadClient::run()
 
     connect(m_tcpSocket, &QTcpSocket::readyRead, this, &ThreadClient::onReadyRead_TcpSocket, Qt::DirectConnection);
     connect(m_tcpSocket, &QTcpSocket::disconnected, this, &ThreadClient::onDisconnected_TcpSocket, Qt::DirectConnection);
+    connect(InstanceManager::instance(), &InstanceManager::readyRead, this, &ThreadClient::onReadyRead_InstanceManager);
 
     exec();
 }
@@ -52,12 +54,12 @@ void ThreadClient::onReadyRead_TcpSocket()
 
     qDebug() << __PRETTY_FUNCTION__ << m_socketDescriptor << ", " << message;
 
+    bool hasToRepond = true;
+    QJsonObject jsonResponse;
     QJsonDocument jsonReceived = QJsonDocument::fromJson(message);
 
     if(!jsonReceived.isEmpty())
     {
-        QJsonObject jsonResponse;
-
         //if no authentify yet
         if(m_uid == -1)
         {
@@ -77,12 +79,12 @@ void ThreadClient::onReadyRead_TcpSocket()
 
                 switch(phase)
                 {
-                case 2:         //list of game for the player
+                case ConstantesShared::PHASE_ListOfGameForThePlayer:
                 {
                     jsonResponse["games"] = jsonArrayOfGamesForUidPlayer(m_uid);
                 }
                     break;
-                case 10:        //list of all players
+                case ConstantesShared::PHASE_ListOfAllPlayers:
                 {
                     QList<QString> listOfPlayers = Authentification::listOfAllUsers();
                     jsonResponse["players"] = QJsonArray::fromStringList(listOfPlayers);
@@ -90,31 +92,61 @@ void ThreadClient::onReadyRead_TcpSocket()
                 }
                     break;
 
-                case 11:        //create a new game
+                case ConstantesShared::PHASE_CreateANewGame:
                 {
                     int uidOtherPlayer = jsonReceived["uidOtherPlayer"].toInt();
                     QString nameOfTheGame = jsonReceived["name"].toString();
-                    InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame);
+                    unsigned int indexNewGame = InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame);
+
+                    jsonResponse["idGame"] = static_cast<int>(indexNewGame);
                 }
                     break;
 
-                case 12:        //remove a game
+                case ConstantesShared::PHASE_RemoveAGame:
                 {
                     int uidGame = jsonReceived["uidGame"].toInt();
-                    InstanceManager::instance()->removeGame(uidGame);
+                    bool success = InstanceManager::instance()->removeGame(uidGame);
+
+                    jsonResponse["result"] = success;
                 }
                     break;
 
+                //INSTANCES
+                case ConstantesShared::PHASE_SelectCards:
+                case ConstantesShared::PHASE_InitReady:
+                case ConstantesShared::PHASE_MoveACard:
+                {
+                    hasToRepond = false;
+
+                    //get information
+                    unsigned int uidGame = jsonReceived["uidGame"].toInt();
+
+                    //add name player in json
+                    QJsonObject objectReceived = jsonReceived.object();
+                    objectReceived["namePlayer"] = m_user;
+
+                    //remove data useless
+                    objectReceived.remove("token");
+                    objectReceived.remove("uidGame");
+
+                    //transfer to the game
+                    InstanceManager::instance()->write(uidGame, QJsonDocument(objectReceived).toJson());
+                }
+
                 default:
-                    m_tcpSocket->write("error: phase does not exist");
-                    qCritical() << "error: phase does not exist";
+                    const QString error = "error: phase does not exist";
+                    jsonResponse["result"] = "ko";
+                    jsonResponse["error"] = error;
+                    qCritical() << error;
                 }
             }
             //wrong token
             else
             {
-                m_tcpSocket->write("wrong token");
-                qCritical() << "wrong token";
+                const QString error = "wrong token";
+                jsonResponse["result"] = "ko";
+                jsonResponse["error"] = error;
+                qCritical() << error;
             }
 
         }
@@ -122,32 +154,16 @@ void ThreadClient::onReadyRead_TcpSocket()
     }
     else
     {
-        m_tcpSocket->write("error during the creation of the json document");
-        qCritical() << "error during the creation of the json document";
+        const QString error = "error during the creation of the json document";
+        jsonResponse["result"] = "ko";
+        jsonResponse["error"] = error;
+        qCritical() << error;
     }
 
-    /*QProcess *process = InstanceManager::instance()->process(0);
-
-    if(process != nullptr)
+    if(hasToRepond == true)
     {
-        QEventLoop loop;
-        connect(process, &QProcess::readyRead, &loop, &QEventLoop::quit);
-        //connect(process, &QProcess::readyRead, this, &ThreadClient::onReadyRead_Process);
-        process->write(message + "\n");
-
-        qDebug() << "Debut de l'attente";
-        loop.exec();
-        qDebug() << "Fin de l'attente";
-
-        QByteArray messageReceived = process->readLine();
-        qDebug() << "Message received from instance:" << messageReceived;
-        m_tcpSocket->write(messageReceived);
+        m_tcpSocket->write(QJsonDocument(jsonResponse).toJson());
     }
-    else
-    {
-        qCritical() << "Process is nullptr";
-    }*/
-
 }
 
 void ThreadClient::onDisconnected_TcpSocket()
@@ -156,9 +172,11 @@ void ThreadClient::onDisconnected_TcpSocket()
     exit(0);
 }
 
-void ThreadClient::onReadyRead_Process()
+void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message)
 {
-    qDebug() << __PRETTY_FUNCTION__ << "Message recu du process";
+    qDebug() << __PRETTY_FUNCTION__ << "Message recu du process," << uidGame << message;
+
+    m_tcpSocket->write(message);
 }
 
 /************************************************************
@@ -193,12 +211,12 @@ QJsonObject ThreadClient::authentify(QString user, QString password)
 QJsonArray ThreadClient::jsonArrayOfGamesForUidPlayer(int uidPlayer)
 {
     QJsonArray jsonListIdGames;
-    QList<int> listUidGames = InstanceManager::instance()->listUidGamesFromUidPlayer(uidPlayer);
-    foreach(int uidGame, listUidGames)
+    QList<unsigned int> listUidGames = InstanceManager::instance()->listUidGamesFromUidPlayer(uidPlayer);
+    foreach(unsigned int uidGame, listUidGames)
     {
         QJsonObject jsonGame;
 
-        jsonGame["uid"] = uidGame;
+        jsonGame["uid"] = static_cast<int>(uidGame);
         jsonGame["name"] = InstanceManager::instance()->nameOfTheGameFromUidGame(uidGame);
 
         jsonListIdGames.append(jsonGame);

@@ -12,8 +12,6 @@ class PacketDeck : public AbstractPacketDynamic
 public:
     PacketDeck(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~PacketDeck();
-
-    static void declareQML();
 	
     int maxCards() const override;
 	void mixCards();

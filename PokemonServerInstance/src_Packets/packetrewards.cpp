@@ -14,10 +14,6 @@ PacketRewards::~PacketRewards()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void PacketRewards::declareQML()
-{
-    qmlRegisterUncreatableType<PacketRewards>("model", 1, 0, "PacketRewards", "PacketRewards error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

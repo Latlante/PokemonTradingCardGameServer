@@ -3,20 +3,20 @@
 
 #include <QObject>
 
-#include <QFile>
+class QFile;
 
-class Log : public QObject
+class Log
 {
-    Q_OBJECT
 public:
-    explicit Log(QString name, QObject *parent = nullptr);
+    explicit Log(QString name);
+    ~Log();
 
     void write(QString message);
 
 signals:
 
 private:
-    QFile m_file;
+    QFile* m_file;
 };
 
 #endif // LOG_H

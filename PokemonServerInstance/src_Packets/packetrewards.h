@@ -10,8 +10,6 @@ class PacketRewards : public AbstractPacketDynamic
 public:
     PacketRewards(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~PacketRewards();
-
-    static void declareQML();
 	
     int maxCards() const override;
 

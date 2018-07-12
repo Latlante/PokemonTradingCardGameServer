@@ -18,10 +18,6 @@ PacketDeck::~PacketDeck()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void PacketDeck::declareQML()
-{
-    qmlRegisterUncreatableType<PacketDeck>("model", 1, 0, "PacketDeck", "PacketDeck error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

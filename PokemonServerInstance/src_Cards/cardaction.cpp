@@ -1,7 +1,5 @@
 #include "cardaction.h"
 #include <QUrl>
-#include <QtQml/qqml.h>
-
 #include "src_Actions/abstractaction.h"
 #include "src_Cards/cardpokemon.h"
 
@@ -27,10 +25,6 @@ CardAction::~CardAction()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void CardAction::declareQML()
-{
-    qmlRegisterUncreatableType<CardAction>("model", 1, 0, "CardAction", "CardAction error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

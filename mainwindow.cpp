@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     InstanceManager::deleteInstance();
+    m_serverClient->close();
     delete m_serverClient;
     delete ui;
 }

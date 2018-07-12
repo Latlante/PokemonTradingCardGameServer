@@ -32,11 +32,6 @@ struct AttackData
 class CardPokemon : public AbstractCard
 {
 	Q_OBJECT
-    Q_PROPERTY(QString name READ name NOTIFY hasEvolved)
-    Q_PROPERTY(QUrl image READ image NOTIFY hasEvolved)
-    Q_PROPERTY(unsigned short lifeTotal READ lifeTotal NOTIFY hasEvolved)
-    Q_PROPERTY(unsigned short lifeLeft READ lifeLeft NOTIFY lifeLeftChanged)
-    Q_PROPERTY(Enum_statusOfPokemon status READ status NOTIFY statusChanged)
 	
 public:
     enum Enum_statusOfPokemon
@@ -48,7 +43,6 @@ public:
         Status_Poisoned,
         Status_Slept
     };
-    Q_ENUMS(Enum_statusOfPokemon)
 
     enum Enum_StatusOfAttack
     {
@@ -85,11 +79,11 @@ public:
 
     int id() override;
     const QString name() override;
-    Q_INVOKABLE AbstractCard::Enum_typeOfCard type() override;
-    Q_INVOKABLE QUrl image() override;
+    AbstractCard::Enum_typeOfCard type() override;
+    QUrl image() override;
     AbstractCard* clone() override;
-    Q_INVOKABLE AbstractCard::Enum_element element();
-    Q_INVOKABLE QString elementFormatString();
+    AbstractCard::Enum_element element();
+    QString elementFormatString();
     unsigned short lifeTotal();
     bool isDied();
     unsigned short lifeLeft();
@@ -116,11 +110,11 @@ public:
     void setResistanceCoef(CardPokemon::Enum_CoefWeaknessResistance coef);
 
 
-    Q_INVOKABLE QList<AttackData> listAttacks();
-    Q_INVOKABLE int attacksCount();
-    Q_INVOKABLE QString attackName(int index);
-    Q_INVOKABLE QString attackDescription(int index);
-    Q_INVOKABLE unsigned short attackDamage(int index);
+    QList<AttackData> listAttacks();
+    int attacksCount();
+    QString attackName(int index);
+    QString attackDescription(int index);
+    unsigned short attackDamage(int index);
     bool replaceOneAttack(int index, AttackData data);
     short numberOfTurnAttackStillBlocks(int indexAttack);
     void decrementNumberOfTurnAttackStillBlocks();
@@ -135,7 +129,7 @@ public:
     void moveAllEnergiesInTrash();
 	unsigned short countEnergies();
 	unsigned short countEnergies(Enum_element element);
-    Q_INVOKABLE ModelListEnergies* modelListOfEnergies();
+    ModelListEnergies* modelListOfEnergies();
 	
     Enum_StatusOfAttack tryToAttack(int indexAttack, CardPokemon *enemy);
 	void takeDamage(unsigned short damage);

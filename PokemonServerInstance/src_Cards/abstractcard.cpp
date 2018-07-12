@@ -1,6 +1,4 @@
 #include "abstractcard.h"
-#include <QPixmap>
-#include <QtQml/qqml.h>
 
 #include "player.h"
 
@@ -25,11 +23,6 @@ AbstractCard::~AbstractCard()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void AbstractCard::declareQML()
-{
-    qmlRegisterUncreatableType<AbstractCard>("model", 1, 0, "AbstractCard", "AbstractCard error");
-}
-
 QString AbstractCard::imageByDefault()
 {
     return "back.png";
@@ -62,15 +55,6 @@ void AbstractCard::setName(const QString& name)
 {
 	m_name = name;
 }
-
-/*QUrl AbstractCard::image()
-{
-    const QString path = "Images/cartes/" + QString::number(id()) + ".png";
-    qDebug() << __PRETTY_FUNCTION__ << "path image:" << path;
-
-    //return QPixmap(path);
-    return path;
-}*/
 
 QString AbstractCard::elementToString(Enum_element element)
 {

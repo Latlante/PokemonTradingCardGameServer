@@ -2,6 +2,7 @@
 #define STDLISTENERWRITTER_H
 
 #include <QObject>
+#include <QThread>
 
 class StdListenerWritter : public QObject
 {
@@ -15,7 +16,7 @@ public:
     void write(QByteArray message);
 
 signals:
-    void messageReceived(QByteArray);
+    void messageReceived(QString);
 
 private:
     QThread m_thread;

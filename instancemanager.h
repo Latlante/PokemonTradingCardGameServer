@@ -2,6 +2,7 @@
 #define INSTANCEMANAGER_H
 
 #include <QObject>
+#include <QMap>
 
 class QProcess;
 
@@ -23,21 +24,28 @@ public:
     static InstanceManager* instance();
     static void deleteInstance();
 
-    void createNewGame(int uidPlay1, int uidPlay2, QString name = "");
+    unsigned int createNewGame(int uidPlay1, int uidPlay2, QString name = "");
     QProcess* game(int index);
-    void removeGame(int index);
+    bool removeGame(int index);
+
+    bool write(unsigned int uidGame, QByteArray message);
 
     QString nameOfTheGameFromUidGame(int uidGame);
-    QList<int> listUidGamesFromUidPlayer(int uidPlayer);
+    unsigned int uidGameFromQProcess(QProcess* process);
+    QList<unsigned int> listUidGamesFromUidPlayer(int uidPlayer);
 
 signals:
+    void readyRead(unsigned int, QByteArray);
 
-public slots:
+private slots:
+    void onReadyRead_Process();
 
 private:
+    static const QString m_PATH_INSTANCE;
     static InstanceManager* m_instance;
+    static unsigned int m_indexGame;
 
-    QList<InstanceGame> m_listGame;
+    QMap<unsigned int, InstanceGame> m_listGame;
 };
 
 #endif // INSTANCEMANAGER_H

@@ -28,8 +28,6 @@ public:
     unsigned short countEnergies(AbstractCard::Enum_element element);
     bool hasEnoughEnergies(QMap<AbstractCard::Enum_element, unsigned short> cost);
 
-    static void declareQML();
-
     int countCard();
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual int rowCount(const QModelIndex & = QModelIndex()) const override;

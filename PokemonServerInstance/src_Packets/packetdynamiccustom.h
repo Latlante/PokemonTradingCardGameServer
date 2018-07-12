@@ -9,8 +9,6 @@ class PacketDynamicCustom : public AbstractPacketDynamic
 public:
     explicit PacketDynamicCustom(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
 
-    static void declareQML();
-
     void setMaxCards(int max);
     int maxCards() const override;
 

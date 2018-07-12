@@ -1,7 +1,6 @@
 #include "bencharea.h"
 
 #include <QDebug>
-#include <QPixmap>
 #include <QVariant>
 #include "src_Cards/abstractcard.h"
 #include "src_Cards/cardpokemon.h"
@@ -21,10 +20,6 @@ BenchArea::~BenchArea()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void BenchArea::declareQML()
-{
-    qmlRegisterUncreatableType<BenchArea>("model", 1, 0, "BenchArea", "BenchArea error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

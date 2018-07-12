@@ -2,15 +2,13 @@
 #define ABSTRACTPACKET_H
 
 #include <QAbstractListModel>
-#include <QtQml/qqml.h>
-#include "utils.h"
+#include "common/utils.h"
 
 class AbstractCard;
 
 class AbstractPacket : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int countCard READ countCard NOTIFY countChanged)
 
 public:
 	enum Enum_roleCard
@@ -23,8 +21,6 @@ public:
 
     AbstractPacket(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~AbstractPacket();
-	
-    static void declareQML();
 
     QString name();
 	

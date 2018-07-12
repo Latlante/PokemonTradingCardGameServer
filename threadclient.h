@@ -20,7 +20,7 @@ private slots:
     void onReadyRead_TcpSocket();
     void onDisconnected_TcpSocket();
 
-    void onReadyRead_Process();
+    void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
 
 private:
     int m_socketDescriptor;

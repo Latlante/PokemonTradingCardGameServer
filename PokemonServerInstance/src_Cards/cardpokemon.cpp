@@ -1,10 +1,8 @@
 #include "cardpokemon.h"
 
 #include <QDebug>
-#include <QQmlEngine>
-#include <QtQml/qqml.h>
 #include <QUrl>
-#include "utils.h"
+#include "common/utils.h"
 #include "src_Actions/abstractaction.h"
 #include "src_Actions/actioncreationfactory.h"
 #include "src_Cards/cardenergy.h"
@@ -65,10 +63,6 @@ CardPokemon::~CardPokemon()
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void CardPokemon::declareQML()
-{
-    qmlRegisterUncreatableType<CardPokemon>("model", 1, 0, "CardPokemon", "CardPokemon error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
@@ -626,7 +620,6 @@ ModelListEnergies* CardPokemon::modelListOfEnergies()
     qDebug() << __PRETTY_FUNCTION__;
 #endif
 
-    QQmlEngine::setObjectOwnership(m_modelListEnergies, QQmlEngine::CppOwnership);
     return m_modelListEnergies;
 }
 

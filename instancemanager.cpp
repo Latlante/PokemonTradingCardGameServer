@@ -3,7 +3,9 @@
 #include <QDebug>
 #include <QProcess>
 
+const QString InstanceManager::m_PATH_INSTANCE = "D:/Users/sapiensc/Documents/GitHub/PokemonTradingCardGameServer/build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit-Release/release/PokemonServerInstance.exe";
 InstanceManager* InstanceManager::m_instance = new InstanceManager();
+unsigned int InstanceManager::m_indexGame = 1;
 
 InstanceManager::InstanceManager(QObject *parent) :
     QObject(parent)
@@ -35,14 +37,15 @@ void InstanceManager::deleteInstance()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-void InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString name)
+unsigned int InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString name)
 {
     qDebug() << "Creation new process";
 
     //Check the name does not already exist
-
+    unsigned int indexNewGame = 0;
     QProcess* process = new QProcess(this);
-    process->start("D:/Users/sapiensc/Documents/build-InstanceTest-Desktop_Qt_5_11_0_MinGW_32bit-Release/release/InstanceTest.exe");
+    connect(process, &QProcess::readyRead, this, &InstanceManager::onReadyRead_Process);
+    process->start(m_PATH_INSTANCE, {name, "Player1", "Player2"});
 
     if(process->waitForStarted())
     {
@@ -51,63 +54,118 @@ void InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString name)
             nameOfTheGame = "game #" + QString::number(m_listGame.count());
 
         InstanceGame game = { process, nameOfTheGame, uidPlay1, uidPlay2 };
-        m_listGame.append(game);
+        m_listGame.insert(m_indexGame, game);
+        indexNewGame = m_indexGame;
+        m_indexGame++;
     }
     else
     {
         qCritical() << "Error creation new process";
     }
+
+    return indexNewGame;
 }
 
 QProcess* InstanceManager::game(int index)
 {
     QProcess* processToReturn = nullptr;
 
-    if((index >= 0) && (index < m_listGame.size()))
+    if((index >= 0) && (m_listGame.contains(index)))
     {
-        processToReturn = m_listGame.at(index).process;
+        processToReturn = m_listGame[index].process;
     }
 
     return processToReturn;
 }
 
-void InstanceManager::removeGame(int index)
+bool InstanceManager::removeGame(int index)
 {
-    if((index >= 0) && (index < m_listGame.size()))
+    bool success = false;
+    if(m_listGame.contains(index) == true)
     {
-        InstanceGame game = m_listGame.takeAt(index);
+        InstanceGame game = m_listGame.take(index);
         QProcess* process = game.process;
 
         if(process != nullptr)
         {
             process->close();
             process->deleteLater();
+            success = true;
         }
     }
+
+    return success;
+}
+
+bool InstanceManager::write(unsigned int uidGame, QByteArray message)
+{
+    qint64 byteWritten = 0;
+
+    if((m_listGame.contains(uidGame)) && (!message.isEmpty()))
+    {
+        QProcess* process = m_listGame[uidGame].process;
+        byteWritten = process->write(message + "\n");
+    }
+
+    return message.length() == byteWritten;
 }
 
 QString InstanceManager::nameOfTheGameFromUidGame(int uidGame)
 {
     QString name = "";
 
-    if((uidGame >= 0) && (uidGame < m_listGame.count()))
+    if((uidGame >= 0) && (m_listGame.contains(uidGame)))
         name = m_listGame[uidGame].name;
 
     return name;
 }
 
-QList<int> InstanceManager::listUidGamesFromUidPlayer(int uidPlayer)
+unsigned int InstanceManager::uidGameFromQProcess(QProcess *process)
 {
-    QList<int> listUidGames;
+    unsigned int uidGame = 0;
 
-    for(int i=0;i<m_listGame.count();++i)
+    for(QMap<unsigned int, InstanceGame>::iterator it=m_listGame.begin();
+        it != m_listGame.end();
+        ++it)
     {
-        if((m_listGame[i].m_uidPlayer1 == uidPlayer) ||
-                (m_listGame[i].m_uidPlayer2 == uidPlayer))
+        InstanceGame instance = it.value();
+        if(instance.process == process)
         {
-            listUidGames.append(i);
+            uidGame = it.key();
+            break;
+        }
+    }
+
+    return uidGame;
+}
+
+QList<unsigned int> InstanceManager::listUidGamesFromUidPlayer(int uidPlayer)
+{
+    QList<unsigned int> listUidGames;
+
+    for(QMap<unsigned int, InstanceGame>::iterator it=m_listGame.begin();
+        it != m_listGame.end();
+        ++it)
+    {
+        InstanceGame instance = it.value();
+        if((instance.m_uidPlayer1 == uidPlayer) ||
+                (instance.m_uidPlayer2 == uidPlayer))
+        {
+            listUidGames.append(it.key());
         }
     }
 
     return listUidGames;
+}
+
+/************************************************************
+*****			  FONCTIONS SLOT PRIVEES				*****
+************************************************************/
+void InstanceManager::onReadyRead_Process()
+{
+    QProcess* process = qobject_cast<QProcess*>(sender());
+    unsigned int uidGame = uidGameFromQProcess(process);
+    QByteArray message = process->readLine();
+
+    emit readyRead(uidGame, message);
 }

@@ -11,10 +11,6 @@ PacketDynamicCustom::PacketDynamicCustom(const QString &namePacket, QList<Abstra
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-void PacketDynamicCustom::declareQML()
-{
-    qmlRegisterUncreatableType<PacketDynamicCustom>("model", 1, 0, "PacketDynamicCustom", "PacketDynamicCustom error");
-}
 
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****

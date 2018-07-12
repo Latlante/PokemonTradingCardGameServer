@@ -23,6 +23,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+Debug:OBJECTS_DIR = debug/obj/
+Debug:MOC_DIR = debug/moc/
+
+Release:OBJECTS_DIR = release/obj/
+Release:MOC_DIR = release/moc/
 
 SOURCES += \
         main.cpp \
@@ -30,14 +35,16 @@ SOURCES += \
     tcpserverclients.cpp \
     threadclient.cpp \
     instancemanager.cpp \
-    authentification.cpp
+    authentification.cpp \
+    Share/constantesshared.cpp
 
 HEADERS += \
         mainwindow.h \
     tcpserverclients.h \
     threadclient.h \
     instancemanager.h \
-    authentification.h
+    authentification.h \
+    Share/constantesshared.h
 
 FORMS += \
         mainwindow.ui

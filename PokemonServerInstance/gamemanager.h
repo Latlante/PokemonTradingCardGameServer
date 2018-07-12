@@ -38,7 +38,7 @@ public:
     void setNumberMaxOfPlayers(unsigned short max);
     Player* addNewPlayer(QString name, QList<AbstractCard*> listCards);
     void selectFirstPlayer();
-    void setInitReady();
+    void setInitReady(Player* playerReady);
 
     //Phase de combat
     void startGame();

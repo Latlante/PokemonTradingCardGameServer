@@ -10,8 +10,6 @@ class PacketHand : public AbstractPacketDynamic
 public:
     PacketHand(const QString& namePacket, QList<AbstractCard *> listCards = QList<AbstractCard*>());
     virtual ~PacketHand();
-
-    static void declareQML();
 	
     int maxCards() const override;
 

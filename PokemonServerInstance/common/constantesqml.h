@@ -3,8 +3,6 @@
 
 #include <QObject>
 
-
-
 class ConstantesQML : public QObject
 {
     Q_OBJECT
@@ -15,11 +13,8 @@ public:
         StepGameInProgress,
         StepFinished
     };
-    Q_ENUMS(StepGame)
 
     explicit ConstantesQML(QObject *parent = nullptr);
-
-    static void declareQML();
 
 signals:
 

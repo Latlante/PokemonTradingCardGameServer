@@ -1,6 +1,5 @@
 #include "stdlistenerwritter.h"
 #include <QTextStream>
-#include <QThread>
 
 StdListenerWritter::StdListenerWritter(QObject *parent) :
     QObject(parent),
@@ -41,7 +40,7 @@ void StdListenerWritter::listening()
 
     while(m_stopThread == false)
     {
-        QByteArray message = sIn.readLine();
+        QString message = sIn.readLine();
 
         if(message.isEmpty() == false)
         {
