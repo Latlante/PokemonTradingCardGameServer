@@ -1,30 +1,38 @@
 #ifndef THREADCLIENT_H
 #define THREADCLIENT_H
 
-#include <QThread>
+//#include <QThread>
+#include <QObject>
 
 class QTcpSocket;
+class QTimer;
 
-class ThreadClient : public QThread
+class ThreadClient : public QObject
 {
     Q_OBJECT
 public:
     explicit ThreadClient(int socketDescriptor, QObject *parent = nullptr);
+    ~ThreadClient();
 
-signals:
+public slots:
+    void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
 
-protected:
-    void run() override;
+public slots:
+    void run();
 
 private slots:
     void onReadyRead_TcpSocket();
     void onDisconnected_TcpSocket();
 
-    void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
+
+    void onTimeOut_timerWritting();
 
 private:
     int m_socketDescriptor;
     QTcpSocket* m_tcpSocket;
+
+    QTimer *m_timerWritting;
+    QList<QByteArray> m_listMessageToSend;
 
     QString m_user;
     int m_uid;

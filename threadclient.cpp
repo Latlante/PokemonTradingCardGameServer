@@ -1,5 +1,6 @@
 #include "threadclient.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QEventLoop>
 #include <QJsonArray>
@@ -7,6 +8,7 @@
 #include <QJsonObject>
 #include <QProcess>
 #include <QTcpSocket>
+#include <QTimer>
 #include <QVariant>
 
 #include "authentification.h"
@@ -14,14 +16,25 @@
 #include "Share/constantesshared.h"
 
 ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
-    QThread(parent),
+    QObject(parent),
     m_socketDescriptor(socketDescriptor),
     m_tcpSocket(nullptr),
+    m_timerWritting(nullptr),
+    m_listMessageToSend({}),
     m_user(""),
     m_uid(-1),
     m_token("")
 {
 
+}
+
+ThreadClient::~ThreadClient()
+{
+    if(m_timerWritting != nullptr)
+    {
+        delete m_timerWritting;
+        m_timerWritting = nullptr;
+    }
 }
 
 /************************************************************
@@ -30,6 +43,9 @@ ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
 void ThreadClient::run()
 {
     qDebug() << "Starting thread: " << m_socketDescriptor;
+
+    moveToThread(QApplication::instance()->thread());
+
     m_tcpSocket = new QTcpSocket();
 
     if(!m_tcpSocket->setSocketDescriptor(m_socketDescriptor))
@@ -38,11 +54,15 @@ void ThreadClient::run()
         return;
     }
 
+    /*m_timerWritting = new QTimer();
+    connect(m_timerWritting, &QTimer::timeout, this, &ThreadClient::onTimeOut_timerWritting, Qt::DirectConnection);
+    m_timerWritting->start(500);*/
+
     connect(m_tcpSocket, &QTcpSocket::readyRead, this, &ThreadClient::onReadyRead_TcpSocket, Qt::DirectConnection);
     connect(m_tcpSocket, &QTcpSocket::disconnected, this, &ThreadClient::onDisconnected_TcpSocket, Qt::DirectConnection);
-    connect(InstanceManager::instance(), &InstanceManager::readyRead, this, &ThreadClient::onReadyRead_InstanceManager);
+    connect(InstanceManager::instance(), &InstanceManager::readyRead, this, &ThreadClient::onReadyRead_InstanceManager, Qt::QueuedConnection);
 
-    exec();
+    //exec();
 }
 
 /************************************************************
@@ -179,11 +199,14 @@ void ThreadClient::onReadyRead_TcpSocket()
     if(hasToRepond == true)
     {
         m_tcpSocket->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+        //m_listMessageToSend.append(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
     }
 }
 
 void ThreadClient::onDisconnected_TcpSocket()
 {
+    qDebug() << __PRETTY_FUNCTION__;
+
     m_tcpSocket->deleteLater();
     exit(0);
 }
@@ -193,6 +216,17 @@ void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray 
     qDebug() << __PRETTY_FUNCTION__ << "Message recu du process," << uidGame << message;
 
     m_tcpSocket->write(message);
+    //m_listMessageToSend.append(message);
+
+}
+
+void ThreadClient::onTimeOut_timerWritting()
+{
+    if(m_listMessageToSend.count() > 0)
+    {
+        QByteArray message = m_listMessageToSend.takeFirst();
+        m_tcpSocket->write(message);
+    }
 }
 
 /************************************************************
