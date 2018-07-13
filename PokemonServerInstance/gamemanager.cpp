@@ -184,33 +184,52 @@ void GameManager::setGameStatus(ConstantesQML::StepGame step)
 }
 
 //PREPARATION DE LA PARTIE
-void GameManager::initGame()
+bool GameManager::initGame()
 {
 #ifdef TRACAGE_PRECIS
     qDebug() << __PRETTY_FUNCTION__;
 #endif
     //emit movingCardAnimationStartAsked();
+    bool allPlayersAreReady = true;
 
-    //Mise en place des récompenses
-    foreach(Player *play, m_listPlayers)
+    //Vérification que les joueurs sont bons
+    if(numberMaxOfPlayers() <= 0)
+        allPlayersAreReady = false;
+    else
     {
-        for(int i=0;i<m_NUMBER_REWARDS;++i)
+        foreach(Player *play, m_listPlayers)
         {
-            play->moveCardFromDeckToReward();
+            if((play->deck() == nullptr) || (play->deck()->countCard() != MAXCARDS_DECK))
+                allPlayersAreReady = false;
         }
     }
 
-    //Distribution de la première main
-    if(checkHandOfEachPlayer() == true)
+
+    if(allPlayersAreReady == true)
     {
-        //On choisit le joueur qui va jouer en premier
-        selectFirstPlayer();
+        //Mise en place des récompenses
+        foreach(Player *play, m_listPlayers)
+        {
+            for(int i=0;i<m_NUMBER_REWARDS;++i)
+            {
+                play->moveCardFromDeckToReward();
+            }
+        }
+
+        //Distribution de la première main
+        if(checkHandOfEachPlayer() == true)
+        {
+            //On choisit le joueur qui va jouer en premier
+            selectFirstPlayer();
+        }
+        else
+        {
+            //On arrête le jeu
+            setGameStatus(ConstantesQML::StepFinished);
+        }
     }
-    else
-    {
-        //On arrête le jeu
-        setGameStatus(ConstantesQML::StepFinished);
-    }
+
+    return allPlayersAreReady;
 }
 
 unsigned short GameManager::numberMaxOfPlayers()

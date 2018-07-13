@@ -33,7 +33,7 @@ public:
     void setGameStatus(ConstantesQML::StepGame step);
 
     //Preparation de la partie
-    void initGame();
+    bool initGame();
     unsigned short numberMaxOfPlayers();
     void setNumberMaxOfPlayers(unsigned short max);
     Player* addNewPlayer(QString name, QList<AbstractCard*> listCards);
