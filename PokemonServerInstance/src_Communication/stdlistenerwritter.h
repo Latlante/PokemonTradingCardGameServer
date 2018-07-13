@@ -17,6 +17,7 @@ public:
 
 signals:
     void messageReceived(QString);
+    void logReceived(QString);
 
 private:
     QThread m_thread;

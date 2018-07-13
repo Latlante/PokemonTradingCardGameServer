@@ -96,9 +96,17 @@ void ThreadClient::onReadyRead_TcpSocket()
                 {
                     int uidOtherPlayer = jsonReceived["uidOtherPlayer"].toInt();
                     QString nameOfTheGame = jsonReceived["name"].toString();
-                    unsigned int indexNewGame = InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame);
 
-                    jsonResponse["idGame"] = static_cast<int>(indexNewGame);
+                    if(InstanceManager::instance()->checkNameOfGameIsAvailable(nameOfTheGame))
+                    {
+                        unsigned int indexNewGame = InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame);
+                        jsonResponse["idGame"] = static_cast<int>(indexNewGame);
+                    }
+                    else
+                    {
+                        jsonResponse["idGame"] = 0;
+                        jsonResponse["error"] = "One game has already that name";
+                    }
                 }
                     break;
 
@@ -130,8 +138,16 @@ void ThreadClient::onReadyRead_TcpSocket()
                     objectReceived.remove("uidGame");
 
                     //transfer to the game
-                    InstanceManager::instance()->write(uidGame, QJsonDocument(objectReceived).toJson());
+                    if(InstanceManager::instance()->write(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact)))
+                    {
+                        qDebug() << __PRETTY_FUNCTION__ << "Write OK";
+                    }
+                    else
+                    {
+                        qDebug() << __PRETTY_FUNCTION__ << "Write error";
+                    }
                 }
+                    break;
 
                 default:
                     const QString error = "error: phase does not exist";
@@ -162,7 +178,7 @@ void ThreadClient::onReadyRead_TcpSocket()
 
     if(hasToRepond == true)
     {
-        m_tcpSocket->write(QJsonDocument(jsonResponse).toJson());
+        m_tcpSocket->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
     }
 }
 

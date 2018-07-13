@@ -78,7 +78,7 @@ signals:
     void headOrTailAsked();
     void selectionDisplayFinished();
 
-    void debug(QString);
+    void logReceived(QString);
     void movingCardAnimationStartAsked();
 
 private slots:

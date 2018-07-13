@@ -1,7 +1,6 @@
 #include "instancemanager.h"
 
 #include <QDebug>
-#include <QProcess>
 
 const QString InstanceManager::m_PATH_INSTANCE = "D:/Users/sapiensc/Documents/GitHub/PokemonTradingCardGameServer/build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit-Release/release/PokemonServerInstance.exe";
 InstanceManager* InstanceManager::m_instance = new InstanceManager();
@@ -10,14 +9,14 @@ unsigned int InstanceManager::m_indexGame = 1;
 InstanceManager::InstanceManager(QObject *parent) :
     QObject(parent)
 {
-
+    qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 }
 
 InstanceManager::~InstanceManager()
 {
     while(m_listGame.count() > 0)
     {
-        removeGame(0);
+        removeGame(m_listGame.keys().first());
     }
 }
 
@@ -41,10 +40,10 @@ unsigned int InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString 
 {
     qDebug() << "Creation new process";
 
-    //Check the name does not already exist
     unsigned int indexNewGame = 0;
-    QProcess* process = new QProcess(this);
+    QProcess* process = new QProcess();
     connect(process, &QProcess::readyRead, this, &InstanceManager::onReadyRead_Process);
+    connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &InstanceManager::onFinished_Process);
     process->start(m_PATH_INSTANCE, {name, "Player1", "Player2"});
 
     if(process->waitForStarted())
@@ -57,6 +56,8 @@ unsigned int InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString 
         m_listGame.insert(m_indexGame, game);
         indexNewGame = m_indexGame;
         m_indexGame++;
+
+        qDebug() << "New process started";
     }
     else
     {
@@ -88,7 +89,9 @@ bool InstanceManager::removeGame(int index)
 
         if(process != nullptr)
         {
-            process->close();
+            if(process->isOpen())
+                process->close();
+
             process->deleteLater();
             success = true;
         }
@@ -100,14 +103,44 @@ bool InstanceManager::removeGame(int index)
 bool InstanceManager::write(unsigned int uidGame, QByteArray message)
 {
     qint64 byteWritten = 0;
+    qDebug() << __PRETTY_FUNCTION__;
 
     if((m_listGame.contains(uidGame)) && (!message.isEmpty()))
     {
+        qDebug() << __PRETTY_FUNCTION__ << ", writting: " << message << " on " << uidGame;
+
         QProcess* process = m_listGame[uidGame].process;
         byteWritten = process->write(message + "\n");
     }
+    else
+    {
+        if(!m_listGame.contains(uidGame))
+            qDebug() << __PRETTY_FUNCTION__ << ", list does not contains " << uidGame;
+    }
 
-    return message.length() == byteWritten;
+    qDebug() << __PRETTY_FUNCTION__ << ", message size = " << message.length();
+    qDebug() << __PRETTY_FUNCTION__ << ", byteWritten=" << byteWritten;
+
+    return (message.length() + 1) == byteWritten;
+}
+
+bool InstanceManager::checkNameOfGameIsAvailable(const QString &nameGame)
+{
+    QList<unsigned int> listKeysGames = m_listGame.keys();
+    int index = 0;
+    bool nameFound = false;
+
+    while((index < listKeysGames.count()) && (nameFound == false))
+    {
+        InstanceGame inst = m_listGame[listKeysGames[index]];
+
+        if(nameGame == inst.name)
+            nameFound = true;
+
+        index++;
+    }
+
+    return !nameFound;
 }
 
 QString InstanceManager::nameOfTheGameFromUidGame(int uidGame)
@@ -168,4 +201,13 @@ void InstanceManager::onReadyRead_Process()
     QByteArray message = process->readLine();
 
     emit readyRead(uidGame, message);
+}
+
+void InstanceManager::onFinished_Process(int exitCode)
+{
+    QProcess* process = qobject_cast<QProcess*>(sender());
+    unsigned int uidGame = uidGameFromQProcess(process);
+    qDebug() << __PRETTY_FUNCTION__ << ", the instance " << uidGame << " is closed with code " << exitCode;
+
+    removeGame(uidGame);
 }

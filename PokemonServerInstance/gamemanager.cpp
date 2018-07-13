@@ -96,7 +96,7 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
     else if((packetOrigin == Player::PCK_Trash) && (packetDestination == Player::PCK_Hand))
         success = play->moveCardFromHandToFight(indexCardOrigin);
     else
-        emit debug(QString(__PRETTY_FUNCTION__) + "move not developp yet");
+        emit logReceived(QString(__PRETTY_FUNCTION__) + "move not developp yet");
 
     return success;
 }
@@ -230,13 +230,33 @@ Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
 #endif
     Player* newPlayer = nullptr;
 
-    if(m_listPlayers.count() < numberMaxOfPlayers())
+    //Check the player is not already in the list
+    bool playerFound = false;
+    int indexList = 0;
+
+    while((indexList < m_listPlayers.count()) && (playerFound == false))
+    {
+        if(m_listPlayers[indexList]->name() == name)
+            playerFound = true;
+
+        indexList++;
+    }
+
+    if((m_listPlayers.count() < numberMaxOfPlayers()) && (playerFound == false))
     {
         newPlayer = new Player(name, listCards);
 
         connect(newPlayer, &Player::endOfTurn, this, &GameManager::onEndOfTurn_Player);
 
         m_listPlayers.append(newPlayer);
+    }
+    else if(playerFound == true)
+    {
+        emit logReceived(name + ": packet already saved");
+    }
+    else
+    {
+        emit logReceived("Too many player in the game (" + QString::number(m_listPlayers.count()) + '/' + QString::number(numberMaxOfPlayers()) + ')');
     }
 
     return newPlayer;

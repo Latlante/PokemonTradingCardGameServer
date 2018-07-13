@@ -20,7 +20,7 @@ void Log::write(QString message)
 {
     if(m_file->open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
     {
-        QString textToWrite = QDateTime::currentDateTime().toString("dd/MM - HH:mm:ss.zzz") + ": " + message;
+        QString textToWrite = QDateTime::currentDateTime().toString("dd/MM - HH:mm:ss.zzz") + ": " + message + "\n";
         m_file->write(textToWrite.toLatin1());
         m_file->close();
     }

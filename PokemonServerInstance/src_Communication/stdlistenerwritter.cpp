@@ -6,8 +6,9 @@ StdListenerWritter::StdListenerWritter(QObject *parent) :
     m_stopThread(false)
 {
     moveToThread(&m_thread);
+    connect(&m_thread, &QThread::started, this, &StdListenerWritter::listening);
     connect(&m_thread, &QThread::finished, this, &QObject::deleteLater);
-    m_thread.start();
+
 }
 
 /************************************************************
@@ -15,7 +16,7 @@ StdListenerWritter::StdListenerWritter(QObject *parent) :
 ************************************************************/
 void StdListenerWritter::startListening()
 {
-
+    m_thread.start();
 }
 
 void StdListenerWritter::stopListening()
@@ -25,6 +26,8 @@ void StdListenerWritter::stopListening()
 
 void StdListenerWritter::write(QByteArray message)
 {
+    emit logReceived(QString(__PRETTY_FUNCTION__) + ", message" + message);
+
     QTextStream sOut(stdout);
 
     sOut << message;
@@ -36,6 +39,8 @@ void StdListenerWritter::write(QByteArray message)
 ************************************************************/
 void StdListenerWritter::listening()
 {
+    emit logReceived("StdListenerWritter: Start listening");
+
     QTextStream sIn(stdin);
 
     while(m_stopThread == false)

@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <QMap>
-
-class QProcess;
+#include <QProcess>
 
 class InstanceManager : public QObject
 {
@@ -30,6 +29,7 @@ public:
 
     bool write(unsigned int uidGame, QByteArray message);
 
+    bool checkNameOfGameIsAvailable(const QString& nameGame);
     QString nameOfTheGameFromUidGame(int uidGame);
     unsigned int uidGameFromQProcess(QProcess* process);
     QList<unsigned int> listUidGamesFromUidPlayer(int uidPlayer);
@@ -39,6 +39,7 @@ signals:
 
 private slots:
     void onReadyRead_Process();
+    void onFinished_Process(int exitCode);
 
 private:
     static const QString m_PATH_INSTANCE;

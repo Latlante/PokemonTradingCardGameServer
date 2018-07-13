@@ -1,5 +1,6 @@
 #include "controller.h"
 
+#include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -18,10 +19,21 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     m_gameManager(GameManager::createInstance()),
     m_log(Log(nameGame))
 {
+    qDebug() << "Constructeur Controller";
     connect(m_communication, &StdListenerWritter::messageReceived, this, &Controller::onMessageReceived_Communication);
+    connect(m_communication, &StdListenerWritter::logReceived, this, &Controller::onLogReceived);
+    m_communication->startListening();
+
+    connect(m_gameManager, &GameManager::logReceived, this, &Controller::onLogReceived);
+    m_gameManager->setNumberMaxOfPlayers(2);
 
     m_log.write("Creation of the game");
     m_log.write("Players: " + player1 + " versus " + player2);
+}
+
+Controller::~Controller()
+{
+    qDebug() << "Destructeur Controller";
 }
 
 /************************************************************
@@ -41,6 +53,7 @@ void Controller::onMessageReceived_Communication(QString message)
         if(!valuePhase.isNull())
         {
             int phase = valuePhase.toInt();
+            m_log.write("Message - Phase= " + QString::number(phase));
 
             switch(static_cast<ConstantesShared::GamePhase>(phase))
             {
@@ -76,13 +89,24 @@ void Controller::onMessageReceived_Communication(QString message)
         }
         else
         {
+            const QString error = "No phase entered";
             jsonResponse["result"] = "ko";
-            jsonResponse["error"] = "No phase entered";
+            jsonResponse["error"] = error;
+            m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
         }
 
-        m_communication->write(QJsonDocument(jsonResponse).toJson());
+        m_communication->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+    }
+    else
+    {
+        m_log.write(QString(__PRETTY_FUNCTION__) + ", error: jsonReceived is empty");
     }
 
+}
+
+void Controller::onLogReceived(QString message)
+{
+    m_log.write(message);
 }
 
 /************************************************************
@@ -93,6 +117,8 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
     QJsonObject jsonResponse;
     QList<AbstractCard*> listCards;
     Database db;
+
+    m_log.write(QString(__PRETTY_FUNCTION__) + ", namePlayer=" + namePlayer + ", tabCards.count=" + QString::number(tabCards.count()));
 
     //Fill the packet
     for(int indexTabCards=0;indexTabCards<tabCards.count();++indexTabCards)
@@ -105,12 +131,15 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
             int idCard = objectCard["id"].toInt();
             int quantity = objectCard["quantity"].toInt();
 
+            m_log.write(QString(__PRETTY_FUNCTION__) + ", idCard=" + QString::number(idCard) + ", quantity=" + QString::number(quantity));
+
             for(int indexQuantity=0;indexQuantity<quantity;++indexQuantity)
             {
                 AbstractCard* abCard = db.cardById(idCard);
 
                 if(abCard != nullptr)
                 {
+                    m_log.write(QString(__PRETTY_FUNCTION__) + ", abCard.name=" + abCard->name());
                     listCards.append(abCard);
                 }
                 else
@@ -150,8 +179,8 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
         else
         {
             jsonResponse["result"] = "ko";
-            jsonResponse["error"] = "Too many players in the game";
-            m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Too many players in the game");
+            jsonResponse["error"] = "Impossible to add a new player";
+            m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Impossible to add a new player");
         }
     }
 
@@ -161,6 +190,8 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
 QJsonObject Controller::moveACard(const QString &namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination)
 {
     QJsonObject jsonResponse;
+
+    m_log.write(QString(__PRETTY_FUNCTION__));
 
     if(m_gameManager->moveACard(namePlayer, packetOrigin, packetDestination, indexCardOrigin, indexCardDestination))
     {
@@ -179,6 +210,8 @@ QJsonObject Controller::setInitReadyForAPlayer(const QString &namePlayer)
 {
     QJsonObject jsonResponse;
     Player* playerReady = m_gameManager->playerByName(namePlayer);
+
+    m_log.write(QString(__PRETTY_FUNCTION__));
 
     if(playerReady != nullptr)
     {

@@ -17,11 +17,13 @@ public:
                         const QString& player1,
                         const QString& player2,
                         QObject *parent = nullptr);
+    ~Controller();
 
 signals:
 
 private slots:
     void onMessageReceived_Communication(QString message);
+    void onLogReceived(QString message);
 
 private:
     StdListenerWritter* m_communication;
