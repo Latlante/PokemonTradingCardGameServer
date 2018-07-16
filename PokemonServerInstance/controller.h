@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "player.h"
+#include "../Share/constantesshared.h"
 #include "src_Log/log.h"
 
 class GameManager;
@@ -25,6 +26,8 @@ private slots:
     void onMessageReceived_Communication(QString message);
     void onLogReceived(QString message);
 
+    void onIndexCurrentPlayerChanged_GameManager(const QString& oldPlayer, const QString& newPlayer);
+
 private:
     StdListenerWritter* m_communication;
     GameManager* m_gameManager;
@@ -36,7 +39,9 @@ private:
     QJsonObject attack_retreat(const QString& namePlayer, unsigned short indexAttack);
     QJsonObject skipTurn(const QString& namePlayer);
 
-    void sendNotifPlayerIsReady(const QString& namePlayer);
+    void sendNotifPlayerIsReady();
+    void sendNotifEndOfTurn(const QString& oldPlayer, const QString& newPlayer);
+    void sendNotifCardMoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard);
 };
 
 #endif // CONTROLLER_H

@@ -32,7 +32,9 @@ public:
     bool checkNameOfGameIsAvailable(const QString& nameGame);
     QString nameOfTheGameFromUidGame(int uidGame);
     unsigned int uidGameFromQProcess(QProcess* process);
+    bool isInTheGame(unsigned int uidGame, unsigned int uidPlayer);
     QList<unsigned int> listUidGamesFromUidPlayer(int uidPlayer);
+    QList<unsigned int> listUidPlayersFromUidGame(unsigned int uidGame);
 
 signals:
     void readyRead(unsigned int, QByteArray);

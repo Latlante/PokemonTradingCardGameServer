@@ -172,6 +172,13 @@ unsigned int InstanceManager::uidGameFromQProcess(QProcess *process)
     return uidGame;
 }
 
+bool InstanceManager::isInTheGame(unsigned int uidGame, unsigned int uidPlayer)
+{
+    QList<unsigned int> listUidGameForPlayer = listUidGamesFromUidPlayer(uidPlayer);
+
+    return listUidGameForPlayer.contains(uidGame);
+}
+
 QList<unsigned int> InstanceManager::listUidGamesFromUidPlayer(int uidPlayer)
 {
     QList<unsigned int> listUidGames;
@@ -189,6 +196,19 @@ QList<unsigned int> InstanceManager::listUidGamesFromUidPlayer(int uidPlayer)
     }
 
     return listUidGames;
+}
+
+QList<unsigned int> InstanceManager::listUidPlayersFromUidGame(unsigned int uidGame)
+{
+    QList<unsigned int> listPlayers;
+
+    if(m_listGame.contains(uidGame))
+    {
+        listPlayers.append(m_listGame[uidGame].m_uidPlayer1);
+        listPlayers.append(m_listGame[uidGame].m_uidPlayer2);
+    }
+
+    return listPlayers;
 }
 
 /************************************************************

@@ -102,6 +102,11 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
 }
 
 //ACCESSEURS
+QList<Player*> GameManager::listOfPlayers()
+{
+    return m_listPlayers;
+}
+
 Player* GameManager::currentPlayer()
 {
 #ifdef TRACAGE_PRECIS
@@ -703,7 +708,7 @@ void GameManager::setIndexCurrentPlayer(int index)
         m_playerAttacking = m_listPlayers[index];
         m_playerAttacked = enemyOf(m_playerAttacking);
 
-        emit indexCurrentPlayerChanged();
+        emit indexCurrentPlayerChanged(m_playerAttacked, m_playerAttacking);
     }
 }
 

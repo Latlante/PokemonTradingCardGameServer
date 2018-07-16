@@ -20,9 +20,23 @@ public:
         PHASE_MoveACard = 40,
         PHASE_Attack_Retreat = 41,
         PHASE_SkipTheTurn = 42,
-        PHASE_NotifCardMoved = 100,
-        PHASE_NotifPlayerIsReady = 101,
-        PHASE_NotifPokemonAttack = 102
+        PHASE_NotifPlayerIsReady = 100,
+        PHASE_NotifEndOfTurn,
+        PHASE_NotifCardMoved,
+        PHASE_NotifDataPokemonChanged,
+        PHASE_NotifPokemonSwitched,
+        PHASE_NotifEnergyAdded,
+        PHASE_NotifEnergyRemoved
+    };
+
+    enum EnumPacket
+    {
+        PACKET_Bench = 1,
+        PACKET_Deck,
+        PACKET_Fight,
+        PACKET_Hand,
+        PACKET_Rewards,
+        PACKET_Trash
     };
 
     ConstantesShared();

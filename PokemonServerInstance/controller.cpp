@@ -6,6 +6,7 @@
 #include <QJsonObject>
 
 #include "gamemanager.h"
+#include "common/constantesqml.h"
 #include "common/database.h"
 #include "common/utils.h"
 #include "src_Cards/abstractcard.h"
@@ -24,6 +25,7 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     connect(m_communication, &StdListenerWritter::logReceived, this, &Controller::onLogReceived);
     m_communication->startListening();
 
+    connect(m_gameManager, &GameManager::indexCurrentPlayerChanged, this, &Controller::onIndexCurrentPlayerChanged_GameManager);
     connect(m_gameManager, &GameManager::logReceived, this, &Controller::onLogReceived);
     m_gameManager->setNumberMaxOfPlayers(2);
 
@@ -86,6 +88,9 @@ void Controller::onMessageReceived_Communication(QString message)
             default:
                 m_log.write(QString(__PRETTY_FUNCTION__) + ", error with the phase:" + QString::number(phase));
             }
+
+            jsonResponse["namePlayer"] = jsonReceived["namePlayer"];
+            jsonResponse["phase"] = jsonReceived["phase"];
         }
         else
         {
@@ -107,6 +112,11 @@ void Controller::onMessageReceived_Communication(QString message)
 void Controller::onLogReceived(QString message)
 {
     m_log.write(message);
+}
+
+void Controller::onIndexCurrentPlayerChanged_GameManager(const QString &oldPlayer, const QString &newPlayer)
+{
+    sendNotifEndOfTurn(oldPlayer, newPlayer);
 }
 
 /************************************************************
@@ -219,7 +229,7 @@ QJsonObject Controller::setInitReadyForAPlayer(const QString &namePlayer)
         if(playerReady->initReady())
         {
             jsonResponse["result"] = "ok";
-            sendNotifPlayerIsReady(namePlayer);
+            sendNotifPlayerIsReady();
         }
         else
         {
@@ -313,12 +323,50 @@ QJsonObject Controller::skipTurn(const QString &namePlayer)
     return jsonResponse;
 }
 
-void Controller::sendNotifPlayerIsReady(const QString &namePlayer)
+void Controller::sendNotifPlayerIsReady()
 {
     QJsonObject jsonResponse;
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifPlayerIsReady);
+    jsonResponse["everyoneIsReady"] = m_gameManager->gameStatus() == ConstantesQML::StepGameInProgress;
+
+    QJsonArray arrayPlayers;
+    foreach(Player* play, m_gameManager->listOfPlayers())
+    {
+        QJsonObject objPlayer;
+        objPlayer["namePlayer"] = play->name();
+        objPlayer["ready"] = play->initReady();
+
+        arrayPlayers.append(objPlayer);
+    }
+    jsonResponse["players"] = arrayPlayers;
+
+    m_communication->write(QJsonDocument(jsonResponse).toJson());
+}
+
+void Controller::sendNotifEndOfTurn(const QString &oldPlayer, const QString &newPlayer)
+{
+    QJsonObject jsonResponse;
+
+    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifEndOfTurn);
+    jsonResponse["endOfTurn"] = oldPlayer;
+    jsonResponse["newTurn"] = newPlayer;
+
+    m_communication->write(QJsonDocument(jsonResponse).toJson());
+}
+
+void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard)
+{
+    QJsonObject jsonResponse;
+
+    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifCardMoved);
     jsonResponse["namePlayer"] = namePlayer;
+    jsonResponse["indexAction"] = 0;
+    jsonResponse["idPacketOrigin"] = static_cast<int>(packetOrigin);
+    jsonResponse["indexCardOrigin"] = indexCardOrigin;
+    jsonResponse["idPacketDestination"] = static_cast<int>(packetDestination);
+    jsonResponse["indexCardDestination"] = indexCardDestination;
+    jsonResponse["idCard"] = idCard;
 
     m_communication->write(QJsonDocument(jsonResponse).toJson());
 }

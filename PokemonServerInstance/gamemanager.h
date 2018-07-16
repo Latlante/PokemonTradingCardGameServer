@@ -25,6 +25,7 @@ public:
     bool moveACard(const QString& namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, unsigned int indexCardOrigin = 0, unsigned int indexCardDestination = 0);
 
     //Accesseurs
+    QList<Player*> listOfPlayers();
     Player* currentPlayer();
     Player* playerAttacked();
     Player* playerAt(int index);
@@ -65,7 +66,7 @@ public:
 
 
 signals:
-    void indexCurrentPlayerChanged();
+    void indexCurrentPlayerChanged(const QString&,const QString&);
     void gameStatusChanged();
     void replacePokemonFighter(Player*);
 
