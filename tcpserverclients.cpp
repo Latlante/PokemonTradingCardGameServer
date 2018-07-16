@@ -25,11 +25,11 @@ void TcpServerClients::start()
 void TcpServerClients::incomingConnection(qintptr socketDescriptor)
 {
     ThreadClient* client = new ThreadClient(socketDescriptor);
-    QThread* thread = new QThread();
-    client->moveToThread(thread);
-    connect(thread, &QThread::started, client, &ThreadClient::run);
-    connect(thread, &QThread::finished, client, &ThreadClient::deleteLater);
+    //QThread* thread = new QThread();
+    //client->moveToThread(thread);
+    //connect(thread, &QThread::started, client, &ThreadClient::run);
+    connect(client, &QThread::finished, client, &ThreadClient::deleteLater);
     //connect(InstanceManager::instance(), &InstanceManager::readyRead, client, &ThreadClient::onReadyRead_InstanceManager, Qt::QueuedConnection);
 
-    thread->start();
+    client->start();
 }

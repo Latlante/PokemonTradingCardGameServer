@@ -1,13 +1,13 @@
 #ifndef THREADCLIENT_H
 #define THREADCLIENT_H
 
-//#include <QThread>
-#include <QObject>
+#include <QThread>
+//#include <QObject>
 
 class QTcpSocket;
 class QTimer;
 
-class ThreadClient : public QObject
+class ThreadClient : public QThread
 {
     Q_OBJECT
 public:
@@ -18,7 +18,7 @@ public slots:
     void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
 
 public slots:
-    void run();
+    void run() override;
 
 private slots:
     void onReadyRead_TcpSocket();

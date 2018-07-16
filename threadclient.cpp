@@ -16,7 +16,7 @@
 #include "Share/constantesshared.h"
 
 ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
-    QObject(parent),
+    QThread(parent),
     m_socketDescriptor(socketDescriptor),
     m_tcpSocket(nullptr),
     m_timerWritting(nullptr),
@@ -54,15 +54,15 @@ void ThreadClient::run()
         return;
     }
 
-    /*m_timerWritting = new QTimer();
+    m_timerWritting = new QTimer();
     connect(m_timerWritting, &QTimer::timeout, this, &ThreadClient::onTimeOut_timerWritting, Qt::DirectConnection);
-    m_timerWritting->start(500);*/
+    m_timerWritting->start(200);
 
     connect(m_tcpSocket, &QTcpSocket::readyRead, this, &ThreadClient::onReadyRead_TcpSocket, Qt::DirectConnection);
     connect(m_tcpSocket, &QTcpSocket::disconnected, this, &ThreadClient::onDisconnected_TcpSocket, Qt::DirectConnection);
     connect(InstanceManager::instance(), &InstanceManager::readyRead, this, &ThreadClient::onReadyRead_InstanceManager, Qt::QueuedConnection);
 
-    //exec();
+    exec();
 }
 
 /************************************************************
@@ -143,6 +143,8 @@ void ThreadClient::onReadyRead_TcpSocket()
                 case ConstantesShared::PHASE_SelectCards:
                 case ConstantesShared::PHASE_InitReady:
                 case ConstantesShared::PHASE_MoveACard:
+                case ConstantesShared::PHASE_Attack_Retreat:
+                case ConstantesShared::PHASE_SkipTheTurn:
                 {
                     hasToRepond = false;
 
@@ -198,8 +200,8 @@ void ThreadClient::onReadyRead_TcpSocket()
 
     if(hasToRepond == true)
     {
-        m_tcpSocket->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
-        //m_listMessageToSend.append(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+        //m_tcpSocket->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+        m_listMessageToSend.append(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
     }
 }
 
@@ -215,8 +217,61 @@ void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray 
 {
     qDebug() << __PRETTY_FUNCTION__ << "Message recu du process," << uidGame << message;
 
-    m_tcpSocket->write(message);
-    //m_listMessageToSend.append(message);
+    //check if we are concerned by the message
+    if(InstanceManager::instance()->isInTheGame(uidGame, m_uid))
+    {
+        QJsonDocument jsonReceived = QJsonDocument::fromJson(message);
+
+        if(!jsonReceived.isEmpty())
+        {
+            QJsonValue valuePhase = jsonReceived["phase"];
+
+            if(!valuePhase.isNull())
+            {
+                int phase = valuePhase.toInt();
+
+                //add uidGame in answer
+                QJsonObject objReceived = jsonReceived.object();
+                objReceived["uidGame"] = uidGame;
+
+                switch(static_cast<ConstantesShared::GamePhase>(phase))
+                {
+                    //INSTANCES
+                case ConstantesShared::PHASE_SelectCards:
+                case ConstantesShared::PHASE_InitReady:
+                case ConstantesShared::PHASE_MoveACard:
+                case ConstantesShared::PHASE_Attack_Retreat:
+                case ConstantesShared::PHASE_SkipTheTurn:
+                    m_listMessageToSend.append(QJsonDocument(objReceived).toJson(QJsonDocument::Compact));
+                    break;
+
+                    //NOTIFICATIONS
+                case ConstantesShared::PHASE_NotifCardMoved:
+                {
+
+                }
+                    break;
+
+                case ConstantesShared::PHASE_NotifPlayerIsReady:
+                {
+                    //same for all players
+                    m_listMessageToSend.append(QJsonDocument(objReceived).toJson(QJsonDocument::Compact));
+                }
+                    break;
+
+                case ConstantesShared::PHASE_NotifPokemonAttack:
+                {
+
+                }
+                    break;
+                }
+            }
+        }
+    }
+
+
+    //m_tcpSocket->write(message);
+    m_listMessageToSend.append(message);
 
 }
 
