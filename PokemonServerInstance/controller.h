@@ -42,6 +42,7 @@ private:
     void sendNotifPlayerIsReady();
     void sendNotifEndOfTurn(const QString& oldPlayer, const QString& newPlayer);
     void sendNotifCardMoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard);
+    void sendNotifDataPokemonChanged(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon);
 };
 
 #endif // CONTROLLER_H

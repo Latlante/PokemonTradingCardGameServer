@@ -100,7 +100,7 @@ void Controller::onMessageReceived_Communication(QString message)
             m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
         }
 
-        m_communication->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+        m_communication->write(jsonReceived["namePlayer"] + ";" + QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
     }
     else
     {
@@ -325,6 +325,7 @@ QJsonObject Controller::skipTurn(const QString &namePlayer)
 
 void Controller::sendNotifPlayerIsReady()
 {
+    QByteArray messageToRespond;
     QJsonObject jsonResponse;
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifPlayerIsReady);
@@ -341,22 +342,28 @@ void Controller::sendNotifPlayerIsReady()
     }
     jsonResponse["players"] = arrayPlayers;
 
-    m_communication->write(QJsonDocument(jsonResponse).toJson());
+    //no player concerned ; no message for the owner ; message for everyone
+    messageToRespond = ";;" + QJsonDocument(jsonResponse).toJson();
+    m_communication->write(messageToRespond);
 }
 
 void Controller::sendNotifEndOfTurn(const QString &oldPlayer, const QString &newPlayer)
 {
+    QByteArray messageToRespond;
     QJsonObject jsonResponse;
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifEndOfTurn);
     jsonResponse["endOfTurn"] = oldPlayer;
     jsonResponse["newTurn"] = newPlayer;
 
-    m_communication->write(QJsonDocument(jsonResponse).toJson());
+    //no player concerned ; no message for the owner ; message for everyone
+    messageToRespond = ";;" + QJsonDocument(jsonResponse).toJson();
+    m_communication->write(messageToRespond);
 }
 
 void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard)
 {
+    QByteArray messageToRespond;
     QJsonObject jsonResponse;
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifCardMoved);
@@ -366,7 +373,42 @@ void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared:
     jsonResponse["indexCardOrigin"] = indexCardOrigin;
     jsonResponse["idPacketDestination"] = static_cast<int>(packetDestination);
     jsonResponse["indexCardDestination"] = indexCardDestination;
+
+    //For others
+    QByteArray messageOthers = QJsonDocument(jsonResponse).toJson();
+
+    //For owner
     jsonResponse["idCard"] = idCard;
 
+    //player who move the card ; info of move with the id of the card ; only info of move
+    messageToRespond = namePlayer + ";" + QJsonDocument(jsonResponse).toJson() + ";" + messageOthers;
     m_communication->write(QJsonDocument(jsonResponse).toJson());
+}
+
+void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon *pokemon)
+{
+    QByteArray messageToRespond;
+    QJsonObject jsonResponse;
+
+    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDataPokemonChanged);
+    jsonResponse["namePlayer"] = namePlayer;
+    jsonResponse["indexAction"] = 0;
+    jsonResponse["idPacket"] = static_cast<int>(packet);
+    jsonResponse["indexCard"] = indexCard;
+    jsonResponse["lifeLeft"] = pokemon->lifeLeft();
+
+    QJsonArray arrayAttacks;
+    for(int i=0;i<pokemon->attacksCount();++i)
+    {
+        QJsonObject objAttack;
+        objAttack["index"] = i;
+        objAttack["available"] = pokemon->numberOfTurnAttackStillBlocks(i) > 0;
+
+        arrayAttacks.append(objAttack);
+    }
+    jsonResponse["attacks"] = arrayAttacks;
+
+    //no player concerned ; no message for the owner ; message for everyone
+    messageToRespond = ";;" + QJsonDocument(jsonResponse).toJson();
+    m_communication->write(messageToRespond);
 }

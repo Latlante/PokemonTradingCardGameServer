@@ -220,7 +220,7 @@ void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray 
     //check if we are concerned by the message
     if(InstanceManager::instance()->isInTheGame(uidGame, m_uid))
     {
-        QJsonDocument jsonReceived = QJsonDocument::fromJson(message);
+        /*QJsonDocument jsonReceived = QJsonDocument::fromJson(message);
 
         if(!jsonReceived.isEmpty())
         {
@@ -266,12 +266,30 @@ void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray 
                     break;
                 }
             }
+        }*/
+
+        QList<QByteArray> listArguments = message.split(';');
+
+        if(listArguments.count() >= 2)
+        {
+            const QString namePlayer = listArguments[0];
+            const QByteArray messageOwner = listArguments[1];
+            const QByteArray messageOthers = listArguments.count() >= 3 ? listArguments[2] : QByteArray();
+
+            if(m_user == namePlayer)
+            {
+                m_listMessageToSend.append(messageOwner);
+            }
+            else if(messageOthers.isEmpty() == false)
+            {
+                m_listMessageToSend.append(messageOthers);
+            }
         }
     }
 
 
     //m_tcpSocket->write(message);
-    m_listMessageToSend.append(message);
+    //m_listMessageToSend.append(message);
 
 }
 
