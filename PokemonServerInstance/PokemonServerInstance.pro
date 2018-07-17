@@ -90,7 +90,16 @@ SOURCES += \
     player.cpp \
     src_Communication/stdlistenerwritter.cpp \
     controller.cpp \
-    src_Log/log.cpp
+    src_Log/log.cpp \
+    src_Log/historicalnotifications.cpp \
+    src_Log/abstractnotification.cpp \
+    src_Log/notificationplayerisready.cpp \
+    src_Log/notificationendofturn.cpp \
+    src_Log/notificationcardmoved.cpp \
+    src_Log/notificationdatapokemonchanged.cpp \
+    src_Log/notificationpokemonswitched.cpp \
+    src_Log/notificationenergyadded.cpp \
+    src_Log/notificationenergyremoved.cpp
 
 HEADERS += \
     common/constantesqml.h \
@@ -161,4 +170,13 @@ HEADERS += \
     player.h \
     src_Communication/stdlistenerwritter.h \
     controller.h \
-    src_Log/log.h
+    src_Log/log.h \
+    src_Log/historicalnotifications.h \
+    src_Log/abstractnotification.h \
+    src_Log/notificationplayerisready.h \
+    src_Log/notificationendofturn.h \
+    src_Log/notificationcardmoved.h \
+    src_Log/notificationdatapokemonchanged.h \
+    src_Log/notificationpokemonswitched.h \
+    src_Log/notificationenergyadded.h \
+    src_Log/notificationenergyremoved.h
