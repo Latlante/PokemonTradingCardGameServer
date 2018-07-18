@@ -8,12 +8,12 @@ class NotificationEndOfTurn : public AbstractNotification
 public:
     NotificationEndOfTurn(const QString& oldPlayer, const QString& newPlayer);
 
+    virtual QJsonObject messageJsonForOwner() override;
+    virtual QJsonObject messageJsonForOthers() override;
+
 private:
     QString m_nameOldPlayer;
     QString m_nameNewPlayer;
-
-    virtual QJsonObject messageJsonForOwner() override;
-    virtual QJsonObject messageJsonForOthers() override;
 };
 
 #endif // NOTIFICATIONENDOFTURN_H

@@ -5,6 +5,7 @@
 
 #include "player.h"
 #include "../Share/constantesshared.h"
+#include "src_Log/historicalnotifications.h"
 #include "src_Log/log.h"
 
 class GameManager;
@@ -31,6 +32,7 @@ private slots:
 private:
     StdListenerWritter* m_communication;
     GameManager* m_gameManager;
+    HistoricalNotifications m_historicNotif;
     Log m_log;
 
     QJsonObject selectCardPerPlayer(const QString& namePlayer, QJsonArray tabCards);

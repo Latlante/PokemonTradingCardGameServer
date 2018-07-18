@@ -11,6 +11,7 @@
 #include "common/utils.h"
 #include "src_Cards/abstractcard.h"
 #include "src_Communication/stdlistenerwritter.h"
+#include "src_Models/modellistenergies.h"
 #include "src_Packets/fightarea.h"
 #include "../Share/constantesshared.h"
 
@@ -18,6 +19,7 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     QObject(parent),
     m_communication(new StdListenerWritter()),
     m_gameManager(GameManager::createInstance()),
+    m_historicNotif(HistoricalNotifications()),
     m_log(Log(nameGame))
 {
     qDebug() << "Constructeur Controller";
@@ -49,7 +51,8 @@ void Controller::onMessageReceived_Communication(QString message)
 
     if(!jsonReceived.isEmpty())
     {
-        QJsonObject jsonResponse;
+        QJsonObject jsonResponseOwner;
+        unsigned int readPoint = m_historicNotif.readPoint();
         QJsonValue valuePhase = jsonReceived["phase"];
 
         if(!valuePhase.isNull())
@@ -60,16 +63,16 @@ void Controller::onMessageReceived_Communication(QString message)
             switch(static_cast<ConstantesShared::GamePhase>(phase))
             {
             case ConstantesShared::PHASE_SelectCards:
-                jsonResponse = selectCardPerPlayer(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = selectCardPerPlayer(jsonReceived["namePlayer"].toString(),
                                                    jsonReceived["cards"].toArray());
                 break;
 
             case ConstantesShared::PHASE_InitReady:
-                jsonResponse = setInitReadyForAPlayer(jsonReceived["namePlayer"].toString());
+                jsonResponseOwner = setInitReadyForAPlayer(jsonReceived["namePlayer"].toString());
                 break;
 
             case ConstantesShared::PHASE_MoveACard:
-                jsonResponse = moveACard(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = moveACard(jsonReceived["namePlayer"].toString(),
                                          static_cast<Player::EnumPacket>(jsonReceived["idPacketOrigin"].toInt()),
                                          static_cast<Player::EnumPacket>(jsonReceived["idPacketDestination"].toInt()),
                                          jsonReceived["idCardOrigin"].toInt(),
@@ -77,30 +80,46 @@ void Controller::onMessageReceived_Communication(QString message)
                 break;
 
             case ConstantesShared::PHASE_Attack_Retreat:
-                jsonResponse = attack_retreat(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = attack_retreat(jsonReceived["namePlayer"].toString(),
                                               jsonReceived["indexAttack"].toInt());
                 break;
 
             case ConstantesShared::PHASE_SkipTheTurn:
-                jsonResponse = skipTurn(jsonReceived["namePlayer"].toString());
+                jsonResponseOwner = skipTurn(jsonReceived["namePlayer"].toString());
                 break;
 
             default:
-                m_log.write(QString(__PRETTY_FUNCTION__) + ", error with the phase:" + QString::number(phase));
+                const QString error = "error with the phase:" + QString::number(phase);
+                jsonResponseOwner["result"] = "ko";
+                jsonResponseOwner["error"] = error;
+                m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
             }
 
-            jsonResponse["namePlayer"] = jsonReceived["namePlayer"];
-            jsonResponse["phase"] = jsonReceived["phase"];
+            jsonResponseOwner["phase"] = jsonReceived["phase"];
         }
         else
         {
             const QString error = "No phase entered";
-            jsonResponse["result"] = "ko";
-            jsonResponse["error"] = error;
+            jsonResponseOwner["result"] = "ko";
+            jsonResponseOwner["error"] = error;
             m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
         }
 
-        m_communication->write(jsonReceived["namePlayer"] + ";" + QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+        //On envoit la réponse avec/sans les actions en fonction de si tout s'est bien passé ou non
+        if(jsonResponseOwner["result"] == "ok")
+        {
+            QJsonObject objOwner = m_historicNotif.buildJsonOwnerFrom(readPoint);
+            jsonResponseOwner["actions"] = objOwner;
+
+            m_communication->write(jsonReceived["namePlayer"].toString().toLatin1() + ";" +
+                                    QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact) + ";" +
+                                    QJsonDocument(m_historicNotif.buildJsonOthersFrom(readPoint)).toJson(QJsonDocument::Compact));
+        }
+        else
+        {
+            m_communication->write(jsonReceived["namePlayer"].toString().toLatin1() + ";" +
+                                    QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact));
+        }
     }
     else
     {
@@ -287,12 +306,20 @@ QJsonObject Controller::attack_retreat(const QString &namePlayer, unsigned short
         {
             bool success = m_gameManager->retreat(pokemonAttacking);
 
-            if(success == false)
+            if(success == true)
+                jsonResponse["result"] = "ok";
+            else
+            {
                 qCritical() << __PRETTY_FUNCTION__ << "Erreur lors de l'échange";
+                jsonResponse["result"] = "ko";
+                jsonResponse["error"] = "error during the retreat";
+            }
         }
         else
         {
             qCritical() << __PRETTY_FUNCTION__ << "erreur de indexAttack=" << indexAttack;
+            jsonResponse["result"] = "ko";
+            jsonResponse["error"] = "error of indexAttack = " + QString::number(indexAttack);
         }
     }
     else
@@ -313,6 +340,7 @@ QJsonObject Controller::skipTurn(const QString &namePlayer)
     if(currentPlayer == m_gameManager->currentPlayer())
     {
         m_gameManager->endOfTurn();
+        jsonResponse["result"] = "ok";
     }
     else
     {
@@ -325,90 +353,53 @@ QJsonObject Controller::skipTurn(const QString &namePlayer)
 
 void Controller::sendNotifPlayerIsReady()
 {
-    QByteArray messageToRespond;
-    QJsonObject jsonResponse;
-
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifPlayerIsReady);
-    jsonResponse["everyoneIsReady"] = m_gameManager->gameStatus() == ConstantesQML::StepGameInProgress;
-
-    QJsonArray arrayPlayers;
+    QMap<QString, bool> mapListPlayersReady;
     foreach(Player* play, m_gameManager->listOfPlayers())
     {
-        QJsonObject objPlayer;
-        objPlayer["namePlayer"] = play->name();
-        objPlayer["ready"] = play->initReady();
-
-        arrayPlayers.append(objPlayer);
+        mapListPlayersReady.insert(play->name(), play->initReady());
     }
-    jsonResponse["players"] = arrayPlayers;
 
-    //no player concerned ; no message for the owner ; message for everyone
-    messageToRespond = ";;" + QJsonDocument(jsonResponse).toJson();
-    m_communication->write(messageToRespond);
+    AbstractNotification* notif = new NotificationPlayerIsReady(m_gameManager->gameStatus() == ConstantesQML::StepGameInProgress,   //bool everyoneIsReady
+                                                                mapListPlayersReady);                                               //QMap listPlayersReady
+    m_historicNotif.addNewNotification(notif);
 }
 
 void Controller::sendNotifEndOfTurn(const QString &oldPlayer, const QString &newPlayer)
 {
-    QByteArray messageToRespond;
-    QJsonObject jsonResponse;
-
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifEndOfTurn);
-    jsonResponse["endOfTurn"] = oldPlayer;
-    jsonResponse["newTurn"] = newPlayer;
-
-    //no player concerned ; no message for the owner ; message for everyone
-    messageToRespond = ";;" + QJsonDocument(jsonResponse).toJson();
-    m_communication->write(messageToRespond);
+    AbstractNotification* notif = new NotificationEndOfTurn(oldPlayer, newPlayer);
+    m_historicNotif.addNewNotification(notif);
 }
 
 void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard)
 {
-    QByteArray messageToRespond;
-    QJsonObject jsonResponse;
-
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifCardMoved);
-    jsonResponse["namePlayer"] = namePlayer;
-    jsonResponse["indexAction"] = 0;
-    jsonResponse["idPacketOrigin"] = static_cast<int>(packetOrigin);
-    jsonResponse["indexCardOrigin"] = indexCardOrigin;
-    jsonResponse["idPacketDestination"] = static_cast<int>(packetDestination);
-    jsonResponse["indexCardDestination"] = indexCardDestination;
-
-    //For others
-    QByteArray messageOthers = QJsonDocument(jsonResponse).toJson();
-
-    //For owner
-    jsonResponse["idCard"] = idCard;
-
-    //player who move the card ; info of move with the id of the card ; only info of move
-    messageToRespond = namePlayer + ";" + QJsonDocument(jsonResponse).toJson() + ";" + messageOthers;
-    m_communication->write(QJsonDocument(jsonResponse).toJson());
+    AbstractNotification* notif = new NotificationCardMoved(namePlayer,
+                                                            idCard,
+                                                            packetOrigin,
+                                                            indexCardOrigin,
+                                                            packetDestination,
+                                                            indexCardDestination);
+    m_historicNotif.addNewNotification(notif);
 }
 
 void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon *pokemon)
 {
-    QByteArray messageToRespond;
-    QJsonObject jsonResponse;
-
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDataPokemonChanged);
-    jsonResponse["namePlayer"] = namePlayer;
-    jsonResponse["indexAction"] = 0;
-    jsonResponse["idPacket"] = static_cast<int>(packet);
-    jsonResponse["indexCard"] = indexCard;
-    jsonResponse["lifeLeft"] = pokemon->lifeLeft();
-
-    QJsonArray arrayAttacks;
+    QMap<unsigned int, bool> mapAttackAvailable;
     for(int i=0;i<pokemon->attacksCount();++i)
     {
-        QJsonObject objAttack;
-        objAttack["index"] = i;
-        objAttack["available"] = pokemon->numberOfTurnAttackStillBlocks(i) > 0;
-
-        arrayAttacks.append(objAttack);
+        mapAttackAvailable.insert(i, pokemon->numberOfTurnAttackStillBlocks(i) > 0);
     }
-    jsonResponse["attacks"] = arrayAttacks;
 
-    //no player concerned ; no message for the owner ; message for everyone
-    messageToRespond = ";;" + QJsonDocument(jsonResponse).toJson();
-    m_communication->write(messageToRespond);
+    QList<unsigned int> listEnergies;
+    for(unsigned short i=0;i<pokemon->modelListOfEnergies()->countEnergies();++i)
+    {
+        listEnergies.append(pokemon->modelListOfEnergies()->energy(i)->id());
+    }
+
+    AbstractNotification* notif = new NotificationDataPokemonChanged(namePlayer,
+                                                                 packet,
+                                                                 indexCard,
+                                                                 pokemon->lifeLeft(),
+                                                                 mapAttackAvailable,
+                                                                 listEnergies);
+    m_historicNotif.addNewNotification(notif);
 }

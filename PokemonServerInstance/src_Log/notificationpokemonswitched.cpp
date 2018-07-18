@@ -12,24 +12,23 @@ NotificationPokemonSwitched::NotificationPokemonSwitched(ConstantesShared::EnumP
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-
-/************************************************************
-*****				FONCTIONS PRIVEES					*****
-************************************************************/
 QJsonObject NotificationPokemonSwitched::messageJsonForOwner()
 {
-    return QJsonObject();
+    return messageJsonForOthers();
 }
 
 QJsonObject NotificationPokemonSwitched::messageJsonForOthers()
 {
-    QJsonObject jsonResponse;
+    QJsonObject jsonResponse = initObject();
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifPokemonSwitched);
-    jsonResponse["namePlayer"] = namePlayer();
     jsonResponse["idPacket"] = static_cast<int>(m_packet);
-    jsonResponse["indexCard"] = m_indexCard;
-    jsonResponse["newIdCard"] = m_newIdCard;
+    jsonResponse["indexCard"] = static_cast<int>(m_indexCard);
+    jsonResponse["newIdCard"] = static_cast<int>(m_newIdCard);
 
     return jsonResponse;
 }
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/

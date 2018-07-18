@@ -12,23 +12,23 @@ NotificationEnergyAdded::NotificationEnergyAdded(ConstantesShared::EnumPacket pa
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-
-/************************************************************
-*****				FONCTIONS PRIVEES					*****
-************************************************************/
 QJsonObject NotificationEnergyAdded::messageJsonForOwner()
 {
-    return QJsonObject();
+    return messageJsonForOthers();
 }
 
 QJsonObject NotificationEnergyAdded::messageJsonForOthers()
 {
-    QJsonObject jsonResponse;
+    QJsonObject jsonResponse = initObject();
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifEnergyAdded);
     jsonResponse["idPacket"] = static_cast<int>(m_packet);
-    jsonResponse["indexCard"] = m_indexCard;
-    jsonResponse["idEnergy"] = m_idEnergy;
+    jsonResponse["indexCard"] = static_cast<int>(m_indexCard);
+    jsonResponse["idEnergy"] = static_cast<int>(m_idEnergy);
 
     return jsonResponse;
 }
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/

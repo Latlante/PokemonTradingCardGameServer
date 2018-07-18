@@ -1,8 +1,7 @@
 #include "notificationdatapokemonchanged.h"
-#include <QMap>
 
-NotificationDataPokemonChanged::NotificationDataPokemonChanged(ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int lifeLeft, QMap<unsigned int, bool> mapAttacksAvailable, QList<unsigned int> listIdEnergies) :
-    AbstractNotification(),
+NotificationDataPokemonChanged::NotificationDataPokemonChanged(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int lifeLeft, QMap<unsigned int, bool> mapAttacksAvailable, QList<unsigned int> listIdEnergies) :
+    AbstractNotification(namePlayer),
     m_packet(packet),
     m_indexCard(indexCard),
     m_lifeLeft(lifeLeft),
@@ -15,30 +14,25 @@ NotificationDataPokemonChanged::NotificationDataPokemonChanged(ConstantesShared:
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-
-/************************************************************
-*****				FONCTIONS PRIVEES					*****
-************************************************************/
 QJsonObject NotificationDataPokemonChanged::messageJsonForOwner()
 {
-    return QJsonObject();
+    return messageJsonForOthers();
 }
 
 QJsonObject NotificationDataPokemonChanged::messageJsonForOthers()
 {
-    QJsonObject jsonResponse;
+    QJsonObject jsonResponse = initObject();
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDataPokemonChanged);
-    jsonResponse["namePlayer"] = namePlayer();
     jsonResponse["idPacket"] = static_cast<int>(m_packet);
-    jsonResponse["indexCard"] = m_indexCard;
-    jsonResponse["lifeLeft"] = m_lifeLeft;
+    jsonResponse["indexCard"] = static_cast<int>(m_indexCard);
+    jsonResponse["lifeLeft"] = static_cast<int>(m_lifeLeft);
 
     QJsonArray arrayAttacks;
     for(QMap<unsigned int,bool>::iterator it=m_mapAttacksAvailable.begin();it!=m_mapAttacksAvailable.end();++it)
     {
         QJsonObject objAttack;
-        objAttack["index"] = it.key();
+        objAttack["index"] = static_cast<int>(it.key());
         objAttack["available"] = it.value();
 
         arrayAttacks.append(objAttack);
@@ -47,3 +41,7 @@ QJsonObject NotificationDataPokemonChanged::messageJsonForOthers()
 
     return jsonResponse;
 }
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/

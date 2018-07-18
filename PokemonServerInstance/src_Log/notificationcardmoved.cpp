@@ -14,35 +14,33 @@ NotificationCardMoved::NotificationCardMoved(const QString &namePlayer, unsigned
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-
-/************************************************************
-*****				FONCTIONS PRIVEES					*****
-************************************************************/
 QJsonObject NotificationCardMoved::messageJsonForOwner()
 {
-    QJsonObject jsonResponse;
+    QJsonObject jsonResponse = initObject();
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifCardMoved);
-    jsonResponse["namePlayer"] = namePlayer();
-    jsonResponse["idCard"] = m_idCard;
+    jsonResponse["idCard"] = static_cast<int>(m_idCard);
     jsonResponse["idPacketOrigin"] = static_cast<int>(m_packetOrigin);
-    jsonResponse["indexCardOrigin"] = m_indexCardOrigin;
+    jsonResponse["indexCardOrigin"] = static_cast<int>(m_indexCardOrigin);
     jsonResponse["idPacketDestination"] = static_cast<int>(m_packetDestination);
-    jsonResponse["indexCardDestination"] = m_indexCardDestination;
+    jsonResponse["indexCardDestination"] = static_cast<int>(m_indexCardDestination);
 
     return jsonResponse;
 }
 
 QJsonObject NotificationCardMoved::messageJsonForOthers()
 {
-    QJsonObject jsonResponse;
+    QJsonObject jsonResponse = initObject();
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifCardMoved);
-    jsonResponse["namePlayer"] = namePlayer();
     jsonResponse["idPacketOrigin"] = static_cast<int>(m_packetOrigin);
-    jsonResponse["indexCardOrigin"] = m_indexCardOrigin;
+    jsonResponse["indexCardOrigin"] = static_cast<int>(m_indexCardOrigin);
     jsonResponse["idPacketDestination"] = static_cast<int>(m_packetDestination);
-    jsonResponse["indexCardDestination"] = m_indexCardDestination;
+    jsonResponse["indexCardDestination"] = static_cast<int>(m_indexCardDestination);
 
     return jsonResponse;
 }
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/

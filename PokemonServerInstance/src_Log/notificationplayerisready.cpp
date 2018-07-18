@@ -1,9 +1,9 @@
 #include "notificationplayerisready.h"
-#include <QMap>
 
 NotificationPlayerIsReady::NotificationPlayerIsReady(bool everyoneIsReady, QMap<QString, bool> mapPlayersReady) :
     AbstractNotification(),
-    m_everyoneIsReady(everyoneIsReady)
+    m_everyoneIsReady(everyoneIsReady),
+    m_mapPlayersReady(mapPlayersReady)
 {
 
 }
@@ -11,18 +11,14 @@ NotificationPlayerIsReady::NotificationPlayerIsReady(bool everyoneIsReady, QMap<
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-
-/************************************************************
-*****				FONCTIONS PRIVEES					*****
-************************************************************/
 QJsonObject NotificationPlayerIsReady::messageJsonForOwner()
 {
-    return QJsonObject();
+    return messageJsonForOthers();
 }
 
 QJsonObject NotificationPlayerIsReady::messageJsonForOthers()
 {
-    QJsonObject jsonResponse;
+    QJsonObject jsonResponse = initObject();
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifPlayerIsReady);
     jsonResponse["everyoneIsReady"] = m_everyoneIsReady;
@@ -40,3 +36,7 @@ QJsonObject NotificationPlayerIsReady::messageJsonForOthers()
 
     return jsonResponse;
 }
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/

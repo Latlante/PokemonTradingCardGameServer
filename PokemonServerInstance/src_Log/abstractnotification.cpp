@@ -1,7 +1,8 @@
 #include "abstractnotification.h"
 
 AbstractNotification::AbstractNotification(const QString& namePlayer) :
-    m_namePlayer(namePlayer)
+    m_namePlayer(namePlayer),
+    m_indexAction(0)
 {
 
 }
@@ -19,10 +20,37 @@ void AbstractNotification::setNamePlayer(const QString &namePlayer)
     m_namePlayer = namePlayer;
 }
 
+unsigned int AbstractNotification::indexAction()
+{
+    return m_indexAction;
+}
+
+void AbstractNotification::setIndexAction(unsigned int indexAction)
+{
+    m_indexAction = indexAction;
+}
+
 QByteArray AbstractNotification::messageJsonComplete()
 {
     QJsonObject objOwner = messageJsonForOwner();
     QJsonObject objOthers = messageJsonForOthers();
 
-    return namePlayer() + ";" + QJsonDocument(objOwner).toJson(QJsonDocument::Compact) + ";" + QJsonDocument(objOthers).toJson(QJsonDocument::Compact);
+    return namePlayer().toLatin1() + ";" +
+            QJsonDocument(objOwner).toJson(QJsonDocument::Compact) + ";" +
+            QJsonDocument(objOthers).toJson(QJsonDocument::Compact);
+}
+
+/************************************************************
+*****				FONCTIONS PROTEGEES					*****
+************************************************************/
+QJsonObject AbstractNotification::initObject()
+{
+    QJsonObject obj;
+
+    //obj["indexAction"] = static_cast<int>(indexAction());
+
+    if(namePlayer() != "")
+        obj["namePlayer"] = namePlayer();
+
+    return obj;
 }

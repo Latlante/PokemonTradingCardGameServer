@@ -166,7 +166,7 @@ void ThreadClient::onReadyRead_TcpSocket()
                     }
                     else
                     {
-                        qDebug() << __PRETTY_FUNCTION__ << "Write error";
+                        qCritical() << __PRETTY_FUNCTION__ << "Write error";
                     }
                 }
                     break;

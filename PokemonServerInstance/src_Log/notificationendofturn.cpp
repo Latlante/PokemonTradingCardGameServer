@@ -11,18 +11,14 @@ NotificationEndOfTurn::NotificationEndOfTurn(const QString &oldPlayer, const QSt
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-
-/************************************************************
-*****				FONCTIONS PRIVEES					*****
-************************************************************/
 QJsonObject NotificationEndOfTurn::messageJsonForOwner()
 {
-    return QJsonObject();
+    return messageJsonForOthers();
 }
 
 QJsonObject NotificationEndOfTurn::messageJsonForOthers()
 {
-    QJsonObject jsonResponse;
+    QJsonObject jsonResponse = initObject();
 
     jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifEndOfTurn);
     jsonResponse["endOfTurn"] = m_nameOldPlayer;
@@ -30,3 +26,7 @@ QJsonObject NotificationEndOfTurn::messageJsonForOthers()
 
     return jsonResponse;
 }
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/

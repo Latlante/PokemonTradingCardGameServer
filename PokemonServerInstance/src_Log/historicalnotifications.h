@@ -3,15 +3,25 @@
 
 #include <QObject>
 
+#include "src_Log/notificationcardmoved.h"
+#include "src_Log/notificationdatapokemonchanged.h"
+#include "src_Log/notificationendofturn.h"
+#include "src_Log/notificationenergyadded.h"
+#include "src_Log/notificationenergyremoved.h"
+#include "src_Log/notificationplayerisready.h"
+#include "src_Log/notificationpokemonswitched.h"
+
 class AbstractNotification;
 
-class HistoricalNotifications : public QObject
+class HistoricalNotifications
 {
-    Q_OBJECT
 public:
-    explicit HistoricalNotifications(QObject *parent = nullptr);
+    explicit HistoricalNotifications();
 
     int addNewNotification(AbstractNotification* notif);
+    unsigned int readPoint();
+    QJsonObject buildJsonOwnerFrom(unsigned int index);
+    QJsonObject buildJsonOthersFrom(unsigned int index);
 
 signals:
 

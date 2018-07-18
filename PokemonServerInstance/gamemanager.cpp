@@ -708,7 +708,7 @@ void GameManager::setIndexCurrentPlayer(int index)
         m_playerAttacking = m_listPlayers[index];
         m_playerAttacked = enemyOf(m_playerAttacking);
 
-        emit indexCurrentPlayerChanged(m_playerAttacked, m_playerAttacking);
+        emit indexCurrentPlayerChanged(m_playerAttacked->name(), m_playerAttacking->name());
     }
 }
 

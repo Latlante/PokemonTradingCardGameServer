@@ -9,22 +9,26 @@
 
 class AbstractNotification
 {
-    Q_OBJECT
 public:
     explicit AbstractNotification(const QString& namePlayer = "");
 
     const QString namePlayer();
     void setNamePlayer(const QString& namePlayer);
 
-    QByteArray messageJsonComplete();
+    unsigned int indexAction();
+    void setIndexAction(unsigned int indexAction);
 
-signals:
+    QByteArray messageJsonComplete();
+    virtual QJsonObject messageJsonForOwner() = 0;
+    virtual QJsonObject messageJsonForOthers() = 0;
+
+protected:
+    QJsonObject initObject();
 
 private:
     QString m_namePlayer;
+    unsigned int m_indexAction;
 
-    virtual QJsonObject messageJsonForOwner() = 0;
-    virtual QJsonObject messageJsonForOthers() = 0;
 
 };
 
