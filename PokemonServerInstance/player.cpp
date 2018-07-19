@@ -5,28 +5,42 @@
 #include "src_Cards/cardaction.h"
 #include "src_Cards/cardenergy.h"
 #include "src_Cards/cardpokemon.h"
+#include "common/utils.h"
 #include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
 #include "src_Packets/packetdeck.h"
 #include "src_Packets/packethand.h"
 #include "src_Packets/packetrewards.h"
 #include "src_Packets/packettrash.h"
+#include "../Share/constantesshared.h"
 
 Player::Player(QString name, QList<AbstractCard*> listCards, QObject *parent) :
 	QObject(parent),
     m_name(name),
-    m_bench(new BenchArea("Bench")),
-    m_deck(new PacketDeck("Deck", listCards)),
-    m_fight(new FightArea("Fight")),
-    m_hand(new PacketHand("Hand")),
-    m_rewards(new PacketRewards("Rewards")),
-    m_trash(new PacketTrash("Trash")),
+    m_bench(new BenchArea(NAME_BENCH)),
+    m_deck(new PacketDeck(NAME_DECK, listCards)),
+    m_fight(new FightArea(NAME_FIGHT)),
+    m_hand(new PacketHand(NAME_HAND)),
+    m_rewards(new PacketRewards(NAME_REWARDS)),
+    m_trash(new PacketTrash(NAME_TRASH)),
     m_initReady(false),
     m_canPlay(true),
     m_energyPlayedForThisRound(false)
 {
     foreach(AbstractCard* card, listCards)
+    {
+        //set owner
         card->setOwner(this);
+
+        //connection for dataChanged, energyAdded and energyRemoved
+        if(card->type() == AbstractCard::TypeOfCard_Pokemon)
+        {
+            CardPokemon* pokemon = static_cast<CardPokemon*>(card);
+            connect(pokemon, &CardPokemon::dataChanged, this, &Player::onDataChanged_CardPokemon);
+            connect(pokemon, &CardPokemon::energyAdded, this, &Player::onEnergyAdded_CardPokemon);
+            connect(pokemon, &CardPokemon::energyRemoved, this, &Player::onEnergyRemoved_CardPokemon);
+        }
+    }
 }
 
 Player::~Player()
@@ -495,6 +509,87 @@ bool Player::swapCardsBetweenBenchAndFight(CardPokemon* pokemonBenchToSwap)
 }
 
 /************************************************************
+*****			 FONCTIONS SLOTS PRIVEES				*****
+************************************************************/
+void Player::onDataChanged_CardPokemon()
+{
+    CardPokemon* pokemon = qobject_cast<CardPokemon*>(sender());
+    int indexCard = -1;
+
+    //check if the card come from the fight area
+    indexCard = fight()->indexOf(pokemon);
+
+    //found
+    if(indexCard >= 0)
+    {
+        emit dataPokemonChanged(name(), ConstantesShared::PACKET_Fight, indexCard, pokemon);
+    }
+    //try in bench area
+    else
+    {
+        indexCard = bench()->indexOf(pokemon);
+
+        //found
+        if(indexCard >= 0)
+        {
+            emit dataPokemonChanged(name(), ConstantesShared::PACKET_Bench, indexCard, pokemon);
+        }
+    }
+}
+
+void Player::onEnergyAdded_CardPokemon(int idEnergy)
+{
+    CardPokemon* pokemon = qobject_cast<CardPokemon*>(sender());
+    int indexCard = -1;
+
+    //check if the card come from the fight area
+    indexCard = fight()->indexOf(pokemon);
+
+    //found
+    if(indexCard >= 0)
+    {
+        emit energyAdded(name(), ConstantesShared::PACKET_Fight, indexCard, idEnergy);
+    }
+    //try in bench area
+    else
+    {
+        indexCard = bench()->indexOf(pokemon);
+
+        //found
+        if(indexCard >= 0)
+        {
+            emit energyAdded(name(), ConstantesShared::PACKET_Bench, indexCard, idEnergy);
+        }
+    }
+}
+
+void Player::onEnergyRemoved_CardPokemon(int indexEnergy)
+{
+    CardPokemon* pokemon = qobject_cast<CardPokemon*>(sender());
+    int indexCard = -1;
+
+    //check if the card come from the fight area
+    indexCard = fight()->indexOf(pokemon);
+
+    //found
+    if(indexCard >= 0)
+    {
+        emit energyRemoved(name(), ConstantesShared::PACKET_Fight, indexCard, indexEnergy);
+    }
+    //try in bench area
+    else
+    {
+        indexCard = bench()->indexOf(pokemon);
+
+        //found
+        if(indexCard >= 0)
+        {
+            emit energyRemoved(name(), ConstantesShared::PACKET_Bench, indexCard, indexEnergy);
+        }
+    }
+}
+
+/************************************************************
 *****				FONCTIONS PRIVEES					*****
 ************************************************************/
 bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket *destination, int index)
@@ -528,10 +623,21 @@ bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket 
     {
         if (destination->isFull() == false)
         {
+            //get data before action
+            ConstantesShared::EnumPacket packetOrigin = ConstantesShared::EnumPacketFromName(source->name());
+            int indexCardOrigin = source->indexOf(cardToMove);
+            ConstantesShared::EnumPacket packetDestination = ConstantesShared::EnumPacketFromName(destination->name());
+            int idCard = cardToMove->id();
+
+            //action
             moveSuccess = source->removeFromPacketWithoutDelete(cardToMove);
 
             if(moveSuccess == true)
+            {
                 moveSuccess = destination->addNewCard(cardToMove);
+
+                //Send notification
+                emit cardMoved(name(), packetOrigin, indexCardOrigin, packetDestination, idCard);
         }
     }
     else

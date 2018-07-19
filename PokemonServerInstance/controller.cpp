@@ -28,6 +28,9 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     m_communication->startListening();
 
     connect(m_gameManager, &GameManager::indexCurrentPlayerChanged, this, &Controller::onIndexCurrentPlayerChanged_GameManager);
+    connect(m_gameManager, &GameManager::dataPokemonChanged, this, &Controller::onDataPokemonChanged_GameManager);
+    connect(m_gameManager, &GameManager::energyAdded, this, &Controller::onEnergyAdded_GameManager);
+    connect(m_gameManager, &GameManager::energyRemoved, this, &Controller::onEnergyRemoved_GameManager);
     connect(m_gameManager, &GameManager::logReceived, this, &Controller::onLogReceived);
     m_gameManager->setNumberMaxOfPlayers(2);
 
@@ -137,6 +140,22 @@ void Controller::onIndexCurrentPlayerChanged_GameManager(const QString &oldPlaye
 {
     sendNotifEndOfTurn(oldPlayer, newPlayer);
 }
+
+void Controller::onDataPokemonChanged_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon)
+{
+    sendNotifDataPokemonChanged(namePlayer, packet, indexCard, pokemon);
+}
+
+void Controller::onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy)
+{
+    sendNotifEnergyAdded(namePlayer, packet, indexCard, idEnergy);
+}
+
+void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy)
+{
+    sendNotifEnergyRemoved(namePlayer, packet, indexCard, indexEnergy);
+}
+
 
 /************************************************************
 *****               FONCTIONS PRIVEES					*****
@@ -396,10 +415,38 @@ void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, Constant
     }
 
     AbstractNotification* notif = new NotificationDataPokemonChanged(namePlayer,
-                                                                 packet,
-                                                                 indexCard,
-                                                                 pokemon->lifeLeft(),
-                                                                 mapAttackAvailable,
-                                                                 listEnergies);
+                                                                     packet,
+                                                                     indexCard,
+                                                                     pokemon->lifeLeft(),
+                                                                     mapAttackAvailable,
+                                                                     listEnergies);
+    m_historicNotif.addNewNotification(notif);
+}
+
+void Controller::sendNotifPokemonSwitched(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard)
+{
+    AbstractNotification* notif = new NotificationPokemonSwitched(namePlayer,
+                                                                  packet,
+                                                                  indexCard,
+                                                                  newIdCard);
+
+    m_historicNotif.addNewNotification(notif);
+}
+
+void Controller::sendNotifEnergyAdded(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy)
+{
+    AbstractNotification* notif = new NotificationEnergyAdded(namePlayer,
+                                                              packet,
+                                                              indexCard,
+                                                              idEnergy);
+    m_historicNotif.addNewNotification(notif);
+}
+
+void Controller::sendNotifEnergyRemoved(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy)
+{
+    AbstractNotification* notif = new NotificationEnergyRemoved(namePlayer,
+                                                                packet,
+                                                                indexCard,
+                                                                indexEnergy);
     m_historicNotif.addNewNotification(notif);
 }

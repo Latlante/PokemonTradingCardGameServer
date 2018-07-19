@@ -1,7 +1,7 @@
 #include "notificationenergyadded.h"
 
-NotificationEnergyAdded::NotificationEnergyAdded(ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int idEnergy) :
-    AbstractNotification(),
+NotificationEnergyAdded::NotificationEnergyAdded(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int idEnergy) :
+    AbstractNotification(namePlayer),
     m_packet(packet),
     m_indexCard(indexCard),
     m_idEnergy(idEnergy)

@@ -54,6 +54,11 @@ AbstractCard* AbstractPacket::card(int index)
     return card;
 }
 
+int AbstractPacket::indexOf(AbstractCard *card)
+{
+    return m_listCards.indexOf(card);
+}
+
 /************************************************************
 *****			FONCTIONS SLOT PROTEGEES				*****
 ************************************************************/

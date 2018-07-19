@@ -10,6 +10,13 @@
 #define MAXCARDS_REWARD     6
 #define MAXCARDS_TRASH      60
 
+#define NAME_BENCH          "Bench"
+#define NAME_DECK           "Deck"
+#define NAME_FIGHT          "Fight"
+#define NAME_HAND           "Hand"
+#define NAME_REWARDS        "Rewards
+#define NAME_TRASH          "Trash"
+
 #define DAMAGE_POISON           10
 #define DAMAGE_WHEN_CONFUSED    30
 

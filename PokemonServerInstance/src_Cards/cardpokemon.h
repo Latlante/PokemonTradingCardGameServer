@@ -166,6 +166,8 @@ signals:
     void statusChanged();
     void listEnergiesChanged();
     void hasEvolved();
+    void energyAdded(int);
+    void energyRemoved(int);
 
 private:
 	AbstractCard::Enum_element m_element;

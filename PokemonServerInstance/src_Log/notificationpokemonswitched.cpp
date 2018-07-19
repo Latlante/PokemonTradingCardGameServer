@@ -1,7 +1,7 @@
 #include "notificationpokemonswitched.h"
 
-NotificationPokemonSwitched::NotificationPokemonSwitched(ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int newIdCard) :
-    AbstractNotification(),
+NotificationPokemonSwitched::NotificationPokemonSwitched(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int newIdCard) :
+    AbstractNotification(namePlayer),
     m_packet(packet),
     m_indexCard(indexCard),
     m_newIdCard(newIdCard)

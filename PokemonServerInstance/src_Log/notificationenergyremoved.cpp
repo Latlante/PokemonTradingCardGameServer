@@ -1,7 +1,7 @@
 #include "notificationenergyremoved.h"
 
-NotificationEnergyRemoved::NotificationEnergyRemoved(ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int indexEnergy) :
-    AbstractNotification(),
+NotificationEnergyRemoved::NotificationEnergyRemoved(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int indexEnergy) :
+    AbstractNotification(namePlayer),
     m_packet(packet),
     m_indexCard(indexCard),
     m_indexEnergy(indexEnergy)

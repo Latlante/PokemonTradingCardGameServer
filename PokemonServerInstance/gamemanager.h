@@ -7,6 +7,7 @@
 #include "common/constantesqml.h"
 #include "src_Cards/abstractcard.h"
 #include "src_Cards/cardpokemon.h"
+#include "../Share/constantesshared.h"
 
 class CtrlPopups;
 
@@ -81,6 +82,12 @@ signals:
 
     void logReceived(QString);
     void movingCardAnimationStartAsked();
+
+    void initReadyChanged();
+    void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int);
+    void dataPokemonChanged(const QString&,ConstantesShared::EnumPacket,int,CardPokemon*);
+    void energyAdded(const QString&, ConstantesShared::EnumPacket, int, int);
+    void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, int);
 
 private slots:
     void onEndOfTurn_Player();

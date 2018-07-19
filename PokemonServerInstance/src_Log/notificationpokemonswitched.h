@@ -6,7 +6,7 @@
 class NotificationPokemonSwitched : public AbstractNotification
 {
 public:
-    NotificationPokemonSwitched(ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int newIdCard);
+    NotificationPokemonSwitched(const QString& namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int newIdCard);
 
     virtual QJsonObject messageJsonForOwner() override;
     virtual QJsonObject messageJsonForOthers() override;

@@ -28,6 +28,9 @@ private slots:
     void onLogReceived(QString message);
 
     void onIndexCurrentPlayerChanged_GameManager(const QString& oldPlayer, const QString& newPlayer);
+    void onDataPokemonChanged_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon);
+    void onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy);
+    void onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy);
 
 private:
     StdListenerWritter* m_communication;
@@ -45,6 +48,9 @@ private:
     void sendNotifEndOfTurn(const QString& oldPlayer, const QString& newPlayer);
     void sendNotifCardMoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard);
     void sendNotifDataPokemonChanged(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon);
+    void sendNotifPokemonSwitched(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard);
+    void sendNotifEnergyAdded(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy);
+    void sendNotifEnergyRemoved(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy);
 };
 
 #endif // CONTROLLER_H

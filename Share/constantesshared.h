@@ -20,7 +20,8 @@ public:
         PHASE_MoveACard = 40,
         PHASE_Attack_Retreat = 41,
         PHASE_SkipTheTurn = 42,
-        PHASE_NotifPlayerIsReady = 100,
+        PHASE_NewGameCreated = 100,
+        PHASE_NotifPlayerIsReady,
         PHASE_NotifEndOfTurn,
         PHASE_NotifCardMoved,
         PHASE_NotifDataPokemonChanged,
@@ -31,7 +32,8 @@ public:
 
     enum EnumPacket
     {
-        PACKET_Bench = 1,
+        PACKET_None = 0,
+        PACKET_Bench,
         PACKET_Deck,
         PACKET_Fight,
         PACKET_Hand,
@@ -40,6 +42,8 @@ public:
     };
 
     ConstantesShared();
+
+    static EnumPacket EnumPacketFromName(const QString& name);
 };
 
 #endif // CONSTANTESSHARED_H

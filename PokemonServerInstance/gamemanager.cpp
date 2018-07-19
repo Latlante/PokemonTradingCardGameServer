@@ -271,6 +271,9 @@ Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
         newPlayer = new Player(name, listCards);
 
         connect(newPlayer, &Player::endOfTurn, this, &GameManager::onEndOfTurn_Player);
+        connect(newPlayer, &Player::dataPokemonChanged, this, &GameManager::dataPokemonChanged);
+        connect(newPlayer, &Player::energyAdded, this, &GameManager::energyAdded);
+        connect(newPlayer, &Player::energyRemoved, this, &GameManager::energyRemoved);
 
         m_listPlayers.append(newPlayer);
     }
@@ -316,6 +319,8 @@ void GameManager::setInitReady(Player *playerReady)
 
     if(everyoneIsReady == true)
         setGameStatus(ConstantesQML::StepGameInProgress);
+
+
 }
 
 //PHASE DE COMBAT

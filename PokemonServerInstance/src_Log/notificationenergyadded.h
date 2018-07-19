@@ -6,7 +6,7 @@
 class NotificationEnergyAdded : public AbstractNotification
 {
 public:
-    NotificationEnergyAdded(ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int idEnergy);
+    NotificationEnergyAdded(const QString& namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int idEnergy);
 
     virtual QJsonObject messageJsonForOwner() override;
     virtual QJsonObject messageJsonForOthers() override;

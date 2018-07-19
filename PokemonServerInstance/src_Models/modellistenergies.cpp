@@ -191,6 +191,11 @@ bool ModelListEnergies::hasEnoughEnergies(QMap<AbstractCard::Enum_element, unsig
     return statusBack;
 }
 
+int ModelListEnergies::indexOf(CardEnergy *energy)
+{
+    return m_listEnergies.indexOf(energy);
+}
+
 int ModelListEnergies::countCard()
 {
     return m_listEnergies.count();

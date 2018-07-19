@@ -555,7 +555,11 @@ void CardPokemon::addEnergy(CardEnergy *energy)
     qDebug() << __PRETTY_FUNCTION__;
 #endif
 
-    m_modelListEnergies->addEnergy(energy);
+    if(energy != nullptr)
+    {
+        m_modelListEnergies->addEnergy(energy);
+        emit energyAdded(energy->id());
+    }
 }
 
 CardEnergy* CardPokemon::takeEnergy(int index)
@@ -564,6 +568,7 @@ CardEnergy* CardPokemon::takeEnergy(int index)
     qDebug() << __PRETTY_FUNCTION__;
 #endif
 
+    emit energyRemoved(index);
     return m_modelListEnergies->takeEnergy(index);
 }
 
@@ -575,7 +580,10 @@ void CardPokemon::moveEnergiesInTrash(QList<CardEnergy*> listEnergies)
 
     //On les supprime
     foreach(CardEnergy* energy, listEnergies)
+    {
+        emit energyRemoved(m_modelListEnergies->indexOf(energy));
         m_modelListEnergies->removeEnergy(energy);
+    }
 
     //Maintenant on peut les placer dans la défausse
     foreach(CardEnergy* energy, listEnergies)
@@ -587,6 +595,10 @@ void CardPokemon::moveAllEnergiesInTrash()
 #ifdef TRACAGE_PRECIS
     qDebug() << __PRETTY_FUNCTION__;
 #endif
+
+    //Notification
+    for(int i=0;i<m_modelListEnergies->countCard();++i)
+        emit energyRemoved(0);
 
     //On récupére les énergies
     QList<CardEnergy*> listEnergies = m_modelListEnergies->takeAllEnergies();

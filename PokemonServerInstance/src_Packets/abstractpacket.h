@@ -33,6 +33,7 @@ public:
     bool isFull();
     bool isEmpty();
     AbstractCard* card(int index);
+    int indexOf(AbstractCard* card);
 
     virtual QVariant data(const QModelIndex &index, int role) const = 0;
     virtual int rowCount(const QModelIndex& = QModelIndex()) const = 0;
