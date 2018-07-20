@@ -9,6 +9,7 @@ public:
     Authentification();
 
     static QList<QString> listOfAllUsers();
+    static QString namePlayerFromUid(int uidPlayer);
 
     bool checkUser(QString user, QString password);
     QString user() const;

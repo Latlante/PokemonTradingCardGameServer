@@ -1,6 +1,11 @@
 #include "instancemanager.h"
-
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+#include "authentification.h"
+#include "Share/constantesshared.h"
 
 const QString InstanceManager::m_PATH_INSTANCE = "D:/Users/sapiensc/Documents/GitHub/PokemonTradingCardGameServer/build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit-Release/release/PokemonServerInstance.exe";
 InstanceManager* InstanceManager::m_instance = new InstanceManager();
@@ -36,7 +41,7 @@ void InstanceManager::deleteInstance()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-unsigned int InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString name)
+unsigned int InstanceManager::createNewGame(int uidPlayCreator, int uidPlayOpponent, QString name)
 {
     qDebug() << "Creation new process";
 
@@ -52,11 +57,12 @@ unsigned int InstanceManager::createNewGame(int uidPlay1, int uidPlay2, QString 
         if(nameOfTheGame == "")
             nameOfTheGame = "game #" + QString::number(m_listGame.count());
 
-        InstanceGame game = { process, nameOfTheGame, uidPlay1, uidPlay2 };
+        InstanceGame game = { process, nameOfTheGame, uidPlayCreator, uidPlayOpponent };
         m_listGame.insert(m_indexGame, game);
         indexNewGame = m_indexGame;
         m_indexGame++;
 
+        sendNotifNewGameCreated(indexNewGame, uidPlayCreator, uidPlayOpponent);
         qDebug() << "New process started";
     }
     else
@@ -230,4 +236,22 @@ void InstanceManager::onFinished_Process(int exitCode)
     qDebug() << __PRETTY_FUNCTION__ << ", the instance " << uidGame << " is closed with code " << exitCode;
 
     removeGame(uidGame);
+}
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/
+void InstanceManager::sendNotifNewGameCreated(unsigned int uidGame, int uidPlayerCreator, int uidPlayerOpponent)
+{
+    QJsonObject jsonResponse;
+    const QString namePlayerCreator = Authentification::namePlayerFromUid(uidPlayerCreator);
+    const QString namePlayerOpponent = Authentification::namePlayerFromUid(uidPlayerOpponent);
+
+    jsonResponse["phase"] = ConstantesShared::PHASE_NotifNewGameCreated;
+    jsonResponse["uidGame"] = static_cast<int>(uidGame);
+    jsonResponse["nameGame"] = m_listGame[uidGame].name;
+    jsonResponse["opponent"] = namePlayerCreator;
+
+    QByteArray messageJson = namePlayerOpponent.toLatin1() + ";" + QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact);
+    emit readyRead(uidGame, messageJson);
 }

@@ -17,7 +17,7 @@ ConstantesShared::EnumPacket ConstantesShared::EnumPacketFromName(const QString 
         packet = PACKET_Fight;
     else if(name == "Hand")
         packet = PACKET_Hand;
-    else if(name = "Rewards")
+    else if(name == "Rewards")
         packet = PACKET_Rewards;
     else if(name == "Trash")
         packet = PACKET_Trash;

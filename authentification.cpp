@@ -33,6 +33,29 @@ QList<QString> Authentification::listOfAllUsers()
     return listUsers;
 }
 
+QString Authentification::namePlayerFromUid(int uidPlayer)
+{
+    QFile fileUsers(m_PATH_FILE_USERS);
+    fileUsers.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString content = fileUsers.readAll();
+    fileUsers.close();
+
+    QList<QString> listPlayers = content.split("\n");
+    QList<QString>::iterator itListPlayers = listPlayers.begin();
+    QString namePlayer = "";
+
+    while((itListPlayers != listPlayers.end()) && (namePlayer == ""))
+    {
+        const QString infoPlayer = *(itListPlayers);
+        if(infoPlayer.section(';', Position_Uid, Position_Uid) == QString::number(uidPlayer))
+            namePlayer = infoPlayer.section(';', Position_Name, Position_Name);
+
+        itListPlayers++;
+    }
+
+    return namePlayer;
+}
+
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/

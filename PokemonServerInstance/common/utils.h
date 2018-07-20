@@ -14,7 +14,7 @@
 #define NAME_DECK           "Deck"
 #define NAME_FIGHT          "Fight"
 #define NAME_HAND           "Hand"
-#define NAME_REWARDS        "Rewards
+#define NAME_REWARDS        "Rewards"
 #define NAME_TRASH          "Trash"
 
 #define DAMAGE_POISON           10

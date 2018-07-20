@@ -30,11 +30,11 @@ ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
 
 ThreadClient::~ThreadClient()
 {
-    if(m_timerWritting != nullptr)
+    /*if(m_timerWritting != nullptr)
     {
         delete m_timerWritting;
         m_timerWritting = nullptr;
-    }
+    }*/
 }
 
 /************************************************************
@@ -209,6 +209,7 @@ void ThreadClient::onDisconnected_TcpSocket()
 {
     qDebug() << __PRETTY_FUNCTION__;
 
+    delete m_timerWritting;
     m_tcpSocket->deleteLater();
     exit(0);
 }

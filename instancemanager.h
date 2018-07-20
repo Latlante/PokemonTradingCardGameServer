@@ -23,7 +23,7 @@ public:
     static InstanceManager* instance();
     static void deleteInstance();
 
-    unsigned int createNewGame(int uidPlay1, int uidPlay2, QString name = "");
+    unsigned int createNewGame(int uidPlayCreator, int uidPlayOpponent, QString name = "");
     QProcess* game(int index);
     bool removeGame(int index);
 
@@ -49,6 +49,8 @@ private:
     static unsigned int m_indexGame;
 
     QMap<unsigned int, InstanceGame> m_listGame;
+
+    void sendNotifNewGameCreated(unsigned int uidGame, int uidPlayerCreator, int uidPlayerOpponent);
 };
 
 #endif // INSTANCEMANAGER_H

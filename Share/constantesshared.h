@@ -20,7 +20,7 @@ public:
         PHASE_MoveACard = 40,
         PHASE_Attack_Retreat = 41,
         PHASE_SkipTheTurn = 42,
-        PHASE_NewGameCreated = 100,
+        PHASE_NotifNewGameCreated = 100,
         PHASE_NotifPlayerIsReady,
         PHASE_NotifEndOfTurn,
         PHASE_NotifCardMoved,

@@ -638,6 +638,7 @@ bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket 
 
                 //Send notification
                 emit cardMoved(name(), packetOrigin, indexCardOrigin, packetDestination, idCard);
+            }
         }
     }
     else
