@@ -25,7 +25,7 @@ ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
     m_uid(-1),
     m_token("")
 {
-
+    connect(this, &ThreadClient::writeToInstance, InstanceManager::instance(), &InstanceManager::write);
 }
 
 ThreadClient::~ThreadClient()
@@ -72,7 +72,7 @@ void ThreadClient::onReadyRead_TcpSocket()
 {
     QByteArray message = m_tcpSocket->readAll();
 
-    qDebug() << __PRETTY_FUNCTION__ << m_socketDescriptor << ", " << message;
+    qDebug() << m_user << __PRETTY_FUNCTION__ << m_socketDescriptor << ", " << message;
 
     bool hasToRepond = true;
     QJsonObject jsonResponse;
@@ -95,7 +95,7 @@ void ThreadClient::onReadyRead_TcpSocket()
             if(tokenReceive == m_token)
             {
                 int phase = jsonReceived["phase"].toInt();
-                qDebug() << __PRETTY_FUNCTION__ << "phase:" << phase;
+                qDebug() << m_user << __PRETTY_FUNCTION__ << "phase:" << phase;
 
                 switch(phase)
                 {
@@ -160,14 +160,15 @@ void ThreadClient::onReadyRead_TcpSocket()
                     objectReceived.remove("uidGame");
 
                     //transfer to the game
-                    if(InstanceManager::instance()->write(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact)))
+                    /*if(InstanceManager::instance()->write(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact)))
                     {
-                        qDebug() << __PRETTY_FUNCTION__ << "Write OK";
+                        qDebug() << m_user << __PRETTY_FUNCTION__ << "Write OK";
                     }
                     else
                     {
-                        qCritical() << __PRETTY_FUNCTION__ << "Write error";
-                    }
+                        qCritical() << m_user << __PRETTY_FUNCTION__ << "Write error";
+                    }*/
+                    emit writeToInstance(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact));
                 }
                     break;
 
@@ -175,7 +176,7 @@ void ThreadClient::onReadyRead_TcpSocket()
                     const QString error = "error: phase does not exist";
                     jsonResponse["result"] = "ko";
                     jsonResponse["error"] = error;
-                    qCritical() << error;
+                    qCritical() << m_user << error;
                 }
             }
             //wrong token
@@ -184,7 +185,7 @@ void ThreadClient::onReadyRead_TcpSocket()
                 const QString error = "wrong token";
                 jsonResponse["result"] = "ko";
                 jsonResponse["error"] = error;
-                qCritical() << error;
+                qCritical() << m_user << error;
             }
 
         }
@@ -195,7 +196,7 @@ void ThreadClient::onReadyRead_TcpSocket()
         const QString error = "error during the creation of the json document";
         jsonResponse["result"] = "ko";
         jsonResponse["error"] = error;
-        qCritical() << error;
+        qCritical() << m_user << error;
     }
 
     if(hasToRepond == true)
@@ -207,7 +208,7 @@ void ThreadClient::onReadyRead_TcpSocket()
 
 void ThreadClient::onDisconnected_TcpSocket()
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    qDebug() << m_user << __PRETTY_FUNCTION__;
 
     delete m_timerWritting;
     m_tcpSocket->deleteLater();
@@ -216,7 +217,7 @@ void ThreadClient::onDisconnected_TcpSocket()
 
 void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message)
 {
-    qDebug() << __PRETTY_FUNCTION__ << "Message recu du process," << uidGame << message;
+    qDebug() << m_user << __PRETTY_FUNCTION__ << "Message recu du process," << uidGame << message;
 
     //check if we are concerned by the message
     if(InstanceManager::instance()->isInTheGame(uidGame, m_uid))
@@ -279,10 +280,12 @@ void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray 
 
             if(m_user == namePlayer)
             {
+                qDebug() << m_user << __PRETTY_FUNCTION__ << "Envoi message propriétaire";
                 m_listMessageToSend.append(messageOwner);
             }
-            else if(messageOthers.isEmpty() == false)
+            else if((messageOthers.isEmpty() == false) && (messageOthers != "{}"))
             {
+                qDebug() << m_user << __PRETTY_FUNCTION__ << "Envoi message aux autres";
                 m_listMessageToSend.append(messageOthers);
             }
         }

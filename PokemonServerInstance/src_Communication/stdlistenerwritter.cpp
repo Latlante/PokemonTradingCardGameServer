@@ -49,9 +49,12 @@ void StdListenerWritter::listening()
 
         if(message.isEmpty() == false)
         {
+            emit logReceived("StdListenerWritter: Message received");
             emit messageReceived(message);
         }
 
         QThread::msleep(100);
     }
+
+    emit logReceived("StdListenerWritter: Stop listening");
 }

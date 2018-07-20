@@ -17,8 +17,11 @@ public:
 public slots:
     void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
 
-public slots:
+protected:
     void run() override;
+
+signals:
+    void writeToInstance(unsigned int,QByteArray);
 
 private slots:
     void onReadyRead_TcpSocket();

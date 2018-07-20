@@ -27,7 +27,6 @@ public:
     QProcess* game(int index);
     bool removeGame(int index);
 
-    bool write(unsigned int uidGame, QByteArray message);
 
     bool checkNameOfGameIsAvailable(const QString& nameGame);
     QString nameOfTheGameFromUidGame(int uidGame);
@@ -35,6 +34,9 @@ public:
     bool isInTheGame(unsigned int uidGame, unsigned int uidPlayer);
     QList<unsigned int> listUidGamesFromUidPlayer(int uidPlayer);
     QList<unsigned int> listUidPlayersFromUidGame(unsigned int uidGame);
+
+public slots:
+    bool write(unsigned int uidGame, QByteArray message);
 
 signals:
     void readyRead(unsigned int, QByteArray);
