@@ -215,7 +215,8 @@ bool Player::moveCardFromHandToBench(int indexHand, int indexBench)
 
     AbstractCard* cardToMove = hand()->card(indexHand);
 
-    if (cardToMove != nullptr)
+    //card cannot be moved if not pokemon in fight area
+    if ((fight()->pokemonFighter() != nullptr) && (cardToMove != nullptr))
     {
         //On autorise uniquement les cartes de type Pokemon a être posé sur le banc
         if (cardToMove->type() == AbstractCard::TypeOfCard_Pokemon)

@@ -73,7 +73,7 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
     bool success = false;
     Player* play = playerByName(namePlayer);
 
-    if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Fight))
+    /*if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Fight))
         success = play->moveCardFromBenchToFight(play->bench()->cardPok(indexCardOrigin));
     else if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Trash))
         success = play->moveCardFromBenchToTrash(indexCardOrigin);
@@ -96,7 +96,12 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
     else if((packetOrigin == Player::PCK_Trash) && (packetDestination == Player::PCK_Hand))
         success = play->moveCardFromHandToFight(indexCardOrigin);
     else
-        emit logReceived(QString(__PRETTY_FUNCTION__) + "move not developp yet");
+        emit logReceived(QString(__PRETTY_FUNCTION__) + "move not developp yet");*/
+
+    if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Bench))
+        success = play->moveCardFromHandToBench(indexCardOrigin, indexCardDestination);
+    else if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Fight))
+        success = play->moveCardFromHandToFight(indexCardOrigin);
 
     return success;
 }
