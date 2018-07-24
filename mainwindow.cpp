@@ -12,13 +12,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     new InstanceManager();
 
-    m_serverClient->start();
+    if(InstanceManager::instance()->checkInstanceExeExists())
+        m_serverClient->start();
+    else
+        qCritical() << __PRETTY_FUNCTION__ << "Instance exe not found";
 }
 
 MainWindow::~MainWindow()
 {
     InstanceManager::deleteInstance();
-    m_serverClient->close();
+
+    if(m_serverClient->isRunning())
+        m_serverClient->close();
     delete m_serverClient;
+
     delete ui;
 }

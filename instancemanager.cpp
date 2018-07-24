@@ -1,5 +1,6 @@
 #include "instancemanager.h"
 #include <QDebug>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -41,43 +42,57 @@ void InstanceManager::deleteInstance()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-unsigned int InstanceManager::createNewGame(int uidPlayCreator, int uidPlayOpponent, QString name)
+bool InstanceManager::checkInstanceExeExists()
+{
+    return QFile::exists(m_PATH_INSTANCE);
+}
+
+unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigned int uidPlayOpponent, const QString& name, QString& error)
 {
     qDebug() << "Creation new process";
-
     unsigned int indexNewGame = 0;
-    QProcess* process = new QProcess();
-    connect(process, &QProcess::readyRead, this, &InstanceManager::onReadyRead_Process);
-    connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &InstanceManager::onFinished_Process);
-    process->start(m_PATH_INSTANCE, {name, "Player1", "Player2"});
 
-    if(process->waitForStarted())
-    {
-        QString nameOfTheGame = name;
-        if(nameOfTheGame == "")
-            nameOfTheGame = "game #" + QString::number(m_listGame.count());
+	if(uidPlayCreator != uidPlayOpponent)
+	{
+		QProcess* process = new QProcess();
+		connect(process, &QProcess::readyRead, this, &InstanceManager::onReadyRead_Process);
+		connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &InstanceManager::onFinished_Process);
+		process->start(m_PATH_INSTANCE, {name, "Player1", "Player2"});
 
-        InstanceGame game = { process, nameOfTheGame, uidPlayCreator, uidPlayOpponent };
-        m_listGame.insert(m_indexGame, game);
-        indexNewGame = m_indexGame;
-        m_indexGame++;
+		if(process->waitForStarted())
+		{
+			QString nameOfTheGame = name;
+			if(nameOfTheGame == "")
+				nameOfTheGame = "game #" + QString::number(m_listGame.count());
 
-        sendNotifNewGameCreated(indexNewGame, uidPlayCreator, uidPlayOpponent);
-        qDebug() << "New process started";
-    }
-    else
-    {
-        qCritical() << "Error creation new process";
-    }
+			InstanceGame game = { process, nameOfTheGame, uidPlayCreator, uidPlayOpponent };
+			m_listGame.insert(m_indexGame, game);
+			indexNewGame = m_indexGame;
+			m_indexGame++;
+
+			sendNotifNewGameCreated(indexNewGame, uidPlayCreator, uidPlayOpponent);
+			qDebug() << "New process started";
+		}
+		else
+		{
+			error = "Process does not start";
+			qCritical() << "Process does not start";
+		}
+	}
+	else
+	{
+		error = "You cannot create a game against yourself";
+		qCritical() << "You cannot create a game against yourself";
+	}
 
     return indexNewGame;
 }
 
-QProcess* InstanceManager::game(int index)
+QProcess* InstanceManager::game(unsigned int index)
 {
     QProcess* processToReturn = nullptr;
 
-    if((index >= 0) && (m_listGame.contains(index)))
+    if(m_listGame.contains(index))
     {
         processToReturn = m_listGame[index].process;
     }
@@ -85,7 +100,7 @@ QProcess* InstanceManager::game(int index)
     return processToReturn;
 }
 
-bool InstanceManager::removeGame(int index)
+bool InstanceManager::removeGame(unsigned int index)
 {
     bool success = false;
     if(m_listGame.contains(index) == true)
@@ -149,11 +164,11 @@ bool InstanceManager::checkNameOfGameIsAvailable(const QString &nameGame)
     return !nameFound;
 }
 
-QString InstanceManager::nameOfTheGameFromUidGame(int uidGame)
+QString InstanceManager::nameOfTheGameFromUidGame(unsigned int uidGame)
 {
     QString name = "";
 
-    if((uidGame >= 0) && (m_listGame.contains(uidGame)))
+    if(m_listGame.contains(uidGame))
         name = m_listGame[uidGame].name;
 
     return name;
@@ -185,7 +200,33 @@ bool InstanceManager::isInTheGame(unsigned int uidGame, unsigned int uidPlayer)
     return listUidGameForPlayer.contains(uidGame);
 }
 
-QList<unsigned int> InstanceManager::listUidGamesFromUidPlayer(int uidPlayer)
+unsigned int InstanceManager::uidOpponentOfInGame(unsigned int uidGame, unsigned int uidPlayer)
+{
+    unsigned int uidOpponent = 0;
+    const QList<unsigned int> listPlayers = listUidPlayersFromUidGame(uidGame);
+
+    if(listPlayers.count() >= 2)
+    {
+        uidOpponent = (uidPlayer == listPlayers[0]) ? listPlayers[1] : listPlayers[0];
+    }
+
+    return uidOpponent;
+}
+
+QString InstanceManager::nameOpponentOfInGame(unsigned int uidGame, unsigned int uidPlayer)
+{
+    QString nameOpponent = "";
+    unsigned int uidOpponent = uidOpponentOfInGame(uidGame, uidPlayer);
+
+    if(uidOpponent > 0)
+    {
+        nameOpponent = Authentification::namePlayerFromUid(uidOpponent);
+    }
+
+    return nameOpponent;
+}
+
+QList<unsigned int> InstanceManager::listUidGamesFromUidPlayer(unsigned int uidPlayer)
 {
     QList<unsigned int> listUidGames;
 
@@ -241,7 +282,7 @@ void InstanceManager::onFinished_Process(int exitCode)
 /************************************************************
 *****				FONCTIONS PRIVEES					*****
 ************************************************************/
-void InstanceManager::sendNotifNewGameCreated(unsigned int uidGame, int uidPlayerCreator, int uidPlayerOpponent)
+void InstanceManager::sendNotifNewGameCreated(unsigned int uidGame, unsigned int uidPlayerCreator, unsigned int uidPlayerOpponent)
 {
     QJsonObject jsonResponse;
     const QString namePlayerCreator = Authentification::namePlayerFromUid(uidPlayerCreator);

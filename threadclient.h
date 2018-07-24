@@ -12,7 +12,7 @@ class ThreadClient : public QThread
     Q_OBJECT
 public:
     explicit ThreadClient(int socketDescriptor, QObject *parent = nullptr);
-    ~ThreadClient();
+    ~ThreadClient() override;
 
 public slots:
     void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
@@ -38,12 +38,12 @@ private:
     QList<QByteArray> m_listMessageToSend;
 
     QString m_user;
-    int m_uid;
+    unsigned int m_uid;
     QString m_token;
 
     QJsonObject authentify(QString user, QString password);
 
-    QJsonArray jsonArrayOfGamesForUidPlayer(int uidPlayer);
+    QJsonArray jsonArrayOfGamesForUidPlayer(unsigned int uidPlayer);
 };
 
 #endif // THREADCLIENT_H

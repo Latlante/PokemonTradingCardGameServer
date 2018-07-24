@@ -1,12 +1,14 @@
 #include "authentification.h"
 
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonObject>
 
 const QString Authentification::m_PATH_FILE_USERS = "Files/users.txt";
 
 Authentification::Authentification() :
     m_user(""),
-    m_uid(-1),
+    m_uid(0),
     m_token("")
 {
 
@@ -15,25 +17,28 @@ Authentification::Authentification() :
 /************************************************************
 *****				FONCTIONS STATIQUES					*****
 ************************************************************/
-QList<QString> Authentification::listOfAllUsers()
+QJsonArray Authentification::listOfAllUsers()
 {
     QFile fileUsers(m_PATH_FILE_USERS);
     fileUsers.open(QIODevice::ReadOnly | QIODevice::Text);
     QString content = fileUsers.readAll();
     fileUsers.close();
 
-    QList<QString> listUsers;
+    QJsonArray listUsers;
     QList<QString> contentSplitByLine = content.split("\n");
 
     foreach(QString line, contentSplitByLine)
     {
-        listUsers.append(line.section(';', Position_Name, Position_Name));
+        QJsonObject obj;
+        obj["uid"] = line.section(';', Position_Uid, Position_Uid);
+        obj["name"] = line.section(';', Position_Name, Position_Name);
+        listUsers.append(obj);
     }
 
     return listUsers;
 }
 
-QString Authentification::namePlayerFromUid(int uidPlayer)
+QString Authentification::namePlayerFromUid(unsigned int uidPlayer)
 {
     QFile fileUsers(m_PATH_FILE_USERS);
     fileUsers.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -77,7 +82,7 @@ bool Authentification::checkUser(QString user, QString password)
         {
             userFound = true;
             m_user = user;
-            m_uid = line.section(';', Position_Uid, Position_Uid).toInt();
+            m_uid = static_cast<unsigned int>(line.section(';', Position_Uid, Position_Uid).toInt());
             m_token ="token";
         }
     }
@@ -90,7 +95,7 @@ QString Authentification::user() const
     return m_user;
 }
 
-int Authentification::uid() const
+unsigned int Authentification::uid() const
 {
     return m_uid;
 }

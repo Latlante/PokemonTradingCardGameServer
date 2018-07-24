@@ -106,8 +106,8 @@ void ThreadClient::onReadyRead_TcpSocket()
                     break;
                 case ConstantesShared::PHASE_ListOfAllPlayers:
                 {
-                    QList<QString> listOfPlayers = Authentification::listOfAllUsers();
-                    jsonResponse["players"] = QJsonArray::fromStringList(listOfPlayers);
+                    QJsonArray listOfPlayers = Authentification::listOfAllUsers();
+                    jsonResponse["players"] = listOfPlayers;
                     jsonResponse["count"] = listOfPlayers.count();
                 }
                     break;
@@ -119,8 +119,12 @@ void ThreadClient::onReadyRead_TcpSocket()
 
                     if(InstanceManager::instance()->checkNameOfGameIsAvailable(nameOfTheGame))
                     {
-                        unsigned int indexNewGame = InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame);
+						QString error = "";
+                        unsigned int indexNewGame = InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame, error);
                         jsonResponse["idGame"] = static_cast<int>(indexNewGame);
+						
+						if(indexNewGame == 0)
+							jsonResponse["error"] = error;
                     }
                     else
                     {
@@ -335,7 +339,7 @@ QJsonObject ThreadClient::authentify(QString user, QString password)
     return jsonResponse;
 }
 
-QJsonArray ThreadClient::jsonArrayOfGamesForUidPlayer(int uidPlayer)
+QJsonArray ThreadClient::jsonArrayOfGamesForUidPlayer(unsigned int uidPlayer)
 {
     QJsonArray jsonListIdGames;
     QList<unsigned int> listUidGames = InstanceManager::instance()->listUidGamesFromUidPlayer(uidPlayer);
@@ -345,6 +349,7 @@ QJsonArray ThreadClient::jsonArrayOfGamesForUidPlayer(int uidPlayer)
 
         jsonGame["uid"] = static_cast<int>(uidGame);
         jsonGame["name"] = InstanceManager::instance()->nameOfTheGameFromUidGame(uidGame);
+        jsonGame["opponent"] = InstanceManager::instance()->nameOpponentOfInGame(uidGame, uidPlayer);
 
         jsonListIdGames.append(jsonGame);
     }

@@ -5,16 +5,21 @@
 #include "threadclient.h"
 #include "instancemanager.h"
 
-TcpServerClients::TcpServerClients()
+TcpServerClients::TcpServerClients() :
+    m_isRunning(false)
 {
 
 }
 
+/************************************************************
+*****				FONCTIONS PUBLIQUES					*****
+************************************************************/
 void TcpServerClients::start()
 {
     if(listen(QHostAddress::Any, 23002))
     {
         qDebug() << "Server listening...";
+        m_isRunning = true;
     }
     else
     {
@@ -22,6 +27,14 @@ void TcpServerClients::start()
     }
 }
 
+bool TcpServerClients::isRunning()
+{
+    return m_isRunning;
+}
+
+/************************************************************
+*****				FONCTIONS PROTEGEES					*****
+************************************************************/
 void TcpServerClients::incomingConnection(qintptr socketDescriptor)
 {
     ThreadClient* client = new ThreadClient(socketDescriptor);

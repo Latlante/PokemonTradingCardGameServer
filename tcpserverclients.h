@@ -9,9 +9,13 @@ public:
     TcpServerClients();
 
     void start();
+    bool isRunning();
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
+
+private:
+    bool m_isRunning;
 };
 
 #endif // TCPSERVERCLIENTS_H

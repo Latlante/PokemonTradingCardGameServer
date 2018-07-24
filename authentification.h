@@ -8,12 +8,12 @@ class Authentification
 public:
     Authentification();
 
-    static QList<QString> listOfAllUsers();
-    static QString namePlayerFromUid(int uidPlayer);
+    static QJsonArray listOfAllUsers();
+    static QString namePlayerFromUid(unsigned int uidPlayer);
 
     bool checkUser(QString user, QString password);
     QString user() const;
-    int uid() const;
+    unsigned int uid() const;
     QString token() const;
 
 private:
@@ -27,7 +27,7 @@ private:
     };
 
     QString m_user;
-    int m_uid;
+    unsigned int m_uid;
     QString m_token;
 };
 

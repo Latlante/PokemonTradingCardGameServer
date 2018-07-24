@@ -12,8 +12,8 @@ class InstanceManager : public QObject
     {
         QProcess* process;
         QString name;
-        int m_uidPlayer1;
-        int m_uidPlayer2;
+        unsigned int m_uidPlayer1;
+        unsigned int m_uidPlayer2;
     };
 
 public:
@@ -23,17 +23,23 @@ public:
     static InstanceManager* instance();
     static void deleteInstance();
 
-    unsigned int createNewGame(int uidPlayCreator, int uidPlayOpponent, QString name = "");
-    QProcess* game(int index);
-    bool removeGame(int index);
+    //Handle game
+    bool checkInstanceExeExists();
+    unsigned int createNewGame(unsigned int uidPlayCreator, unsigned int uidPlayOpponent, const QString& name, QString& error);
+    QProcess* game(unsigned int index);
+    bool removeGame(unsigned int index);
 
-
-    bool checkNameOfGameIsAvailable(const QString& nameGame);
-    QString nameOfTheGameFromUidGame(int uidGame);
-    unsigned int uidGameFromQProcess(QProcess* process);
-    bool isInTheGame(unsigned int uidGame, unsigned int uidPlayer);
-    QList<unsigned int> listUidGamesFromUidPlayer(int uidPlayer);
+    //Players
     QList<unsigned int> listUidPlayersFromUidGame(unsigned int uidGame);
+    bool isInTheGame(unsigned int uidGame, unsigned int uidPlayer);
+    unsigned int uidOpponentOfInGame(unsigned int uidGame, unsigned int uidPlayer);
+    QString nameOpponentOfInGame(unsigned int uidGame, unsigned int uidPlayer);
+
+    //Game
+    QList<unsigned int> listUidGamesFromUidPlayer(unsigned int uidPlayer);
+    QString nameOfTheGameFromUidGame(unsigned int uidGame);
+    bool checkNameOfGameIsAvailable(const QString& nameGame);
+    unsigned int uidGameFromQProcess(QProcess* process);
 
 public slots:
     bool write(unsigned int uidGame, QByteArray message);
@@ -52,7 +58,7 @@ private:
 
     QMap<unsigned int, InstanceGame> m_listGame;
 
-    void sendNotifNewGameCreated(unsigned int uidGame, int uidPlayerCreator, int uidPlayerOpponent);
+    void sendNotifNewGameCreated(unsigned int uidGame, unsigned int uidPlayerCreator, unsigned int uidPlayerOpponent);
 };
 
 #endif // INSTANCEMANAGER_H
