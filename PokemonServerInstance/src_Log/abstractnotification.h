@@ -10,7 +10,8 @@
 class AbstractNotification
 {
 public:
-    explicit AbstractNotification(const QString& namePlayer = "");
+    explicit AbstractNotification(ConstantesShared::GamePhase phase, const QString& namePlayer = "");
+    virtual ~AbstractNotification();
 
     const QString namePlayer();
     void setNamePlayer(const QString& namePlayer);
@@ -26,6 +27,7 @@ protected:
     QJsonObject initObject();
 
 private:
+    ConstantesShared::GamePhase m_phase;
     QString m_namePlayer;
     unsigned int m_indexAction;
 

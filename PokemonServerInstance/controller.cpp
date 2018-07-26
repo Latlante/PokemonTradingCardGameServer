@@ -84,7 +84,7 @@ void Controller::onMessageReceived_Communication(QString message)
 
             case ConstantesShared::PHASE_Attack_Retreat:
                 jsonResponseOwner = attack_retreat(jsonReceived["namePlayer"].toString(),
-                                              jsonReceived["indexAttack"].toInt());
+                                                   jsonReceived["indexAttack"].toInt());
                 break;
 
             case ConstantesShared::PHASE_SkipTheTurn:
@@ -448,5 +448,13 @@ void Controller::sendNotifEnergyRemoved(const QString &namePlayer, ConstantesSha
                                                                 packet,
                                                                 indexCard,
                                                                 indexEnergy);
+    m_historicNotif.addNewNotification(notif);
+}
+
+void Controller::sendNotifDisplayPacket(const QString &namePlayer, QMap<int, int> cards)
+{
+    AbstractNotification* notif = new NotificationDisplayPackets(namePlayer,
+                                                                 cards);
+
     m_historicNotif.addNewNotification(notif);
 }

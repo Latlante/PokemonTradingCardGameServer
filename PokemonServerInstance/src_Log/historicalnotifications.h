@@ -11,6 +11,8 @@
 #include "src_Log/notificationplayerisready.h"
 #include "src_Log/notificationpokemonswitched.h"
 
+#include "src_Log/notificationdisplaypackets.h"
+
 class AbstractNotification;
 
 class HistoricalNotifications

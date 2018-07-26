@@ -1,7 +1,7 @@
 #include "notificationdatapokemonchanged.h"
 
 NotificationDataPokemonChanged::NotificationDataPokemonChanged(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int lifeLeft, QMap<unsigned int, bool> mapAttacksAvailable, QList<unsigned int> listIdEnergies) :
-    AbstractNotification(namePlayer),
+    AbstractNotification(ConstantesShared::PHASE_NotifDataPokemonChanged, namePlayer),
     m_packet(packet),
     m_indexCard(indexCard),
     m_lifeLeft(lifeLeft),
@@ -23,7 +23,6 @@ QJsonObject NotificationDataPokemonChanged::messageJsonForOthers()
 {
     QJsonObject jsonResponse = initObject();
 
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDataPokemonChanged);
     jsonResponse["idPacket"] = static_cast<int>(m_packet);
     jsonResponse["indexCard"] = static_cast<int>(m_indexCard);
     jsonResponse["lifeLeft"] = static_cast<int>(m_lifeLeft);

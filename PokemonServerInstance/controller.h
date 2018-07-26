@@ -51,6 +51,8 @@ private:
     void sendNotifPokemonSwitched(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard);
     void sendNotifEnergyAdded(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy);
     void sendNotifEnergyRemoved(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy);
+
+    void sendNotifDisplayPacket(const QString &namePlayer, QMap<int,int> cards);
 };
 
 #endif // CONTROLLER_H

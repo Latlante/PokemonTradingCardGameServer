@@ -1,7 +1,7 @@
 #include "notificationplayerisready.h"
 
 NotificationPlayerIsReady::NotificationPlayerIsReady(bool everyoneIsReady, QMap<QString, bool> mapPlayersReady) :
-    AbstractNotification(),
+    AbstractNotification(ConstantesShared::PHASE_NotifPlayerIsReady),
     m_everyoneIsReady(everyoneIsReady),
     m_mapPlayersReady(mapPlayersReady)
 {
@@ -20,7 +20,6 @@ QJsonObject NotificationPlayerIsReady::messageJsonForOthers()
 {
     QJsonObject jsonResponse = initObject();
 
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifPlayerIsReady);
     jsonResponse["everyoneIsReady"] = m_everyoneIsReady;
 
     QJsonArray arrayPlayers;

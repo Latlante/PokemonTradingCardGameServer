@@ -1,8 +1,14 @@
 #include "abstractnotification.h"
 
-AbstractNotification::AbstractNotification(const QString& namePlayer) :
+AbstractNotification::AbstractNotification(ConstantesShared::GamePhase phase, const QString& namePlayer) :
+    m_phase(phase),
     m_namePlayer(namePlayer),
     m_indexAction(0)
+{
+
+}
+
+AbstractNotification::~AbstractNotification()
 {
 
 }
@@ -48,6 +54,7 @@ QJsonObject AbstractNotification::initObject()
     QJsonObject obj;
 
     //obj["indexAction"] = static_cast<int>(indexAction());
+    obj["phase"] = static_cast<int>(m_phase);
 
     if(namePlayer() != "")
         obj["namePlayer"] = namePlayer();

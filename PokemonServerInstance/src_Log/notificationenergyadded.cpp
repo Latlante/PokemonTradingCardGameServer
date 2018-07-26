@@ -1,7 +1,7 @@
 #include "notificationenergyadded.h"
 
 NotificationEnergyAdded::NotificationEnergyAdded(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int idEnergy) :
-    AbstractNotification(namePlayer),
+    AbstractNotification(ConstantesShared::PHASE_NotifEnergyAdded, namePlayer),
     m_packet(packet),
     m_indexCard(indexCard),
     m_idEnergy(idEnergy)
@@ -21,7 +21,6 @@ QJsonObject NotificationEnergyAdded::messageJsonForOthers()
 {
     QJsonObject jsonResponse = initObject();
 
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifEnergyAdded);
     jsonResponse["idPacket"] = static_cast<int>(m_packet);
     jsonResponse["indexCard"] = static_cast<int>(m_indexCard);
     jsonResponse["idEnergy"] = static_cast<int>(m_idEnergy);

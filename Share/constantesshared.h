@@ -27,7 +27,10 @@ public:
         PHASE_NotifDataPokemonChanged,
         PHASE_NotifPokemonSwitched,
         PHASE_NotifEnergyAdded,
-        PHASE_NotifEnergyRemoved
+        PHASE_NotifEnergyRemoved,
+
+        PHASE_NotifDisplayPacket = 120,
+        PHASE_DisplayPacketResponse
     };
 
     enum EnumPacket

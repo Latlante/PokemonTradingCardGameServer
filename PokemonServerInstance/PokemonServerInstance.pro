@@ -100,7 +100,8 @@ SOURCES += \
     src_Log/notificationpokemonswitched.cpp \
     src_Log/notificationenergyadded.cpp \
     src_Log/notificationenergyremoved.cpp \
-    ../Share/constantesshared.cpp
+    ../Share/constantesshared.cpp \
+    src_Log/notificationdisplaypackets.cpp
 
 HEADERS += \
     common/constantesqml.h \
@@ -181,4 +182,5 @@ HEADERS += \
     src_Log/notificationpokemonswitched.h \
     src_Log/notificationenergyadded.h \
     src_Log/notificationenergyremoved.h \
-    ../Share/constantesshared.h
+    ../Share/constantesshared.h \
+    src_Log/notificationdisplaypackets.h

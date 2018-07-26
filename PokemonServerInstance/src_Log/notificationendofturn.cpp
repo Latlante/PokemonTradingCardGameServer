@@ -1,7 +1,7 @@
 #include "notificationendofturn.h"
 
 NotificationEndOfTurn::NotificationEndOfTurn(const QString &oldPlayer, const QString &newPlayer) :
-    AbstractNotification(),
+    AbstractNotification(ConstantesShared::PHASE_NotifEndOfTurn),
     m_nameOldPlayer(oldPlayer),
     m_nameNewPlayer(newPlayer)
 {
@@ -20,7 +20,6 @@ QJsonObject NotificationEndOfTurn::messageJsonForOthers()
 {
     QJsonObject jsonResponse = initObject();
 
-    jsonResponse["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifEndOfTurn);
     jsonResponse["endOfTurn"] = m_nameOldPlayer;
     jsonResponse["newTurn"] = m_nameNewPlayer;
 

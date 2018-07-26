@@ -7,6 +7,7 @@ class NotificationCardMoved : public AbstractNotification
 {
 public:
     NotificationCardMoved(const QString& namePlayer, unsigned int idCard, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination);
+    virtual ~NotificationCardMoved() override;
 
     virtual QJsonObject messageJsonForOwner() override;
     virtual QJsonObject messageJsonForOthers() override;
