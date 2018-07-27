@@ -37,7 +37,8 @@ SOURCES += \
     instancemanager.cpp \
     authentification.cpp \
     Share/constantesshared.cpp \
-    Models/modeltablegames.cpp
+    Models/modeltablegames.cpp \
+    Models/modellistusers.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,7 +47,8 @@ HEADERS += \
     instancemanager.h \
     authentification.h \
     Share/constantesshared.h \
-    Models/modeltablegames.h
+    Models/modeltablegames.h \
+    Models/modellistusers.h
 
 FORMS += \
         mainwindow.ui

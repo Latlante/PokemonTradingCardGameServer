@@ -2,6 +2,7 @@
 #define MODELTABLEGAMES_H
 
 #include <QAbstractTableModel>
+#include <QDateTime>
 
 class ModelTableGames : public QAbstractTableModel
 {
@@ -12,6 +13,7 @@ class ModelTableGames : public QAbstractTableModel
         ROLE_NAME,
         ROLE_PLAYER_CREATOR,
         ROLE_PLAYER_OPPONENT,
+        ROLE_DATE_CREATION,
         ROLE_BUTTON_DELETE,
         ROLE_COUNT
     };
@@ -36,6 +38,7 @@ private:
         QString nameGame;
         QString playerCreator;
         QString playerOpponent;
+        QDateTime dateCreation;
     };
     QList<InfoGame> m_listInfos;
 };

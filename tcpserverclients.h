@@ -5,6 +5,7 @@
 
 class TcpServerClients : public QTcpServer
 {
+    Q_OBJECT
 public:
     TcpServerClients();
 
@@ -13,6 +14,10 @@ public:
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
+
+signals:
+    void newUserConnected(int,QString);
+    void userDisconnected(int);
 
 private:
     bool m_isRunning;

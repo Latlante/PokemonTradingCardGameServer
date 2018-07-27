@@ -21,6 +21,8 @@ protected:
     void run() override;
 
 signals:
+    void newUserConnected(int,QString);
+    void userDisconnected(int);
     void writeToInstance(unsigned int,QByteArray);
 
 private slots:

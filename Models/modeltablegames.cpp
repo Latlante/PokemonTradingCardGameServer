@@ -24,6 +24,7 @@ QVariant ModelTableGames::data(const QModelIndex &index, int role) const
             case ROLE_NAME:             return m_listInfos[index.row()].nameGame;
             case ROLE_PLAYER_CREATOR:   return m_listInfos[index.row()].playerCreator;
             case ROLE_PLAYER_OPPONENT:  return m_listInfos[index.row()].playerOpponent;
+            case ROLE_DATE_CREATION:    return m_listInfos[index.row()].dateCreation.toString("dd/MM - hh:mm");
             case ROLE_BUTTON_DELETE:    return "X";
             }
         }
@@ -47,7 +48,7 @@ int ModelTableGames::rowCount(const QModelIndex&) const
 ************************************************************/
 void ModelTableGames::addNewGame(unsigned int id, const QString& nameGame, const QString& creator, const QString& opponent)
 {
-    InfoGame info = { id, nameGame, creator, opponent };
+    InfoGame info = { id, nameGame, creator, opponent, QDateTime::currentDateTime() };
 
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     m_listInfos.append(info);

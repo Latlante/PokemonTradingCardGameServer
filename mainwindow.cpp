@@ -17,6 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     else
         qCritical() << __PRETTY_FUNCTION__ << "Instance exe not found";
 
+    ui->listView_Users->setModel(&m_modelUsers);
+    connect(m_serverClient, &TcpServerClients::newUserConnected, &m_modelUsers, &ModelListUsers::addNewUser);
+    connect(m_serverClient, &TcpServerClients::userDisconnected, &m_modelUsers, &ModelListUsers::removeAUser);
+
+    ui->tableView_Games->setModel(&m_modelGames);
     connect(InstanceManager::instance(), &InstanceManager::newGameCreated, &m_modelGames, &ModelTableGames::addNewGame);
     connect(InstanceManager::instance(), &InstanceManager::gameRemoved, &m_modelGames, &ModelTableGames::removeAGame);
 }

@@ -22,7 +22,7 @@ ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
     m_timerWritting(nullptr),
     m_listMessageToSend({}),
     m_user(""),
-    m_uid(-1),
+    m_uid(0),
     m_token("")
 {
     connect(this, &ThreadClient::writeToInstance, InstanceManager::instance(), &InstanceManager::write);
@@ -213,6 +213,7 @@ void ThreadClient::onReadyRead_TcpSocket()
 void ThreadClient::onDisconnected_TcpSocket()
 {
     qDebug() << m_user << __PRETTY_FUNCTION__;
+    emit userDisconnected(m_socketDescriptor);
 
     delete m_timerWritting;
     m_tcpSocket->deleteLater();
@@ -329,6 +330,7 @@ QJsonObject ThreadClient::authentify(QString user, QString password)
         jsonResponse["result"] = "ok";
         jsonResponse["token"] = m_token;
         jsonResponse["games"] = jsonArrayOfGamesForUidPlayer(m_uid);
+        emit newUserConnected(m_socketDescriptor, m_user);
     }
     else
     {

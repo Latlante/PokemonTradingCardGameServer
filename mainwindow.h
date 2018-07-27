@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "Models/modellistusers.h"
 #include "Models/modeltablegames.h"
 
 class TcpServerClients;
@@ -22,6 +23,7 @@ private:
     Ui::MainWindow *ui;
     TcpServerClients* m_serverClient;
 
+    ModelListUsers m_modelUsers;
     ModelTableGames m_modelGames;
 };
 
