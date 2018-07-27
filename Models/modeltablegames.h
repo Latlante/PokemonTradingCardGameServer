@@ -7,6 +7,8 @@
 class ModelTableGames : public QAbstractTableModel
 {
     Q_OBJECT
+
+public:
     enum ColumnRole
     {
         ROLE_ID = 0,
@@ -18,10 +20,9 @@ class ModelTableGames : public QAbstractTableModel
         ROLE_COUNT
     };
 
-public:
     explicit ModelTableGames(QObject *parent = nullptr);
 
-    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual int columnCount(const QModelIndex & = QModelIndex()) const override;
     virtual int rowCount(const QModelIndex & = QModelIndex()) const override;
 

@@ -19,6 +19,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void onDClicked_TableView_Games(const QModelIndex& index);
+
 private:
     Ui::MainWindow *ui;
     TcpServerClients* m_serverClient;
