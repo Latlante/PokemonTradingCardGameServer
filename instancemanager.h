@@ -45,6 +45,8 @@ public slots:
     bool write(unsigned int uidGame, QByteArray message);
 
 signals:
+    void newGameCreated(unsigned int,QString,QString,QString);
+    void gameRemoved(int);
     void readyRead(unsigned int, QByteArray);
 
 private slots:

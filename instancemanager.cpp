@@ -71,6 +71,10 @@ unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigne
 			m_indexGame++;
 
 			sendNotifNewGameCreated(indexNewGame, uidPlayCreator, uidPlayOpponent);
+            emit newGameCreated(indexNewGame,
+                                name,
+                                Authentification::namePlayerFromUid(uidPlayCreator),
+                                Authentification::namePlayerFromUid(uidPlayOpponent));
 			qDebug() << "New process started";
 		}
 		else
@@ -114,6 +118,7 @@ bool InstanceManager::removeGame(unsigned int index)
                 process->close();
 
             process->deleteLater();
+            emit gameRemoved(static_cast<int>(index));
             success = true;
         }
     }

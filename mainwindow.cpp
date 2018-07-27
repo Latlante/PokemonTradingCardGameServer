@@ -16,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
         m_serverClient->start();
     else
         qCritical() << __PRETTY_FUNCTION__ << "Instance exe not found";
+
+    connect(InstanceManager::instance(), &InstanceManager::newGameCreated, &m_modelGames, &ModelTableGames::addNewGame);
+    connect(InstanceManager::instance(), &InstanceManager::gameRemoved, &m_modelGames, &ModelTableGames::removeAGame);
 }
 
 MainWindow::~MainWindow()

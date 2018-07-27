@@ -81,7 +81,7 @@ void ThreadClient::onReadyRead_TcpSocket()
     if(!jsonReceived.isEmpty())
     {
         //if no authentify yet
-        if(m_uid == -1)
+        if(m_uid == 0)
         {
             jsonResponse = authentify(jsonReceived["name"].toString(),
                                       jsonReceived["password"].toString());
