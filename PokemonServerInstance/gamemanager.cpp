@@ -13,6 +13,7 @@
 
 const int GameManager::m_NUMBER_FIRST_CARDS = 7;
 const int GameManager::m_NUMBER_REWARDS = 6;
+const int GameManager::m_NUMBER_MAX_TRY_CHECK_HAND = 5;
 GameManager* GameManager::m_instance = nullptr;
 
 GameManager::GameManager(QObject *parent) :
@@ -168,6 +169,27 @@ Player* GameManager::playerByName(const QString &name)
     return playToReturn;
 }
 
+Player* GameManager::enemyOf(Player *play)
+{
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
+    Player* playerEnnemy = nullptr;
+
+    //A REVOIR
+    if(play == m_listPlayers[0])
+    {
+        playerEnnemy = m_listPlayers[1];
+    }
+    else if(play == m_listPlayers[1])
+    {
+        playerEnnemy = m_listPlayers[0];
+    }
+
+    return playerEnnemy;
+}
+
 ConstantesQML::StepGame GameManager::gameStatus()
 {
 #ifdef TRACAGE_PRECIS
@@ -296,6 +318,69 @@ Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
     }
 
     return newPlayer;
+}
+
+void GameManager::removePlayer(Player *play)
+{
+    int index = m_listPlayers.indexOf(play);
+
+    if((index >= 0) && (index < m_listPlayers.count()))
+        delete m_listPlayers.takeAt(index);
+}
+
+bool GameManager::initPlayer(Player *play)
+{
+    bool success = true;
+
+    //Check
+    if((play->deck() == nullptr) || (play->deck()->countCard() != MAXCARDS_DECK))
+        success = false;
+
+    if(success == true)
+    {
+        //Hand
+        drawFirstCards(play);
+        int numberTry = 0;
+        while((play->hand()->isFirstHandOk() == false) && (numberTry < m_NUMBER_MAX_TRY_CHECK_HAND))
+        {
+            play->moveAllCardFromHandToDeck();
+            drawFirstCards(play);
+            numberTry++;
+        }
+
+            //ok
+        if(numberTry < m_NUMBER_MAX_TRY_CHECK_HAND)
+        {
+            /*for(int i=0;i<play->hand()->countCard();++i)
+            {
+                emit cardMoved(play->name(),
+                               ConstantesShared::EnumPacketFromName(NAME_DECK),
+                               0,
+                               ConstantesShared::EnumPacketFromName(NAME_HAND),
+                               0,
+                               -1);
+            }*/
+        }
+        else
+            success = false;
+    }
+
+    if(success == true)
+    {
+        //Rewards
+        for(int i=0;i<m_NUMBER_REWARDS;++i)
+        {
+            play->moveCardFromDeckToReward();
+            /*emit cardMoved(play->name(),
+                           ConstantesShared::EnumPacketFromName(NAME_DECK),
+                           0,
+                           ConstantesShared::EnumPacketFromName(NAME_REWARDS),
+                           -1,
+                           -1);*/
+        }
+    }
+
+    return success;
 }
 
 void GameManager::selectFirstPlayer()
@@ -724,27 +809,6 @@ void GameManager::setIndexCurrentPlayer(int index)
 
         emit indexCurrentPlayerChanged(m_playerAttacked->name(), m_playerAttacking->name());
     }
-}
-
-Player* GameManager::enemyOf(Player *play)
-{
-#ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
-#endif
-
-    Player* playerEnnemy = nullptr;
-
-    //A REVOIR
-    if(play == m_listPlayers[0])
-    {
-        playerEnnemy = m_listPlayers[1];
-    }
-    else if(play == m_listPlayers[1])
-    {
-        playerEnnemy = m_listPlayers[0];
-    }
-
-    return playerEnnemy;
 }
 
 bool GameManager::checkHandOfEachPlayer()

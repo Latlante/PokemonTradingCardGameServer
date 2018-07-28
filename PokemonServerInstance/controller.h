@@ -27,6 +27,8 @@ private slots:
     void onMessageReceived_Communication(QString message);
     void onLogReceived(QString message);
 
+    void onInitReadyChanged_GameManager();
+    void onCardMoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard);
     void onIndexCurrentPlayerChanged_GameManager(const QString& oldPlayer, const QString& newPlayer);
     void onDataPokemonChanged_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon);
     void onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy);
@@ -38,6 +40,7 @@ private:
     HistoricalNotifications m_historicNotif;
     Log m_log;
 
+    QJsonObject getAllInfoOnTheGame(const QString& namePlayer);
     QJsonObject selectCardPerPlayer(const QString& namePlayer, QJsonArray tabCards);
     QJsonObject moveACard(const QString& namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination);
     QJsonObject setInitReadyForAPlayer(const QString& namePlayer);

@@ -31,6 +31,7 @@ public:
     Player* playerAttacked();
     Player* playerAt(int index);
     Player* playerByName(const QString& name);
+    Player* enemyOf(Player* play);
     ConstantesQML::StepGame gameStatus();
     void setGameStatus(ConstantesQML::StepGame step);
 
@@ -39,6 +40,8 @@ public:
     unsigned short numberMaxOfPlayers();
     void setNumberMaxOfPlayers(unsigned short max);
     Player* addNewPlayer(QString name, QList<AbstractCard*> listCards);
+    void removePlayer(Player* play);
+    bool initPlayer(Player* play);
     void selectFirstPlayer();
     void setInitReady(Player* playerReady);
 
@@ -84,7 +87,7 @@ signals:
     void movingCardAnimationStartAsked();
 
     void initReadyChanged();
-    void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int);
+    void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int,int);
     void dataPokemonChanged(const QString&,ConstantesShared::EnumPacket,int,CardPokemon*);
     void energyAdded(const QString&, ConstantesShared::EnumPacket, int, int);
     void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, int);
@@ -102,6 +105,7 @@ private:
 
     static const int m_NUMBER_FIRST_CARDS;
     static const int m_NUMBER_REWARDS;
+    static const int m_NUMBER_MAX_TRY_CHECK_HAND;
     static GameManager *m_instance;
     unsigned short m_numberMaxOfPlayers;
 	QList<Player*> m_listPlayers;
@@ -115,7 +119,6 @@ private:
     QVariant m_elementFromDisplays;
 
     void setIndexCurrentPlayer(int index);
-    Player* enemyOf(Player* play);
 
     bool checkHandOfEachPlayer();
     void drawFirstCards(Player *play);

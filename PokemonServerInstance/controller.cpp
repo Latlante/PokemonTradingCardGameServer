@@ -12,7 +12,12 @@
 #include "src_Cards/abstractcard.h"
 #include "src_Communication/stdlistenerwritter.h"
 #include "src_Models/modellistenergies.h"
+#include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
+#include "src_Packets/packetdeck.h"
+#include "src_Packets/packethand.h"
+#include "src_Packets/packetrewards.h"
+#include "src_Packets/packettrash.h"
 #include "../Share/constantesshared.h"
 
 Controller::Controller(const QString &nameGame, const QString &player1, const QString &player2, QObject *parent) :
@@ -28,6 +33,8 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     m_communication->startListening();
 
     connect(m_gameManager, &GameManager::indexCurrentPlayerChanged, this, &Controller::onIndexCurrentPlayerChanged_GameManager);
+    connect(m_gameManager, &GameManager::initReadyChanged, this, &Controller::onInitReadyChanged_GameManager);
+    connect(m_gameManager, &GameManager::cardMoved, this, &Controller::onCardMoved_GameManager);
     connect(m_gameManager, &GameManager::dataPokemonChanged, this, &Controller::onDataPokemonChanged_GameManager);
     connect(m_gameManager, &GameManager::energyAdded, this, &Controller::onEnergyAdded_GameManager);
     connect(m_gameManager, &GameManager::energyRemoved, this, &Controller::onEnergyRemoved_GameManager);
@@ -65,6 +72,9 @@ void Controller::onMessageReceived_Communication(QString message)
 
             switch(static_cast<ConstantesShared::GamePhase>(phase))
             {
+            case ConstantesShared::PHASE_GetAllInfoOnGame:
+                jsonResponseOwner = getAllInfoOnTheGame(jsonReceived["namePlayer"].toString());
+                break;
             case ConstantesShared::PHASE_SelectCards:
                 jsonResponseOwner = selectCardPerPlayer(jsonReceived["namePlayer"].toString(),
                                                    jsonReceived["cards"].toArray());
@@ -136,6 +146,16 @@ void Controller::onLogReceived(QString message)
     m_log.write(message);
 }
 
+void Controller::onInitReadyChanged_GameManager()
+{
+    sendNotifPlayerIsReady();
+}
+
+void Controller::onCardMoved_GameManager(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard)
+{
+    sendNotifCardMoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, idCard);
+}
+
 void Controller::onIndexCurrentPlayerChanged_GameManager(const QString &oldPlayer, const QString &newPlayer)
 {
     sendNotifEndOfTurn(oldPlayer, newPlayer);
@@ -160,6 +180,200 @@ void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, Constant
 /************************************************************
 *****               FONCTIONS PRIVEES					*****
 ************************************************************/
+QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
+{
+    QJsonObject jsonResponse;
+    Player* playerYou = m_gameManager->playerByName(namePlayer);
+
+    if(m_gameManager->gameStatus() == ConstantesQML::StepPreparation)
+    {
+        if(playerYou == nullptr)
+            jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepSelectionCards);
+        else
+            jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepPreparation);
+    }
+    else if(m_gameManager->gameStatus() == ConstantesQML::StepGameInProgress)
+    {
+        jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepGameInProgress);
+
+        //You
+        if(playerYou != nullptr)
+        {
+            QJsonObject objYou;
+
+                //Bench
+            QJsonArray arrayYouBench;
+            for(int iBench=0;iBench<playerYou->bench()->countCard();++iBench)
+            {
+                CardPokemon* pokemon = playerYou->bench()->cardPok(iBench);
+                QJsonObject objYouBenchPokemon;
+
+                objYouBenchPokemon["id"] = pokemon->id();
+                objYouBenchPokemon["damage"] = pokemon->damageMarker() * DAMAGE_MARQUER_VALUE;
+
+                    //Energies
+                QJsonArray arrayYouBenchPokemonEnergies;
+                ModelListEnergies* modelEnergies = pokemon->modelListOfEnergies();
+                for(unsigned short iEnergy=0;iEnergy<modelEnergies->countEnergies();++iEnergy)
+                {
+                    CardEnergy* cardEn = modelEnergies->energy(iEnergy);
+
+                    if(cardEn != nullptr)
+                        arrayYouBenchPokemonEnergies.append(static_cast<int>(cardEn->element()));
+                    else
+                        m_log.write(QString(__PRETTY_FUNCTION__) + "you, an energy (" + QString::number(iEnergy).toLatin1() + ") card is nullptr");
+                }
+
+                objYouBenchPokemon["energies"] = arrayYouBenchPokemonEnergies;
+            }
+            objYou["bench"] = arrayYouBench;
+
+                //Deck
+            objYou["deckCount"] = playerYou->deck()->countCard();
+
+                //Fight
+            QJsonObject objYouFight;
+            CardPokemon* pokemonFight = playerYou->fight()->pokemonFighter();
+
+            if(pokemonFight != nullptr)
+            {
+                objYouFight["id"] = pokemonFight->id();
+                objYouFight["damage"] = pokemonFight->damageMarker() * DAMAGE_MARQUER_VALUE;
+                objYouFight["status"] = static_cast<int>(pokemonFight->status());
+
+                    //Energies
+                QJsonArray arrayYouFightPokemonEnergies;
+                ModelListEnergies* modelEnergies = pokemonFight->modelListOfEnergies();
+                for(unsigned short iEnergy=0;iEnergy<modelEnergies->countEnergies();++iEnergy)
+                {
+                    CardEnergy* cardEn = modelEnergies->energy(iEnergy);
+
+                    if(cardEn != nullptr)
+                        arrayYouFightPokemonEnergies.append(static_cast<int>(cardEn->element()));
+                    else
+                        m_log.write(QString(__PRETTY_FUNCTION__) + "you, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                }
+
+                objYouFight["energies"] = arrayYouFightPokemonEnergies;
+
+            }
+            else
+            {
+                m_log.write(QString(__PRETTY_FUNCTION__) + "you, pokemon fighter is nullptr");
+            }
+            objYou["fight"] = objYouFight;
+
+                //Hand
+            QJsonArray arrayYouHand;
+            for(int iHand=0;iHand<playerYou->hand()->countCard();++iHand)
+            {
+                AbstractCard* cardHand = playerYou->hand()->card(iHand);
+                if(cardHand != nullptr)
+                    arrayYouHand.append(cardHand->id());
+                else
+                    m_log.write(QString(__PRETTY_FUNCTION__) + "you, an card hand (" + QString::number(iHand) + ") is nullptr");
+            }
+            objYou["hand"] = arrayYouHand;
+
+                //Rewards
+            objYou["rewardsCount"] = playerYou->rewards()->countCard();
+
+                //Trash
+            objYou["trashCount"] = playerYou->trash()->countCard();
+
+            jsonResponse["you"] = objYou;
+        }
+
+        //Enemy
+        Player* playerEnemy = m_gameManager->enemyOf(playerYou);
+        if(playerEnemy != nullptr)
+        {
+            QJsonObject objEnemy;
+
+                //Bench
+            QJsonArray arrayEnemyBench;
+            for(int iBench=0;iBench<playerEnemy->bench()->countCard();++iBench)
+            {
+                CardPokemon* pokemon = playerEnemy->bench()->cardPok(iBench);
+                QJsonObject objEnemyBenchPokemon;
+
+                objEnemyBenchPokemon["id"] = pokemon->id();
+                objEnemyBenchPokemon["damage"] = pokemon->damageMarker() * DAMAGE_MARQUER_VALUE;
+
+                    //Energies
+                QJsonArray arrayEnemyBenchPokemonEnergies;
+                ModelListEnergies* modelEnergies = pokemon->modelListOfEnergies();
+                for(unsigned short iEnergy=0;iEnergy<modelEnergies->countEnergies();++iEnergy)
+                {
+                    CardEnergy* cardEn = modelEnergies->energy(iEnergy);
+
+                    if(cardEn != nullptr)
+                        arrayEnemyBenchPokemonEnergies.append(static_cast<int>(cardEn->element()));
+                    else
+                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                }
+
+                objEnemyBenchPokemon["energies"] = arrayEnemyBenchPokemonEnergies;
+            }
+            objEnemy["bench"] = arrayEnemyBench;
+
+                //Deck
+            objEnemy["deckCount"] = playerEnemy->deck()->countCard();
+
+                //Fight
+            QJsonObject objEnemyFight;
+            CardPokemon* pokemonFight = playerEnemy->fight()->pokemonFighter();
+
+            if(pokemonFight != nullptr)
+            {
+                objEnemyFight["id"] = pokemonFight->id();
+                objEnemyFight["damage"] = pokemonFight->damageMarker() * DAMAGE_MARQUER_VALUE;
+                objEnemyFight["status"] = static_cast<int>(pokemonFight->status());
+
+                    //Energies
+                QJsonArray arrayEnemyFightPokemonEnergies;
+                ModelListEnergies* modelEnergies = pokemonFight->modelListOfEnergies();
+                for(unsigned short iEnergy=0;iEnergy<modelEnergies->countEnergies();++iEnergy)
+                {
+                    CardEnergy* cardEn = modelEnergies->energy(iEnergy);
+
+                    if(cardEn != nullptr)
+                        arrayEnemyFightPokemonEnergies.append(static_cast<int>(cardEn->element()));
+                    else
+                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                }
+
+                objEnemyFight["energies"] = arrayEnemyFightPokemonEnergies;
+
+            }
+            else
+            {
+                m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, pokemon fighter is nullptr");
+            }
+            objEnemy["fight"] = objEnemyFight;
+
+                //Hand
+            objEnemy["handCount"] = playerEnemy->hand()->countCard();
+
+                //Rewards
+            objEnemy["rewardsCount"] = playerEnemy->rewards()->countCard();
+
+                //Trash
+            objEnemy["trashCount"] = playerEnemy->trash()->countCard();
+
+            jsonResponse["enemy"] = objEnemy;
+        }
+
+        jsonResponse["yourTurn"] = m_gameManager->currentPlayer() == playerYou ? true : false;
+    }
+    else
+    {
+        jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepFinished);
+    }
+
+    return jsonResponse;
+}
+
 QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArray tabCards)
 {
     QJsonObject jsonResponse;
@@ -221,8 +435,19 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
 
         if(play != nullptr)
         {
-            jsonResponse["success"] = "ok";
-            m_log.write(QString(__PRETTY_FUNCTION__) + ", " + namePlayer + " created");
+            if(m_gameManager->initPlayer(play))
+            {
+                jsonResponse["success"] = "ok";
+                m_log.write(QString(__PRETTY_FUNCTION__) + ", " + namePlayer + " created");
+            }
+            else
+            {
+                m_gameManager->removePlayer(play);
+
+                jsonResponse["success"] = "ko";
+                jsonResponse["error"] = "No enough base to play";
+                m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough base to play");
+            }
         }
         else
         {
