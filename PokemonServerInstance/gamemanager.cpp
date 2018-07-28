@@ -271,7 +271,7 @@ Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
         indexList++;
     }
 
-    if((m_listPlayers.count() < numberMaxOfPlayers()) && (playerFound == false))
+    if((m_listPlayers.count() < numberMaxOfPlayers()) && (playerFound == false) && (listCards.count() == MAXCARDS_DECK))
     {
         newPlayer = new Player(name, listCards);
 
@@ -285,6 +285,10 @@ Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
     else if(playerFound == true)
     {
         emit logReceived(name + ": packet already saved");
+    }
+    else if(listCards.count() < MAXCARDS_DECK)
+    {
+        emit logReceived(name + ": Not enough card in the packet");
     }
     else
     {

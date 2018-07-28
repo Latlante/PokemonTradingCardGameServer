@@ -45,8 +45,9 @@ void ModelListUsers::addNewUser(int socketDescriptor, const QString& nameUser)
     endInsertRows();
 }
 
-void ModelListUsers::removeAUser(int index)
+void ModelListUsers::removeAUser(int socketDescriptor)
 {
+    int index = indexListFromSocketDescriptor(socketDescriptor);
     if((index >= 0) && (index < m_listInfos.count()))
     {
         beginRemoveRows(QModelIndex(), index, index);
