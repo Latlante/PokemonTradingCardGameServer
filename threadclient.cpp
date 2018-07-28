@@ -139,7 +139,7 @@ void ThreadClient::onReadyRead_TcpSocket()
                     int uidGame = jsonReceived["uidGame"].toInt();
                     bool success = InstanceManager::instance()->removeGame(uidGame);
 
-                    jsonResponse["result"] = success;
+                    jsonResponse["success"] = success;
                 }
                     break;
 
@@ -178,7 +178,7 @@ void ThreadClient::onReadyRead_TcpSocket()
 
                 default:
                     const QString error = "error: phase does not exist";
-                    jsonResponse["result"] = "ko";
+                    jsonResponse["success"] = "ko";
                     jsonResponse["error"] = error;
                     qCritical() << m_user << error;
                 }
@@ -187,7 +187,7 @@ void ThreadClient::onReadyRead_TcpSocket()
             else
             {
                 const QString error = "wrong token";
-                jsonResponse["result"] = "ko";
+                jsonResponse["success"] = "ko";
                 jsonResponse["error"] = error;
                 qCritical() << m_user << error;
             }
@@ -198,7 +198,7 @@ void ThreadClient::onReadyRead_TcpSocket()
     else
     {
         const QString error = "error during the creation of the json document";
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = error;
         qCritical() << m_user << error;
     }
@@ -327,14 +327,14 @@ QJsonObject ThreadClient::authentify(QString user, QString password)
         m_token = auth.token();
 
         //answer
-        jsonResponse["result"] = "ok";
+        jsonResponse["success"] = "ok";
         jsonResponse["token"] = m_token;
         jsonResponse["games"] = jsonArrayOfGamesForUidPlayer(m_uid);
         emit newUserConnected(m_socketDescriptor, m_user);
     }
     else
     {
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = "authentification failed";
     }
 

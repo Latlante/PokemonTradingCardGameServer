@@ -93,7 +93,7 @@ void Controller::onMessageReceived_Communication(QString message)
 
             default:
                 const QString error = "error with the phase:" + QString::number(phase);
-                jsonResponseOwner["result"] = "ko";
+                jsonResponseOwner["success"] = "ko";
                 jsonResponseOwner["error"] = error;
                 m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
             }
@@ -103,13 +103,13 @@ void Controller::onMessageReceived_Communication(QString message)
         else
         {
             const QString error = "No phase entered";
-            jsonResponseOwner["result"] = "ko";
+            jsonResponseOwner["success"] = "ko";
             jsonResponseOwner["error"] = error;
             m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
         }
 
         //On envoit la réponse avec/sans les actions en fonction de si tout s'est bien passé ou non
-        if(jsonResponseOwner["result"] == "ok")
+        if(jsonResponseOwner["success"] == "ok")
         {
             QJsonObject objOwner = m_historicNotif.buildJsonOwnerFrom(readPoint);
             jsonResponseOwner["actions"] = objOwner;
@@ -205,13 +205,13 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
     //Check the packet is ok
     if(listCards.count() < MAXCARDS_DECK)
     {
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = "No enough card in packet";
         m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough card in packet");
     }
     else if(listCards.count() > MAXCARDS_DECK)
     {
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = "Too many cards in packet";
         m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Too many cards in packet");
     }
@@ -221,12 +221,12 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
 
         if(play != nullptr)
         {
-            jsonResponse["result"] = "ok";
+            jsonResponse["success"] = "ok";
             m_log.write(QString(__PRETTY_FUNCTION__) + ", " + namePlayer + " created");
         }
         else
         {
-            jsonResponse["result"] = "ko";
+            jsonResponse["success"] = "ko";
             jsonResponse["error"] = "Impossible to add a new player";
             m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Impossible to add a new player");
         }
@@ -243,11 +243,11 @@ QJsonObject Controller::moveACard(const QString &namePlayer, Player::EnumPacket 
 
     if(m_gameManager->moveACard(namePlayer, packetOrigin, packetDestination, indexCardOrigin, indexCardDestination))
     {
-        jsonResponse["result"] = "ok";
+        jsonResponse["success"] = "ok";
     }
     else
     {
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = "error during the move of the card";
     }
 
@@ -266,18 +266,18 @@ QJsonObject Controller::setInitReadyForAPlayer(const QString &namePlayer)
         m_gameManager->setInitReady(playerReady);
         if(playerReady->initReady())
         {
-            jsonResponse["result"] = "ok";
+            jsonResponse["success"] = "ok";
             sendNotifPlayerIsReady();
         }
         else
         {
-            jsonResponse["result"] = "ko";
+            jsonResponse["success"] = "ko";
             jsonResponse["error"] = "error, no pokemon in fight area";
         }
     }
     else
     {
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = "error, name of player not found";
     }
 
@@ -326,24 +326,24 @@ QJsonObject Controller::attack_retreat(const QString &namePlayer, unsigned short
             bool success = m_gameManager->retreat(pokemonAttacking);
 
             if(success == true)
-                jsonResponse["result"] = "ok";
+                jsonResponse["success"] = "ok";
             else
             {
                 qCritical() << __PRETTY_FUNCTION__ << "Erreur lors de l'échange";
-                jsonResponse["result"] = "ko";
+                jsonResponse["success"] = "ko";
                 jsonResponse["error"] = "error during the retreat";
             }
         }
         else
         {
             qCritical() << __PRETTY_FUNCTION__ << "erreur de indexAttack=" << indexAttack;
-            jsonResponse["result"] = "ko";
+            jsonResponse["success"] = "ko";
             jsonResponse["error"] = "error of indexAttack = " + QString::number(indexAttack);
         }
     }
     else
     {
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = "not your turn";
     }
 
@@ -359,11 +359,11 @@ QJsonObject Controller::skipTurn(const QString &namePlayer)
     if(currentPlayer == m_gameManager->currentPlayer())
     {
         m_gameManager->endOfTurn();
-        jsonResponse["result"] = "ok";
+        jsonResponse["success"] = "ok";
     }
     else
     {
-        jsonResponse["result"] = "ko";
+        jsonResponse["success"] = "ko";
         jsonResponse["error"] = "not your turn";
     }
 
