@@ -19,6 +19,7 @@
 #include "src_Packets/packetrewards.h"
 #include "src_Packets/packettrash.h"
 #include "../Share/constantesshared.h"
+#include <QCoreApplication>
 
 Controller::Controller(const QString &nameGame, const QString &player1, const QString &player2, QObject *parent) :
     QObject(parent),
@@ -48,6 +49,10 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
 Controller::~Controller()
 {
     qDebug() << "Destructeur Controller";
+
+    m_communication->stopListening();
+    m_communication->deleteLater();
+    delete m_gameManager;
 }
 
 /************************************************************
@@ -56,6 +61,13 @@ Controller::~Controller()
 void Controller::onMessageReceived_Communication(QString message)
 {
     m_log.write("Message received: " + message);
+
+    if(message == "exit")
+    {
+        m_communication->stopListening();
+        qApp->quit();
+        return;
+    }
 
     QJsonDocument jsonReceived = QJsonDocument::fromJson(message.toLatin1());
 
@@ -151,9 +163,9 @@ void Controller::onInitReadyChanged_GameManager()
     sendNotifPlayerIsReady();
 }
 
-void Controller::onCardMoved_GameManager(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard)
+void Controller::onCardMoved_GameManager(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard)
 {
-    sendNotifCardMoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, idCard);
+    sendNotifCardMoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, idCard);
 }
 
 void Controller::onIndexCurrentPlayerChanged_GameManager(const QString &oldPlayer, const QString &newPlayer)
@@ -438,6 +450,8 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
             if(m_gameManager->initPlayer(play))
             {
                 jsonResponse["success"] = "ok";
+                jsonResponse["deck"] = MAXCARDS_DECK;
+                jsonResponse["rewards"] = MAXCARDS_REWARD;
                 m_log.write(QString(__PRETTY_FUNCTION__) + ", " + namePlayer + " created");
             }
             else
@@ -614,14 +628,21 @@ void Controller::sendNotifEndOfTurn(const QString &oldPlayer, const QString &new
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int indexCardDestination, int idCard)
+void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard)
 {
+    m_log.write(QString(__PRETTY_FUNCTION__) +
+                ", namePlayer: " + namePlayer +
+                ", historic: " + QString::number(m_historicNotif.count()) +
+                ", packetOrigin: " + QString::number(packetOrigin) +
+                ", indexCardOrigin: " + QString::number(indexCardOrigin) +
+                ", packetDestination: " + QString::number(packetDestination) +
+                ", idCard: " + QString::number(idCard));
+
     AbstractNotification* notif = new NotificationCardMoved(namePlayer,
                                                             idCard,
                                                             packetOrigin,
                                                             indexCardOrigin,
-                                                            packetDestination,
-                                                            indexCardDestination);
+                                                            packetDestination);
     m_historicNotif.addNewNotification(notif);
 }
 

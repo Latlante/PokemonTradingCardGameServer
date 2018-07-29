@@ -8,7 +8,7 @@
 #include "authentification.h"
 #include "Share/constantesshared.h"
 
-const QString InstanceManager::m_PATH_INSTANCE = "D:/Users/sapiensc/Documents/GitHub/PokemonTradingCardGameServer/build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit-Release/release/PokemonServerInstance.exe";
+const QString InstanceManager::m_PATH_INSTANCE = "C:/Users/Corentin/Documents/Programmes/PokemonTradingCardGameServer/build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit3-Release/release/PokemonServerInstance.exe";
 InstanceManager* InstanceManager::m_instance = new InstanceManager();
 unsigned int InstanceManager::m_indexGame = 1;
 
@@ -106,6 +106,7 @@ QProcess* InstanceManager::game(unsigned int index)
 
 bool InstanceManager::removeGame(unsigned int index)
 {
+    qDebug() << __PRETTY_FUNCTION__;
     bool success = false;
     if(m_listGame.contains(index) == true)
     {
@@ -114,12 +115,15 @@ bool InstanceManager::removeGame(unsigned int index)
 
         if(process != nullptr)
         {
-            if(process->isOpen())
-                process->close();
-
-            process->deleteLater();
-            emit gameRemoved(static_cast<int>(index));
-            success = true;
+            process->write("exit");
+            //if(process->waitForFinished(10000))
+            {
+                process->deleteLater();
+                emit gameRemoved(static_cast<int>(index));
+                success = true;
+            }
+            /*else
+                qDebug() << __PRETTY_FUNCTION__ << "timeOut to finish the process";*/
         }
     }
 

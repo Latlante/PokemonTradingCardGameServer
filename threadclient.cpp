@@ -144,6 +144,7 @@ void ThreadClient::onReadyRead_TcpSocket()
                     break;
 
                 //INSTANCES
+                case ConstantesShared::PHASE_GetAllInfoOnGame:
                 case ConstantesShared::PHASE_SelectCards:
                 case ConstantesShared::PHASE_InitReady:
                 case ConstantesShared::PHASE_MoveACard:
@@ -164,14 +165,6 @@ void ThreadClient::onReadyRead_TcpSocket()
                     objectReceived.remove("uidGame");
 
                     //transfer to the game
-                    /*if(InstanceManager::instance()->write(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact)))
-                    {
-                        qDebug() << m_user << __PRETTY_FUNCTION__ << "Write OK";
-                    }
-                    else
-                    {
-                        qCritical() << m_user << __PRETTY_FUNCTION__ << "Write error";
-                    }*/
                     emit writeToInstance(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact));
                 }
                     break;
@@ -227,54 +220,6 @@ void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray 
     //check if we are concerned by the message
     if(InstanceManager::instance()->isInTheGame(uidGame, m_uid))
     {
-        /*QJsonDocument jsonReceived = QJsonDocument::fromJson(message);
-
-        if(!jsonReceived.isEmpty())
-        {
-            QJsonValue valuePhase = jsonReceived["phase"];
-
-            if(!valuePhase.isNull())
-            {
-                int phase = valuePhase.toInt();
-
-                //add uidGame in answer
-                QJsonObject objReceived = jsonReceived.object();
-                objReceived["uidGame"] = uidGame;
-
-                switch(static_cast<ConstantesShared::GamePhase>(phase))
-                {
-                    //INSTANCES
-                case ConstantesShared::PHASE_SelectCards:
-                case ConstantesShared::PHASE_InitReady:
-                case ConstantesShared::PHASE_MoveACard:
-                case ConstantesShared::PHASE_Attack_Retreat:
-                case ConstantesShared::PHASE_SkipTheTurn:
-                    m_listMessageToSend.append(QJsonDocument(objReceived).toJson(QJsonDocument::Compact));
-                    break;
-
-                    //NOTIFICATIONS
-                case ConstantesShared::PHASE_NotifCardMoved:
-                {
-
-                }
-                    break;
-
-                case ConstantesShared::PHASE_NotifPlayerIsReady:
-                {
-                    //same for all players
-                    m_listMessageToSend.append(QJsonDocument(objReceived).toJson(QJsonDocument::Compact));
-                }
-                    break;
-
-                case ConstantesShared::PHASE_NotifPokemonAttack:
-                {
-
-                }
-                    break;
-                }
-            }
-        }*/
-
         QList<QByteArray> listArguments = message.split(';');
 
         if(listArguments.count() >= 2)
@@ -295,11 +240,6 @@ void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray 
             }
         }
     }
-
-
-    //m_tcpSocket->write(message);
-    //m_listMessageToSend.append(message);
-
 }
 
 void ThreadClient::onTimeOut_timerWritting()

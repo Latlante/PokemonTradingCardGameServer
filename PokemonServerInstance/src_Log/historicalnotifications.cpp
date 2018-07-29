@@ -1,4 +1,5 @@
 #include "historicalnotifications.h"
+#include <QDebug>
 
 //#include "abstractnotification.h"
 
@@ -12,6 +13,8 @@ HistoricalNotifications::HistoricalNotifications()
 ************************************************************/
 int HistoricalNotifications::addNewNotification(AbstractNotification *notif)
 {
+    qDebug() << __PRETTY_FUNCTION__ << count();
+
     m_listNotifications.append(notif);
 
     return m_listNotifications.indexOf(notif);
@@ -22,15 +25,22 @@ unsigned int HistoricalNotifications::readPoint()
     return m_listNotifications.count();
 }
 
+int HistoricalNotifications::count()
+{
+    return m_listNotifications.count();
+}
+
 QJsonObject HistoricalNotifications::buildJsonOwnerFrom(unsigned int index)
 {
+    qDebug() << __PRETTY_FUNCTION__ << index << "/" << count();
+
     QJsonObject objToReturn;
 
     if(index < static_cast<unsigned int>(m_listNotifications.count()))
     {
         for(int i=index;i<m_listNotifications.count();++i)
         {
-            objToReturn[QString::number(index)] = m_listNotifications[i]->messageJsonForOwner();
+            objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOwner();
         }
     }
 
@@ -39,6 +49,8 @@ QJsonObject HistoricalNotifications::buildJsonOwnerFrom(unsigned int index)
 
 QJsonObject HistoricalNotifications::buildJsonOthersFrom(unsigned int index)
 {
+    qDebug() << __PRETTY_FUNCTION__ << index << "/" << count();
+
     QJsonObject objToReturn;
 
     if(index < static_cast<unsigned int>(m_listNotifications.count()))

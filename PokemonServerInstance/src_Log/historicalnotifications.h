@@ -22,6 +22,7 @@ public:
 
     int addNewNotification(AbstractNotification* notif);
     unsigned int readPoint();
+    int count();
     QJsonObject buildJsonOwnerFrom(unsigned int index);
     QJsonObject buildJsonOthersFrom(unsigned int index);
 
