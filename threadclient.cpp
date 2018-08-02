@@ -1,6 +1,7 @@
 #include "threadclient.h"
 
 #include <QApplication>
+#include <QDataStream>
 #include <QDebug>
 #include <QEventLoop>
 #include <QJsonArray>
@@ -19,6 +20,7 @@ ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
     QThread(parent),
     m_socketDescriptor(socketDescriptor),
     m_tcpSocket(nullptr),
+    m_sizeAnswerAsynchrone(0),
     m_timerWritting(nullptr),
     m_listMessageToSend({}),
     m_user(""),
@@ -70,137 +72,44 @@ void ThreadClient::run()
 ************************************************************/
 void ThreadClient::onReadyRead_TcpSocket()
 {
-    QByteArray message = m_tcpSocket->readAll();
+    //init the answer
+    QByteArray responseSerialize;
+    QDataStream requestToRead(m_tcpSocket);
 
-    qDebug() << m_user << __PRETTY_FUNCTION__ << m_socketDescriptor << ", " << message;
-
-    bool hasToRepond = true;
-    QJsonObject jsonResponse;
-    QJsonDocument jsonReceived = QJsonDocument::fromJson(message);
-
-    if(!jsonReceived.isEmpty())
+    if(m_sizeAnswerAsynchrone == 0)
     {
-        //if no authentify yet
-        if(m_uid == 0)
-        {
-            jsonResponse = authentify(jsonReceived["name"].toString(),
-                                      jsonReceived["password"].toString());
-        }
-        //authentification success
-        else
-        {
-            QString tokenReceive = jsonReceived["token"].toString();
+        //Check we have the minimum to start reading
+        if(m_tcpSocket->bytesAvailable() < sizeof(quint16))
+            return;
 
-            //everything is good
-            if(tokenReceive == m_token)
-            {
-                int phase = jsonReceived["phase"].toInt();
-                qDebug() << m_user << __PRETTY_FUNCTION__ << "phase:" << phase;
+        //Check we have all the answer
+        requestToRead >> m_sizeAnswerAsynchrone;
+    }
 
-                switch(phase)
-                {
-                case ConstantesShared::PHASE_ListOfGameForThePlayer:
-                {
-                    jsonResponse["games"] = jsonArrayOfGamesForUidPlayer(m_uid);
-                }
-                    break;
-                case ConstantesShared::PHASE_ListOfAllPlayers:
-                {
-                    QJsonArray listOfPlayers = Authentification::listOfAllUsers();
-                    jsonResponse["players"] = listOfPlayers;
-                    jsonResponse["count"] = listOfPlayers.count();
-                }
-                    break;
+    if(m_tcpSocket->bytesAvailable() < m_sizeAnswerAsynchrone)
+        return;
 
-                case ConstantesShared::PHASE_CreateANewGame:
-                {
-                    int uidOtherPlayer = jsonReceived["uidOtherPlayer"].toInt();
-                    QString nameOfTheGame = jsonReceived["name"].toString();
+    //From here, we have everything, so we can get all the message
+    requestToRead >> responseSerialize;
+    QJsonParseError jsonError;
+    QJsonDocument docNotif = QJsonDocument::fromJson(responseSerialize, &jsonError);
 
-                    if(InstanceManager::instance()->checkNameOfGameIsAvailable(nameOfTheGame))
-                    {
-						QString error = "";
-                        unsigned int indexNewGame = InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame, error);
-                        jsonResponse["idGame"] = static_cast<int>(indexNewGame);
-						
-						if(indexNewGame == 0)
-							jsonResponse["error"] = error;
-                    }
-                    else
-                    {
-                        jsonResponse["idGame"] = 0;
-                        jsonResponse["error"] = "One game has already that name";
-                    }
-                }
-                    break;
-
-                case ConstantesShared::PHASE_RemoveAGame:
-                {
-                    int uidGame = jsonReceived["uidGame"].toInt();
-                    bool success = InstanceManager::instance()->removeGame(uidGame);
-
-                    jsonResponse["success"] = success;
-                }
-                    break;
-
-                //INSTANCES
-                case ConstantesShared::PHASE_GetAllInfoOnGame:
-                case ConstantesShared::PHASE_SelectCards:
-                case ConstantesShared::PHASE_InitReady:
-                case ConstantesShared::PHASE_MoveACard:
-                case ConstantesShared::PHASE_Attack_Retreat:
-                case ConstantesShared::PHASE_SkipTheTurn:
-                {
-                    hasToRepond = false;
-
-                    //get information
-                    unsigned int uidGame = jsonReceived["uidGame"].toInt();
-
-                    //add name player in json
-                    QJsonObject objectReceived = jsonReceived.object();
-                    objectReceived["namePlayer"] = m_user;
-
-                    //remove data useless
-                    objectReceived.remove("token");
-                    objectReceived.remove("uidGame");
-
-                    //transfer to the game
-                    emit writeToInstance(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact));
-                }
-                    break;
-
-                default:
-                    const QString error = "error: phase does not exist";
-                    jsonResponse["success"] = "ko";
-                    jsonResponse["error"] = error;
-                    qCritical() << m_user << error;
-                }
-            }
-            //wrong token
-            else
-            {
-                const QString error = "wrong token";
-                jsonResponse["success"] = "ko";
-                jsonResponse["error"] = error;
-                qCritical() << m_user << error;
-            }
-
-        }
-
+    if(jsonError.error == QJsonParseError::NoError)
+    {
+        executeRequest(docNotif);
+        m_sizeAnswerAsynchrone = 0;
     }
     else
     {
+        QJsonObject jsonResponse;
         const QString error = "error during the creation of the json document";
         jsonResponse["success"] = "ko";
         jsonResponse["error"] = error;
         qCritical() << m_user << error;
-    }
 
-    if(hasToRepond == true)
-    {
-        //m_tcpSocket->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
         m_listMessageToSend.append(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
     }
+
 }
 
 void ThreadClient::onDisconnected_TcpSocket()
@@ -259,6 +168,125 @@ void ThreadClient::onTimeOut_timerWritting()
 /************************************************************
 *****				FONCTIONS PRIVEES					*****
 ************************************************************/
+void ThreadClient::executeRequest(const QJsonDocument &jsonReceived)
+{
+    bool hasToRepond = true;
+    QJsonObject jsonResponse;
+
+    //if no authentify yet
+    if(m_uid == 0)
+    {
+        jsonResponse = authentify(jsonReceived["name"].toString(),
+                                  jsonReceived["password"].toString());
+    }
+    //authentification success
+    else
+    {
+        QString tokenReceive = jsonReceived["token"].toString();
+
+        //everything is good
+        if(tokenReceive == m_token)
+        {
+            int phase = jsonReceived["phase"].toInt();
+            qDebug() << m_user << __PRETTY_FUNCTION__ << "phase:" << phase;
+
+            switch(phase)
+            {
+            case ConstantesShared::PHASE_ListOfGameForThePlayer:
+            {
+                jsonResponse["games"] = jsonArrayOfGamesForUidPlayer(m_uid);
+            }
+                break;
+            case ConstantesShared::PHASE_ListOfAllPlayers:
+            {
+                QJsonArray listOfPlayers = Authentification::listOfAllUsers();
+                jsonResponse["players"] = listOfPlayers;
+                jsonResponse["count"] = listOfPlayers.count();
+            }
+                break;
+
+            case ConstantesShared::PHASE_CreateANewGame:
+            {
+                int uidOtherPlayer = jsonReceived["uidOtherPlayer"].toInt();
+                QString nameOfTheGame = jsonReceived["name"].toString();
+
+                if(InstanceManager::instance()->checkNameOfGameIsAvailable(nameOfTheGame))
+                {
+                    QString error = "";
+                    unsigned int indexNewGame = InstanceManager::instance()->createNewGame(m_uid, uidOtherPlayer, nameOfTheGame, error);
+                    jsonResponse["idGame"] = static_cast<int>(indexNewGame);
+
+                    if(indexNewGame == 0)
+                        jsonResponse["error"] = error;
+                }
+                else
+                {
+                    jsonResponse["idGame"] = 0;
+                    jsonResponse["error"] = "One game has already that name";
+                }
+            }
+                break;
+
+            case ConstantesShared::PHASE_RemoveAGame:
+            {
+                int uidGame = jsonReceived["uidGame"].toInt();
+                bool success = InstanceManager::instance()->removeGame(uidGame);
+
+                jsonResponse["success"] = success;
+            }
+                break;
+
+            //INSTANCES
+            case ConstantesShared::PHASE_GetAllInfoOnGame:
+            case ConstantesShared::PHASE_SelectCards:
+            case ConstantesShared::PHASE_InitReady:
+            case ConstantesShared::PHASE_MoveACard:
+            case ConstantesShared::PHASE_Attack_Retreat:
+            case ConstantesShared::PHASE_SkipTheTurn:
+            {
+                hasToRepond = false;
+
+                //get information
+                unsigned int uidGame = jsonReceived["uidGame"].toInt();
+
+                //add name player in json
+                QJsonObject objectReceived = jsonReceived.object();
+                objectReceived["namePlayer"] = m_user;
+
+                //remove data useless
+                objectReceived.remove("token");
+                objectReceived.remove("uidGame");
+
+                //transfer to the game
+                emit writeToInstance(uidGame, QJsonDocument(objectReceived).toJson(QJsonDocument::Compact));
+            }
+                break;
+
+            default:
+                const QString error = "error: phase does not exist";
+                jsonResponse["success"] = "ko";
+                jsonResponse["error"] = error;
+                qCritical() << m_user << error;
+            }
+        }
+        //wrong token
+        else
+        {
+            const QString error = "wrong token";
+            jsonResponse["success"] = "ko";
+            jsonResponse["error"] = error;
+            qCritical() << m_user << error;
+        }
+
+    }
+
+    if(hasToRepond == true)
+    {
+        //m_tcpSocket->write(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+        m_listMessageToSend.append(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
+    }
+}
+
 QJsonObject ThreadClient::authentify(QString user, QString password)
 {
     QJsonObject jsonResponse;

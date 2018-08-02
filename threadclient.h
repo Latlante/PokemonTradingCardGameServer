@@ -35,6 +35,7 @@ private slots:
 private:
     int m_socketDescriptor;
     QTcpSocket* m_tcpSocket;
+    quint16 m_sizeAnswerAsynchrone;
 
     QTimer *m_timerWritting;
     QList<QByteArray> m_listMessageToSend;
@@ -43,6 +44,7 @@ private:
     unsigned int m_uid;
     QString m_token;
 
+    void executeRequest(const QJsonDocument &jsonReceived);
     QJsonObject authentify(QString user, QString password);
 
     QJsonArray jsonArrayOfGamesForUidPlayer(unsigned int uidPlayer);
