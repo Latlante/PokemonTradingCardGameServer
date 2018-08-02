@@ -156,12 +156,13 @@ void ThreadClient::onTimeOut_timerWritting()
     if(m_listMessageToSend.count() > 0)
     {
         QByteArray message = m_listMessageToSend.takeFirst();
-        int size = message.length();
-        char sizeMSB = static_cast<char>((size >> 8) & 0xFF);
-        char sizeLSB = static_cast<char>(size & 0xFF);
-        message.prepend(sizeMSB);
-        message.prepend(sizeLSB);
-        m_tcpSocket->write(message);
+        QByteArray requestToSend;
+        QDataStream in(&requestToSend, QIODevice::WriteOnly);
+
+        in << static_cast<quint16>(message.length());
+        in << message;
+
+        m_tcpSocket->write(requestToSend);
     }
 }
 
