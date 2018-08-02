@@ -276,6 +276,8 @@ void InstanceManager::onReadyRead_Process()
     unsigned int uidGame = uidGameFromQProcess(process);
     QByteArray message = process->readLine();
 
+    qDebug() << __PRETTY_FUNCTION__ << uidGame << message;
+
     emit readyRead(uidGame, message);
 }
 

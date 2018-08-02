@@ -35,6 +35,8 @@ QJsonObject HistoricalNotifications::buildJsonOwnerFrom(unsigned int index)
     qDebug() << __PRETTY_FUNCTION__ << index << "/" << count();
 
     QJsonObject objToReturn;
+    objToReturn["indexBegin"] = static_cast<int>(index);
+    objToReturn["indexEnd"] = m_listNotifications.count();
 
     if(index < static_cast<unsigned int>(m_listNotifications.count()))
     {

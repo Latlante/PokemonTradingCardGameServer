@@ -203,10 +203,13 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
             jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepSelectionCards);
         else
             jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepPreparation);
+
+        jsonResponse["success"] = "ok";
     }
     else if(m_gameManager->gameStatus() == ConstantesQML::StepGameInProgress)
     {
         jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepGameInProgress);
+        jsonResponse["success"] = "ok";
 
         //You
         if(playerYou != nullptr)
@@ -381,6 +384,8 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
     else
     {
         jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepFinished);
+        jsonResponse["success"] = "ok";
+
     }
 
     return jsonResponse;

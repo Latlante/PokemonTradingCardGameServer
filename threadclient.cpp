@@ -174,6 +174,8 @@ void ThreadClient::executeRequest(const QJsonDocument &jsonReceived)
     bool hasToRepond = true;
     QJsonObject jsonResponse;
 
+    qDebug() << __PRETTY_FUNCTION__ << "message received:" << jsonReceived.toJson(QJsonDocument::Compact);
+
     //if no authentify yet
     if(m_uid == 0)
     {
