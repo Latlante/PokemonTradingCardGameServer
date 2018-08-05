@@ -6,7 +6,7 @@
 class NotificationCardMoved : public AbstractNotification
 {
 public:
-    NotificationCardMoved(const QString& namePlayer, unsigned int idCard, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination);
+    NotificationCardMoved(const QString& namePlayer, unsigned int idCard, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, bool showCardToEveryone);
     virtual ~NotificationCardMoved() override;
 
     virtual QJsonObject messageJsonForOwner() override;
@@ -16,6 +16,7 @@ private:
     unsigned int m_idCard;
     ConstantesShared::EnumPacket m_packetOrigin, m_packetDestination;
     unsigned int m_indexCardOrigin;
+    bool m_showCardToEveryone;
 };
 
 #endif // NOTIFICATIONCARDMOVED_H

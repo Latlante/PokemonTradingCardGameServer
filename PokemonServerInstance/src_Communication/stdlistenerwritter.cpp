@@ -42,10 +42,13 @@ void StdListenerWritter::listening()
     emit logReceived("StdListenerWritter: Start listening");
 
     QTextStream sIn(stdin);
+    int index = 0;
 
     while(m_stopThread == false)
     {
         QString message = sIn.readLine();
+
+        emit logReceived("listening... (" + QString::number(message.length()) + ")");
 
         if(message.isEmpty() == false)
         {

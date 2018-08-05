@@ -48,6 +48,7 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
 
 Controller::~Controller()
 {
+    m_log.write("Destructeur Controller");
     qDebug() << "Destructeur Controller";
 
     m_communication->stopListening();
@@ -60,7 +61,7 @@ Controller::~Controller()
 ************************************************************/
 void Controller::onMessageReceived_Communication(QString message)
 {
-    m_log.write("Message received: " + message);
+    m_log.write(QString(__PRETTY_FUNCTION__) + "Message received: " + message);
 
     if(message == "exit")
     {
@@ -163,9 +164,9 @@ void Controller::onInitReadyChanged_GameManager()
     sendNotifPlayerIsReady();
 }
 
-void Controller::onCardMoved_GameManager(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard)
+void Controller::onCardMoved_GameManager(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard, bool showCardToEveryone)
 {
-    sendNotifCardMoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, idCard);
+    sendNotifCardMoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, idCard, showCardToEveryone);
 }
 
 void Controller::onIndexCurrentPlayerChanged_GameManager(const QString &oldPlayer, const QString &newPlayer)
@@ -633,7 +634,7 @@ void Controller::sendNotifEndOfTurn(const QString &oldPlayer, const QString &new
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard)
+void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard, bool showCardToEveryone)
 {
     m_log.write(QString(__PRETTY_FUNCTION__) +
                 ", namePlayer: " + namePlayer +
@@ -641,13 +642,15 @@ void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared:
                 ", packetOrigin: " + QString::number(packetOrigin) +
                 ", indexCardOrigin: " + QString::number(indexCardOrigin) +
                 ", packetDestination: " + QString::number(packetDestination) +
-                ", idCard: " + QString::number(idCard));
+                ", idCard: " + QString::number(idCard) +
+                ", showCardToEveryone: " + QString(showCardToEveryone ? "true" : "false"));
 
     AbstractNotification* notif = new NotificationCardMoved(namePlayer,
                                                             idCard,
                                                             packetOrigin,
                                                             indexCardOrigin,
-                                                            packetDestination);
+                                                            packetDestination,
+                                                            showCardToEveryone);
     m_historicNotif.addNewNotification(notif);
 }
 

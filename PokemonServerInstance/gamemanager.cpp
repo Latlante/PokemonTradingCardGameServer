@@ -99,10 +99,16 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
     else
         emit logReceived(QString(__PRETTY_FUNCTION__) + "move not developp yet");*/
 
-    if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Bench))
-        success = play->moveCardFromHandToBench(indexCardOrigin, indexCardDestination);
-    else if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Fight))
-        success = play->moveCardFromHandToFight(indexCardOrigin);
+    if(play != nullptr)
+    {
+        if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Bench))
+            success = play->moveCardFromHandToBench(indexCardOrigin, indexCardDestination);
+        else if((packetOrigin == Player::PCK_Hand) && (packetDestination == Player::PCK_Fight))
+            success = play->moveCardFromHandToFight(indexCardOrigin);
+    }
+    else
+        emit logReceived(QString(__PRETTY_FUNCTION__) + "player (" + namePlayer + ") is nullptr");
+
 
     return success;
 }

@@ -599,12 +599,22 @@ bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket 
 
     if (destination->isFull() == false)
     {
+        //get data before action
         AbstractCard* cardToMove = source->takeACard(index);
+        ConstantesShared::EnumPacket packetOrigin = ConstantesShared::EnumPacketFromName(source->name());
+        ConstantesShared::EnumPacket packetDestination = ConstantesShared::EnumPacketFromName(destination->name());
+        int idCard = cardToMove->id();
 
         if (cardToMove != nullptr)
         {
             destination->addNewCard(cardToMove);
             moveSuccess = true;
+
+            //Send notification
+            if((destination->name() == NAME_BENCH) || (destination->name() == NAME_FIGHT))
+                emit cardMoved(name(), packetOrigin, index, packetDestination, idCard, true);
+            else
+                emit cardMoved(name(), packetOrigin, index, packetDestination, idCard, false);
         }
         else
         {
@@ -638,7 +648,10 @@ bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket 
                 moveSuccess = destination->addNewCard(cardToMove);
 
                 //Send notification
-                emit cardMoved(name(), packetOrigin, indexCardOrigin, packetDestination, idCard);
+                if((destination->name() == NAME_BENCH) || (destination->name() == NAME_FIGHT))
+                    emit cardMoved(name(), packetOrigin, indexCardOrigin, packetDestination, idCard, true);
+                else
+                    emit cardMoved(name(), packetOrigin, indexCardOrigin, packetDestination, idCard, false);
             }
         }
     }

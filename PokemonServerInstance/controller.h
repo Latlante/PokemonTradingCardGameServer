@@ -28,7 +28,7 @@ private slots:
     void onLogReceived(QString message);
 
     void onInitReadyChanged_GameManager();
-    void onCardMoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard);
+    void onCardMoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard, bool showCardToEveryone);
     void onIndexCurrentPlayerChanged_GameManager(const QString& oldPlayer, const QString& newPlayer);
     void onDataPokemonChanged_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon);
     void onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy);
@@ -49,7 +49,7 @@ private:
 
     void sendNotifPlayerIsReady();
     void sendNotifEndOfTurn(const QString& oldPlayer, const QString& newPlayer);
-    void sendNotifCardMoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard);
+    void sendNotifCardMoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard, bool showCardToEveryone);
     void sendNotifDataPokemonChanged(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon);
     void sendNotifPokemonSwitched(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard);
     void sendNotifEnergyAdded(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy);

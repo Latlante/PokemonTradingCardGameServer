@@ -57,9 +57,9 @@ unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigne
 		QProcess* process = new QProcess();
 		connect(process, &QProcess::readyRead, this, &InstanceManager::onReadyRead_Process);
 		connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &InstanceManager::onFinished_Process);
-		process->start(m_PATH_INSTANCE, {name, "Player1", "Player2"});
+        process->start(m_PATH_INSTANCE, {name, "Player1", "Player2"});
 
-		if(process->waitForStarted())
+        if(process->waitForStarted())
 		{
 			QString nameOfTheGame = name;
 			if(nameOfTheGame == "")
@@ -299,10 +299,15 @@ void InstanceManager::sendNotifNewGameCreated(unsigned int uidGame, unsigned int
     const QString namePlayerCreator = Authentification::namePlayerFromUid(uidPlayerCreator);
     const QString namePlayerOpponent = Authentification::namePlayerFromUid(uidPlayerOpponent);
 
-    jsonResponse["phase"] = ConstantesShared::PHASE_NotifNewGameCreated;
-    jsonResponse["uidGame"] = static_cast<int>(uidGame);
-    jsonResponse["nameGame"] = m_listGame[uidGame].name;
-    jsonResponse["opponent"] = namePlayerCreator;
+    QJsonObject jsonAction;
+    jsonAction["phase"] = ConstantesShared::PHASE_NotifNewGameCreated;
+    jsonAction["uidGame"] = static_cast<int>(uidGame);
+    jsonAction["nameGame"] = m_listGame[uidGame].name;
+    jsonAction["opponent"] = namePlayerCreator;
+
+    jsonResponse["indexBegin"] = 1;
+    jsonResponse["indexEnd"] = 2;
+    jsonResponse["1"] = jsonAction;
 
     QByteArray messageJson = namePlayerOpponent.toLatin1() + ";" + QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact);
     emit readyRead(uidGame, messageJson);

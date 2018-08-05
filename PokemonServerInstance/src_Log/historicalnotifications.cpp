@@ -54,12 +54,14 @@ QJsonObject HistoricalNotifications::buildJsonOthersFrom(unsigned int index)
     qDebug() << __PRETTY_FUNCTION__ << index << "/" << count();
 
     QJsonObject objToReturn;
+    objToReturn["indexBegin"] = static_cast<int>(index);
+    objToReturn["indexEnd"] = m_listNotifications.count();
 
     if(index < static_cast<unsigned int>(m_listNotifications.count()))
     {
         for(int i=index;i<m_listNotifications.count();++i)
         {
-            objToReturn[QString::number(index)] = m_listNotifications[i]->messageJsonForOthers();
+            objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOthers();
         }
     }
 

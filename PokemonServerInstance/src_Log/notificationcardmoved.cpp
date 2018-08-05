@@ -1,11 +1,12 @@
 #include "notificationcardmoved.h"
 
-NotificationCardMoved::NotificationCardMoved(const QString &namePlayer, unsigned int idCard, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination) :
+NotificationCardMoved::NotificationCardMoved(const QString &namePlayer, unsigned int idCard, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, bool showCardToEveryone) :
     AbstractNotification(ConstantesShared::PHASE_NotifCardMoved, namePlayer),
     m_idCard(idCard),
     m_packetOrigin(packetOrigin),
     m_packetDestination(packetDestination),
-    m_indexCardOrigin(indexCardOrigin)
+    m_indexCardOrigin(indexCardOrigin),
+    m_showCardToEveryone(showCardToEveryone)
 {
 
 }
@@ -20,7 +21,7 @@ NotificationCardMoved::~NotificationCardMoved()
 ************************************************************/
 QJsonObject NotificationCardMoved::messageJsonForOwner()
 {
-    QJsonObject jsonResponse = initObject();
+    QJsonObject jsonResponse = messageJsonForOthers();
 
     jsonResponse["idCard"] = static_cast<int>(m_idCard);
     jsonResponse["idPacketOrigin"] = static_cast<int>(m_packetOrigin);
@@ -33,6 +34,9 @@ QJsonObject NotificationCardMoved::messageJsonForOwner()
 QJsonObject NotificationCardMoved::messageJsonForOthers()
 {
     QJsonObject jsonResponse = initObject();
+
+    if(m_showCardToEveryone == true)
+        jsonResponse["idCard"] = static_cast<int>(m_idCard);
 
     jsonResponse["idPacketOrigin"] = static_cast<int>(m_packetOrigin);
     jsonResponse["indexCardOrigin"] = static_cast<int>(m_indexCardOrigin);

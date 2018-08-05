@@ -26,7 +26,8 @@ class Player : public QObject
 public:
     enum EnumPacket
     {
-        PCK_Bench = 0,
+        PACKET_None = 0,
+        PCK_Bench,
         PCK_Deck,
         PCK_Fight,
         PCK_Hand,
@@ -80,7 +81,7 @@ signals:
     void canPlayChanged();
     void initReadyChanged();
 
-    void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int);
+    void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int,bool);
     void dataPokemonChanged(const QString&,ConstantesShared::EnumPacket,int,CardPokemon*);
     void energyAdded(const QString&, ConstantesShared::EnumPacket, int, int);
     void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, int);

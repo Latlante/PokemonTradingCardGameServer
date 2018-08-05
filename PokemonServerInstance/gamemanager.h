@@ -87,7 +87,7 @@ signals:
     void movingCardAnimationStartAsked();
 
     void initReadyChanged();
-    void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int);
+    void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int,bool);
     void dataPokemonChanged(const QString&,ConstantesShared::EnumPacket,int,CardPokemon*);
     void energyAdded(const QString&, ConstantesShared::EnumPacket, int, int);
     void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, int);
