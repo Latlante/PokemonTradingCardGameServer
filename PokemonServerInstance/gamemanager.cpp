@@ -280,7 +280,7 @@ void GameManager::setNumberMaxOfPlayers(unsigned short max)
     m_numberMaxOfPlayers = max;
 }
 
-Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
+Player *GameManager::addNewPlayer(QString name)
 {
 #ifdef TRACAGE_PRECIS
     qDebug() << __PRETTY_FUNCTION__;
@@ -301,7 +301,7 @@ Player *GameManager::addNewPlayer(QString name, QList<AbstractCard*> listCards)
 
     if((m_listPlayers.count() < numberMaxOfPlayers()) && (playerFound == false) && (listCards.count() == MAXCARDS_DECK))
     {
-        newPlayer = new Player(name, listCards);
+        newPlayer = new Player(name);
 
         connect(newPlayer, &Player::endOfTurn, this, &GameManager::onEndOfTurn_Player);
         connect(newPlayer, &Player::cardMoved, this ,&GameManager::cardMoved);

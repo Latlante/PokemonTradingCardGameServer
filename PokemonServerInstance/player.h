@@ -35,7 +35,7 @@ public:
         PCK_Trash
     };
 
-	Player(QString name, QList<AbstractCard*> listCards, QObject *parent = NULL);
+    Player(QString name, QObject *parent = NULL);
 	~Player();
 	
     const QString name();
@@ -45,6 +45,9 @@ public:
     PacketHand* hand();
     PacketRewards* rewards();
     PacketTrash* trash();
+
+    void fillDeck(QList<AbstractCard*> listCards);
+    void emptyingDeck();
 	
 	void newTurn();
     void turnFinished();

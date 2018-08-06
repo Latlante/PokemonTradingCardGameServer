@@ -14,11 +14,11 @@
 #include "src_Packets/packettrash.h"
 #include "../Share/constantesshared.h"
 
-Player::Player(QString name, QList<AbstractCard*> listCards, QObject *parent) :
+Player::Player(QString name, QObject *parent) :
 	QObject(parent),
     m_name(name),
     m_bench(new BenchArea(NAME_BENCH)),
-    m_deck(new PacketDeck(NAME_DECK, listCards)),
+    m_deck(new PacketDeck(NAME_DECK)),
     m_fight(new FightArea(NAME_FIGHT)),
     m_hand(new PacketHand(NAME_HAND)),
     m_rewards(new PacketRewards(NAME_REWARDS)),
@@ -27,20 +27,7 @@ Player::Player(QString name, QList<AbstractCard*> listCards, QObject *parent) :
     m_canPlay(true),
     m_energyPlayedForThisRound(false)
 {
-    foreach(AbstractCard* card, listCards)
-    {
-        //set owner
-        card->setOwner(this);
 
-        //connection for dataChanged, energyAdded and energyRemoved
-        if(card->type() == AbstractCard::TypeOfCard_Pokemon)
-        {
-            CardPokemon* pokemon = static_cast<CardPokemon*>(card);
-            connect(pokemon, &CardPokemon::dataChanged, this, &Player::onDataChanged_CardPokemon);
-            connect(pokemon, &CardPokemon::energyAdded, this, &Player::onEnergyAdded_CardPokemon);
-            connect(pokemon, &CardPokemon::energyRemoved, this, &Player::onEnergyRemoved_CardPokemon);
-        }
-    }
 }
 
 Player::~Player()
@@ -93,6 +80,34 @@ PacketRewards* Player::rewards()
 PacketTrash* Player::trash()
 {
     return m_trash;
+}
+
+void Player::fillDeck(QList<AbstractCard*> listCards)
+{
+    foreach(AbstractCard* card, listCards)
+    {
+        m_deck->addNewCard(card);
+
+        //set owner
+        card->setOwner(this);
+
+        //connection for dataChanged, energyAdded and energyRemoved
+        if(card->type() == AbstractCard::TypeOfCard_Pokemon)
+        {
+            CardPokemon* pokemon = static_cast<CardPokemon*>(card);
+            connect(pokemon, &CardPokemon::dataChanged, this, &Player::onDataChanged_CardPokemon);
+            connect(pokemon, &CardPokemon::energyAdded, this, &Player::onEnergyAdded_CardPokemon);
+            connect(pokemon, &CardPokemon::energyRemoved, this, &Player::onEnergyRemoved_CardPokemon);
+        }
+    }
+}
+
+void Player::emptyingDeck()
+{
+    while(m_deck->countCard() > 0)
+    {
+        delete m_deck->takeACard(0);
+    }
 }
 
 void Player::newTurn()

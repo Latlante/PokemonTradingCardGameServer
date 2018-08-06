@@ -44,6 +44,9 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
 
     m_log.write("Creation of the game");
     m_log.write("Players: " + player1 + " versus " + player2);
+
+    m_gameManager->addNewPlayer(player1);
+    m_gameManager->addNewPlayer(player2);
 }
 
 Controller::~Controller()
@@ -200,10 +203,90 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
 
     if(m_gameManager->gameStatus() == ConstantesQML::StepPreparation)
     {
-        if(playerYou == nullptr)
+        if(playerYou->deck()->countCard() <= 0)
             jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepSelectionCards);
         else
             jsonResponse["gameStatus"] = static_cast<int>(ConstantesQML::StepPreparation);
+
+        //if the opponent has already fill his deck
+        Player* playerOpponent = m_gameManager->enemyOf(playerYou);
+        if((playerOpponent != nullptr) && (playerOpponent->deck()->countCard() > 0))
+        {
+            QJsonObject objEnemy;
+
+                //Bench
+            QJsonArray arrayEnemyBench;
+            for(int iBench=0;iBench<playerOpponent->bench()->countCard();++iBench)
+            {
+                CardPokemon* pokemon = playerOpponent->bench()->cardPok(iBench);
+                QJsonObject objEnemyBenchPokemon;
+
+                objEnemyBenchPokemon["id"] = pokemon->id();
+                objEnemyBenchPokemon["damage"] = pokemon->damageMarker() * DAMAGE_MARQUER_VALUE;
+
+                    //Energies
+                QJsonArray arrayEnemyBenchPokemonEnergies;
+                ModelListEnergies* modelEnergies = pokemon->modelListOfEnergies();
+                for(unsigned short iEnergy=0;iEnergy<modelEnergies->countEnergies();++iEnergy)
+                {
+                    CardEnergy* cardEn = modelEnergies->energy(iEnergy);
+
+                    if(cardEn != nullptr)
+                        arrayEnemyBenchPokemonEnergies.append(static_cast<int>(cardEn->element()));
+                    else
+                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                }
+
+                objEnemyBenchPokemon["energies"] = arrayEnemyBenchPokemonEnergies;
+            }
+            objEnemy["bench"] = arrayEnemyBench;
+
+                //Deck
+            objEnemy["deckCount"] = playerOpponent->deck()->countCard();
+
+                //Fight
+            QJsonObject objEnemyFight;
+            CardPokemon* pokemonFight = playerOpponent->fight()->pokemonFighter();
+
+            if(pokemonFight != nullptr)
+            {
+                objEnemyFight["id"] = pokemonFight->id();
+                objEnemyFight["damage"] = pokemonFight->damageMarker() * DAMAGE_MARQUER_VALUE;
+                objEnemyFight["status"] = static_cast<int>(pokemonFight->status());
+
+                    //Energies
+                QJsonArray arrayEnemyFightPokemonEnergies;
+                ModelListEnergies* modelEnergies = pokemonFight->modelListOfEnergies();
+                for(unsigned short iEnergy=0;iEnergy<modelEnergies->countEnergies();++iEnergy)
+                {
+                    CardEnergy* cardEn = modelEnergies->energy(iEnergy);
+
+                    if(cardEn != nullptr)
+                        arrayEnemyFightPokemonEnergies.append(static_cast<int>(cardEn->element()));
+                    else
+                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                }
+
+                objEnemyFight["energies"] = arrayEnemyFightPokemonEnergies;
+
+            }
+            else
+            {
+                m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, pokemon fighter is nullptr");
+            }
+            objEnemy["fight"] = objEnemyFight;
+
+                //Hand
+            objEnemy["handCount"] = playerOpponent->hand()->countCard();
+
+                //Rewards
+            objEnemy["rewardsCount"] = playerOpponent->rewards()->countCard();
+
+                //Trash
+            objEnemy["trashCount"] = playerOpponent->trash()->countCard();
+
+            jsonResponse["enemy"] = objEnemy;
+        }
 
         jsonResponse["success"] = "ok";
     }
@@ -449,10 +532,11 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
     }
     else
     {
-        Player* play = m_gameManager->addNewPlayer(namePlayer, listCards);
+        Player* play = m_gameManager->playerByName(namePlayer);
 
         if(play != nullptr)
         {
+            play->fillDeck(listCards);
             if(m_gameManager->initPlayer(play))
             {
                 jsonResponse["success"] = "ok";
@@ -462,7 +546,7 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
             }
             else
             {
-                m_gameManager->removePlayer(play);
+                play->emptyingDeck();
 
                 jsonResponse["success"] = "ko";
                 jsonResponse["error"] = "No enough base to play";
@@ -472,8 +556,8 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
         else
         {
             jsonResponse["success"] = "ko";
-            jsonResponse["error"] = "Impossible to add a new player";
-            m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Impossible to add a new player");
+            jsonResponse["error"] = "Player " + namePlayer + " is nullptr";
+            m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": player is nullptr");
         }
     }
 
