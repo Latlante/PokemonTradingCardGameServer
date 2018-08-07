@@ -48,7 +48,7 @@ void StdListenerWritter::listening()
     {
         QString message = sIn.readLine();
 
-        emit logReceived("listening... (" + QString::number(message.length()) + ")");
+        //emit logReceived("listening... (" + QString::number(message.length()) + ")");
 
         if(message.isEmpty() == false)
         {
