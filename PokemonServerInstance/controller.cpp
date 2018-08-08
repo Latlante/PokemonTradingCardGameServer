@@ -238,6 +238,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                 }
 
                 objEnemyBenchPokemon["energies"] = arrayEnemyBenchPokemonEnergies;
+                arrayEnemyBench.append(objEnemyBenchPokemon);
             }
             objEnemy["bench"] = arrayEnemyBench;
 
@@ -268,13 +269,12 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                 }
 
                 objEnemyFight["energies"] = arrayEnemyFightPokemonEnergies;
-
+                objEnemy["fight"] = objEnemyFight;
             }
             else
             {
                 m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, pokemon fighter is nullptr");
             }
-            objEnemy["fight"] = objEnemyFight;
 
                 //Hand
             objEnemy["handCount"] = playerOpponent->hand()->countCard();
