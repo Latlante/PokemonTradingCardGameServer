@@ -84,6 +84,10 @@ PacketTrash* Player::trash()
 
 void Player::fillDeck(QList<AbstractCard*> listCards)
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     foreach(AbstractCard* card, listCards)
     {
         m_deck->addNewCard(card);
@@ -106,6 +110,10 @@ void Player::fillDeck(QList<AbstractCard*> listCards)
 
 void Player::emptyingDeck()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     while(m_deck->countCard() > 0)
     {
         delete m_deck->takeACard(0);
@@ -114,6 +122,10 @@ void Player::emptyingDeck()
 
 void Player::newTurn()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     setCanPlay(true);
     m_energyPlayedForThisRound = false;
     //fight()->pokemonFighter()->setStatus(CardPokemon::Status_Normal);
@@ -121,6 +133,10 @@ void Player::newTurn()
 
 void Player::turnFinished()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     //On remet à 0 les historiques de dégats pour chaque pokémon
     for(int i=0;i<fight()->countCard();++i)
     {
@@ -138,11 +154,19 @@ void Player::turnFinished()
 
 bool Player::isPlaying()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     return m_canPlay;
 }
 
 void Player::drawOneCard()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     //qDebug() << m_name << " - "<< __PRETTY_FUNCTION__;
 
     moveCardFromDeckToHand();
@@ -150,11 +174,19 @@ void Player::drawOneCard()
 
 void Player::drawOneReward(AbstractCard* cardReward)
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     moveCardFromRewardToHand(cardReward);
 }
 
 bool Player::isLoser()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     //Conditions de victoire:
     //  -> Plus de récompense à piocher
     //  -> Plus de carte dans le deck
@@ -170,11 +202,18 @@ bool Player::isLoser()
 
 bool Player::initReady()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     return m_initReady;
 }
 
 void Player::setInitReady(bool ready)
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
     if(m_initReady != ready)
     {
         m_initReady = ready;
@@ -184,6 +223,9 @@ void Player::setInitReady(bool ready)
 
 bool Player::setInitReadyIfReady()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
     bool success = false;
 
     if(fight()->countCard() > 0)
@@ -198,11 +240,19 @@ bool Player::setInitReadyIfReady()
 
 bool Player::canPlay()
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     return m_canPlay;
 }
 
 void Player::setCanPlay(bool status)
 {
+#ifdef TRACAGE_PRECIS
+    qDebug() << __PRETTY_FUNCTION__;
+#endif
+
     if(status != m_canPlay)
     {
         m_canPlay = status;

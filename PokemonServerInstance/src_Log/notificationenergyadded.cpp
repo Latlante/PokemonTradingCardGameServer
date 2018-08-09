@@ -23,7 +23,7 @@ QJsonObject NotificationEnergyAdded::messageJsonForOthers()
 
     jsonResponse["idPacket"] = static_cast<int>(m_packet);
     jsonResponse["indexCard"] = static_cast<int>(m_indexCard);
-    jsonResponse["idEnergy"] = static_cast<int>(m_idEnergy);
+    jsonResponse["elementEnergy"] = static_cast<int>(m_idEnergy);
 
     return jsonResponse;
 }
