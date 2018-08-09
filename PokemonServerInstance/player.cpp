@@ -100,6 +100,8 @@ void Player::fillDeck(QList<AbstractCard*> listCards)
             connect(pokemon, &CardPokemon::energyRemoved, this, &Player::onEnergyRemoved_CardPokemon);
         }
     }
+
+    m_deck->mixCards();
 }
 
 void Player::emptyingDeck()
