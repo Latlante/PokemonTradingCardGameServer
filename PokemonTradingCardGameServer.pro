@@ -38,7 +38,9 @@ SOURCES += \
     authentification.cpp \
     Share/constantesshared.cpp \
     Models/modeltablegames.cpp \
-    Models/modellistusers.cpp
+    Models/modellistusers.cpp \
+    CommunicationInstance/tcpserverinstance.cpp \
+    CommunicationInstance/threadinstance.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -48,7 +50,9 @@ HEADERS += \
     authentification.h \
     Share/constantesshared.h \
     Models/modeltablegames.h \
-    Models/modellistusers.h
+    Models/modellistusers.h \
+    CommunicationInstance/tcpserverinstance.h \
+    CommunicationInstance/threadinstance.h
 
 FORMS += \
         mainwindow.ui
