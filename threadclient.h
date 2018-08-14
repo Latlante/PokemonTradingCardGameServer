@@ -16,9 +16,6 @@ public:
 
     void newMessage(QByteArray message);
 
-public slots:
-    void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
-
 protected:
     void run() override;
 

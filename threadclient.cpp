@@ -131,35 +131,6 @@ void ThreadClient::onDisconnected_TcpSocket()
     exit(0);
 }
 
-void ThreadClient::onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message)
-{
-    qDebug() << m_user << __PRETTY_FUNCTION__ << "Message recu du process," << uidGame << message;
-
-    //check if we are concerned by the message
-    if(InstanceManager::instance()->isInTheGame(uidGame, m_uid))
-    {
-        QList<QByteArray> listArguments = message.split(';');
-
-        if(listArguments.count() >= 2)
-        {
-            const QString namePlayer = listArguments[0];
-            const QByteArray messageOwner = listArguments[1];
-            const QByteArray messageOthers = listArguments.count() >= 3 ? listArguments[2] : QByteArray();
-
-            if(m_user == namePlayer)
-            {
-                qDebug() << m_user << __PRETTY_FUNCTION__ << "Envoi message propriétaire";
-                m_listMessageToSend.append(messageOwner);
-            }
-            else if((messageOthers.isEmpty() == false) && (messageOthers != "{}"))
-            {
-                qDebug() << m_user << __PRETTY_FUNCTION__ << "Envoi message aux autres";
-                m_listMessageToSend.append(messageOthers);
-            }
-        }
-    }
-}
-
 void ThreadClient::onTimeOut_timerWritting()
 {
     if(m_listMessageToSend.count() > 0)

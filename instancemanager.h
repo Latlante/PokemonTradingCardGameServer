@@ -41,16 +41,12 @@ public:
     bool checkNameOfGameIsAvailable(const QString& nameGame);
     unsigned int uidGameFromQProcess(QProcess* process);
 
-public slots:
-    bool write(unsigned int uidGame, QByteArray message);
-
 signals:
     void newGameCreated(unsigned int,QString,QString,QString);
     void gameRemoved(int);
     void readyRead(unsigned int, QByteArray);
 
 private slots:
-    void onReadyRead_Process();
     void onFinished_Process(int exitCode);
 
 private:

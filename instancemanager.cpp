@@ -57,7 +57,6 @@ unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigne
 		QProcess* process = new QProcess();
         const QString namePlayerCreator = Authentification::namePlayerFromUid(uidPlayCreator);
         const QString namePlayerOpponent = Authentification::namePlayerFromUid(uidPlayOpponent);
-		connect(process, &QProcess::readyRead, this, &InstanceManager::onReadyRead_Process);
 		connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &InstanceManager::onFinished_Process);
         process->start(m_PATH_INSTANCE, {name, namePlayerCreator, namePlayerOpponent});
 
@@ -130,30 +129,6 @@ bool InstanceManager::removeGame(unsigned int index)
     }
 
     return success;
-}
-
-bool InstanceManager::write(unsigned int uidGame, QByteArray message)
-{
-    qint64 byteWritten = 0;
-    qDebug() << __PRETTY_FUNCTION__;
-
-    if((m_listGame.contains(uidGame)) && (!message.isEmpty()))
-    {
-        qDebug() << __PRETTY_FUNCTION__ << ", writting: " << message << " on " << uidGame;
-
-        QProcess* process = m_listGame[uidGame].process;
-        byteWritten = process->write(message + "\n");
-    }
-    else
-    {
-        if(!m_listGame.contains(uidGame))
-            qDebug() << __PRETTY_FUNCTION__ << ", list does not contains " << uidGame;
-    }
-
-    qDebug() << __PRETTY_FUNCTION__ << ", message size = " << message.length();
-    qDebug() << __PRETTY_FUNCTION__ << ", byteWritten=" << byteWritten;
-
-    return (message.length() + 1) == byteWritten;
 }
 
 bool InstanceManager::checkNameOfGameIsAvailable(const QString &nameGame)
@@ -272,17 +247,6 @@ QList<unsigned int> InstanceManager::listUidPlayersFromUidGame(unsigned int uidG
 /************************************************************
 *****			  FONCTIONS SLOT PRIVEES				*****
 ************************************************************/
-void InstanceManager::onReadyRead_Process()
-{
-    QProcess* process = qobject_cast<QProcess*>(sender());
-    unsigned int uidGame = uidGameFromQProcess(process);
-    QByteArray message = process->readLine();
-
-    qDebug() << __PRETTY_FUNCTION__ << uidGame << message;
-
-    emit readyRead(uidGame, message);
-}
-
 void InstanceManager::onFinished_Process(int exitCode)
 {
     QProcess* process = qobject_cast<QProcess*>(sender());
