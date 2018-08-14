@@ -14,6 +14,8 @@ public:
     explicit ThreadClient(int socketDescriptor, QObject *parent = nullptr);
     ~ThreadClient() override;
 
+    void newMessage(QByteArray message);
+
 public slots:
     void onReadyRead_InstanceManager(unsigned int uidGame, QByteArray message);
 
@@ -21,6 +23,7 @@ protected:
     void run() override;
 
 signals:
+    void clientAuthentified(unsigned int);
     void newUserConnected(int,QString);
     void userDisconnected(int);
     void writeToInstance(unsigned int,QByteArray);

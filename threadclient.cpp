@@ -42,6 +42,15 @@ ThreadClient::~ThreadClient()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
+void ThreadClient::newMessage(QByteArray message)
+{
+    if(message.length() > 0)
+        m_listMessageToSend.append(message);
+}
+
+/************************************************************
+*****				FONCTIONS PUBLIQUES					*****
+************************************************************/
 void ThreadClient::run()
 {
     qDebug() << "Starting thread: " << m_socketDescriptor;
@@ -307,6 +316,7 @@ QJsonObject ThreadClient::authentify(QString user, QString password)
         jsonResponse["token"] = m_token;
         jsonResponse["games"] = jsonArrayOfGamesForUidPlayer(m_uid);
         emit newUserConnected(m_socketDescriptor, m_user);
+        emit clientAuthentified(m_uid);
     }
     else
     {

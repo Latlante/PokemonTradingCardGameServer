@@ -25,6 +25,15 @@ ThreadInstance::ThreadInstance(int socketDescriptor, QObject *parent) :
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
+void ThreadInstance::newMessage(QByteArray message)
+{
+    if(message.length() > 0)
+        m_listMessageToSend.append(message);
+}
+
+/************************************************************
+*****				FONCTIONS PROTEGEES					*****
+************************************************************/
 void ThreadInstance::run()
 {
     qDebug() << "Starting thread instance: " << m_socketDescriptor;
@@ -78,7 +87,7 @@ void ThreadInstance::onReadyRead_TcpSocket()
 
     if(jsonError.error == QJsonParseError::NoError)
     {
-        emit messageReceived(docNotif);
+        executeRequest(docNotif);
         m_sizeAnswerAsynchrone = 0;
     }
     else
@@ -116,5 +125,27 @@ void ThreadInstance::onTimeOut_timerWritting()
         in << message;
 
         m_tcpSocket->write(requestToSend);
+    }
+}
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/
+void ThreadInstance::executeRequest(const QJsonDocument &jsonReceived)
+{
+    qDebug() << __PRETTY_FUNCTION__ << "message received:" << jsonReceived.toJson(QJsonDocument::Compact);
+
+    //Authentification
+    if(jsonReceived.object().contains("phase") == false)
+    {
+        unsigned int uidGame = static_cast<unsigned int>(jsonReceived["uidGame"].toInt());
+        if(uidGame > 0)
+            emit instanceAuthentified(uidGame);
+        else
+            qWarning() << __PRETTY_FUNCTION__ << "error during authentification of the instance: " << jsonReceived.toJson(QJsonDocument::Compact);
+    }
+    else
+    {
+        emit messageReceived(jsonReceived);
     }
 }

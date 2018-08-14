@@ -12,11 +12,13 @@ class ThreadInstance : public QThread
 public:
     ThreadInstance(int socketDescriptor, QObject* parent = nullptr);
 
+    void newMessage(QByteArray message);
+
 protected:
     void run() override;
 
 signals:
-    void newInstanceConnected(int);
+    void instanceAuthentified(unsigned int);
     void instanceDisconnected(int);
     void messageReceived(QJsonDocument);
 
@@ -33,6 +35,8 @@ private:
 
     QTimer *m_timerWritting;
     QList<QByteArray> m_listMessageToSend;
+
+    void executeRequest(const QJsonDocument &jsonReceived);
 };
 
 #endif // THREADINSTANCE_H

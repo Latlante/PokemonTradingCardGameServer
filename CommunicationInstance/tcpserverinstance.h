@@ -3,6 +3,8 @@
 
 #include <QTcpServer>
 
+class ThreadInstance;
+
 class TcpServerInstance : public QTcpServer
 {
     Q_OBJECT
@@ -12,15 +14,21 @@ public:
     void start();
     bool isRunning();
 
+    bool newMessage(unsigned int uid, QByteArray message);
+
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
 
 signals:
-    void newUserConnected(int,QString);
-    void userDisconnected(int);
+    void newInstanceConnected(int);
+    void instanceDisconnected(int);
+
+private slots:
+    void onInstanceAuthentified_ThreadInstance(unsigned int uid);
 
 private:
     bool m_isRunning;
+    QMap<unsigned int, ThreadInstance*> m_mapThreadInstance;
 
 };
 
