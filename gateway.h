@@ -17,6 +17,10 @@ public:
 
 signals:
 
+private slots:
+    void onWriteToInstance_serverClients(unsigned int uidGame, QByteArray message);
+    void onWriteToClient_serverInstances(unsigned int uidGame, QByteArray message);
+
 private:
     TcpServerClients* m_serverClients;
     TcpServerInstance* m_serverInstance;

@@ -72,3 +72,18 @@ void TcpServerInstance::onInstanceAuthentified_ThreadInstance(unsigned int uid)
     ThreadInstance* client = qobject_cast<ThreadInstance*>(sender());
     m_mapThreadInstance.insert(uid, client);
 }
+
+void TcpServerInstance::onWriteToClient_ThreadInstance(QByteArray message)
+{
+    ThreadInstance* instance = qobject_cast<ThreadInstance*>(sender());
+    const unsigned int uidGame = m_mapThreadInstance.key(instance, 0);
+
+    if(uidGame > 0)
+    {
+        emit writeToClient(uidGame, message);
+    }
+    else
+    {
+        qWarning() << __PRETTY_FUNCTION__ << "uidGame = 0";
+    }
+}

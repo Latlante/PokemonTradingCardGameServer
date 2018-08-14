@@ -11,7 +11,7 @@ Gateway::Gateway(QObject *parent) :
     m_serverClients(new TcpServerClients()),
     m_serverInstance(new TcpServerInstance())
 {
-
+    connect(m_serverClients, &TcpServerClients::writeToInstance, this, &Gateway::onWriteToInstance_serverClients);
 }
 
 Gateway::~Gateway()
@@ -37,4 +37,32 @@ bool Gateway::startServers()
         qCritical() << __PRETTY_FUNCTION__ << "Instance exe not found";
 
     return success;
+}
+
+/************************************************************
+*****			  FONCTIONS SLOT PRIVEES				*****
+************************************************************/
+void Gateway::onWriteToInstance_serverClients(unsigned int uidGame, QByteArray message)
+{
+    qDebug() << __PRETTY_FUNCTION__ << uidGame << message;
+    m_serverInstance->newMessage(uidGame, message);
+}
+
+void Gateway::onWriteToClient_serverInstances(unsigned int uidGame, QByteArray message)
+{
+    qDebug() << __PRETTY_FUNCTION__ << uidGame << message;
+    QList<QString> messageSplit = QString(message).split(";");
+    QList<unsigned int> listUidPlayers = InstanceManager::instance()->listUidPlayersFromUidGame(uidGame);
+    unsigned int currentUidPlayer = messageSplit[0].toUInt();
+
+    foreach(unsigned int uidPlayer, listUidPlayers)
+    {
+        if(uidPlayer == currentUidPlayer)
+            m_serverClients->newMessage(uidPlayer, messageSplit[1].toLatin1());
+        else if(messageSplit.count() >= 2)
+        {
+            if(messageSplit[2].length() > 2)
+                m_serverClients->newMessage(uidPlayer, messageSplit[2].toLatin1());
+        }
+    }
 }

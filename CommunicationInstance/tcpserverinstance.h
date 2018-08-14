@@ -22,9 +22,11 @@ protected:
 signals:
     void newInstanceConnected(int);
     void instanceDisconnected(int);
+    void writeToClient(unsigned int,QByteArray);
 
 private slots:
     void onInstanceAuthentified_ThreadInstance(unsigned int uid);
+    void onWriteToClient_ThreadInstance(QByteArray message);
 
 private:
     bool m_isRunning;

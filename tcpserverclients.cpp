@@ -62,6 +62,7 @@ void TcpServerClients::incomingConnection(qintptr socketDescriptor)
     connect(client, &ThreadClient::clientAuthentified, this, &TcpServerClients::onClientAuthentified_ThreadClient);
     connect(client, &ThreadClient::newUserConnected, this, &TcpServerClients::newUserConnected);
     connect(client, &ThreadClient::userDisconnected, this, &TcpServerClients::userDisconnected);
+    connect(client, &ThreadClient::writeToInstance, this, &TcpServerClients::writeToInstance);
     connect(client, &QThread::finished, client, &ThreadClient::deleteLater);
     //connect(InstanceManager::instance(), &InstanceManager::readyRead, client, &ThreadClient::onReadyRead_InstanceManager, Qt::QueuedConnection);
 

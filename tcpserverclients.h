@@ -22,6 +22,7 @@ protected:
 signals:
     void newUserConnected(int,QString);
     void userDisconnected(int);
+    void writeToInstance(unsigned int,QByteArray);
 
 private slots:
     void onClientAuthentified_ThreadClient(unsigned int uid);
