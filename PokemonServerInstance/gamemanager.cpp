@@ -10,6 +10,7 @@
 #include "src_Packets/packetrewards.h"
 #include "src_Packets/packettrash.h"
 #include "common/utils.h"
+#include "src_Log/log.h"
 
 const int GameManager::m_NUMBER_FIRST_CARDS = 7;
 const int GameManager::m_NUMBER_REWARDS = 6;
@@ -97,7 +98,7 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
     else if((packetOrigin == Player::PCK_Trash) && (packetDestination == Player::PCK_Hand))
         success = play->moveCardFromHandToFight(indexCardOrigin);
     else
-        emit logReceived(QString(__PRETTY_FUNCTION__) + "move not developp yet");*/
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "move not developp yet");*/
 
     if(play != nullptr)
     {
@@ -107,7 +108,7 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
             success = play->moveCardFromHandToFight(indexCardOrigin);
     }
     else
-        emit logReceived(QString(__PRETTY_FUNCTION__) + "player (" + namePlayer + ") is nullptr");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "player (" + namePlayer + ") is nullptr");
 
 
     return success;
@@ -122,7 +123,7 @@ QList<Player*> GameManager::listOfPlayers()
 Player* GameManager::currentPlayer()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     return m_playerAttacking;
 }
@@ -130,7 +131,7 @@ Player* GameManager::currentPlayer()
 Player* GameManager::playerAttacked()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     return m_playerAttacked;
 }
@@ -138,7 +139,7 @@ Player* GameManager::playerAttacked()
 Player* GameManager::playerAt(int index)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     Player* play = nullptr;
 
@@ -178,7 +179,7 @@ Player* GameManager::playerByName(const QString &name)
 Player* GameManager::enemyOf(Player *play)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     Player* playerEnnemy = nullptr;
@@ -199,7 +200,7 @@ Player* GameManager::enemyOf(Player *play)
 ConstantesQML::StepGame GameManager::gameStatus()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     return m_gameStatus;
 }
@@ -207,7 +208,7 @@ ConstantesQML::StepGame GameManager::gameStatus()
 void GameManager::setGameStatus(ConstantesQML::StepGame step)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     if(m_gameStatus != step)
@@ -226,7 +227,7 @@ void GameManager::setGameStatus(ConstantesQML::StepGame step)
 bool GameManager::initGame()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     //emit movingCardAnimationStartAsked();
     bool allPlayersAreReady = true;
@@ -284,7 +285,7 @@ void GameManager::setNumberMaxOfPlayers(unsigned short max)
 Player *GameManager::addNewPlayer(QString name)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     Player* newPlayer = nullptr;
 
@@ -314,11 +315,11 @@ Player *GameManager::addNewPlayer(QString name)
     }
     else if(playerFound == true)
     {
-        emit logReceived(name + ": player already saved");
+        Log::instance()->write(name + ": player already saved");
     }
     else
     {
-        emit logReceived("Too many player in the game (" + QString::number(m_listPlayers.count()) + '/' + QString::number(numberMaxOfPlayers()) + ')');
+        Log::instance()->write("Too many player in the game (" + QString::number(m_listPlayers.count()) + '/' + QString::number(numberMaxOfPlayers()) + ')');
     }
 
     return newPlayer;
@@ -390,7 +391,7 @@ bool GameManager::initPlayer(Player *play)
 void GameManager::selectFirstPlayer()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 #ifdef TESTS_UNITAIRES
     setIndexCurrentPlayer(0);
@@ -403,7 +404,7 @@ void GameManager::selectFirstPlayer()
 void GameManager::setInitReady(Player *playerReady)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     if(playerReady != nullptr)
@@ -426,7 +427,7 @@ void GameManager::setInitReady(Player *playerReady)
 void GameManager::startGame()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     selectFirstPlayer();
@@ -438,7 +439,7 @@ void GameManager::startGame()
 void GameManager::nextPlayer()
 {	
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     setIndexCurrentPlayer(m_indexCurrentPlayer+1);
@@ -447,7 +448,7 @@ void GameManager::nextPlayer()
 CardPokemon::Enum_StatusOfAttack GameManager::attack(CardPokemon *pokemonAttacking, unsigned short index)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     CardPokemon::Enum_StatusOfAttack statusOfAttack = CardPokemon::Attack_UnknownError;
 
@@ -478,7 +479,7 @@ CardPokemon::Enum_StatusOfAttack GameManager::attack(CardPokemon *pokemonAttacki
 bool GameManager::retreat(CardPokemon *pokemonToRetreat)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
     bool success = false;
     QList<AbstractCard *> listCardsBench;
@@ -518,7 +519,7 @@ bool GameManager::retreat(CardPokemon *pokemonToRetreat)
 void GameManager::endOfTurn()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     //Si le pokémon attaqué est mort, le joueur pioche sa récompense
@@ -555,7 +556,7 @@ void GameManager::endOfTurn()
 Player* GameManager::gameIsFinished()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     //Conditions de victoire:
@@ -578,7 +579,7 @@ Player* GameManager::gameIsFinished()
 QList<AbstractCard *> GameManager::displayPacket(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
 #ifdef TESTS_UNITAIRES
@@ -600,7 +601,7 @@ QList<AbstractCard *> GameManager::displayPacket(AbstractPacket *packet, unsigne
 AbstractCard::Enum_element GameManager::displayAllElements(unsigned short quantity)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
 #ifdef TESTS_UNITAIRES
@@ -631,7 +632,7 @@ AbstractCard::Enum_element GameManager::displayAllElements(unsigned short quanti
 QList<AbstractCard *> GameManager::displaySelectHiddenCard(PacketRewards *packet, unsigned short quantity)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
 #ifdef TESTS_UNITAIRES
@@ -649,7 +650,7 @@ QList<AbstractCard *> GameManager::displaySelectHiddenCard(PacketRewards *packet
 QList<CardEnergy*> GameManager::displayEnergiesForAPokemon(CardPokemon* pokemon, unsigned short quantity, AbstractCard::Enum_element element)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
 #ifdef TESTS_UNITAIRES
@@ -677,7 +678,7 @@ QList<CardEnergy*> GameManager::displayEnergiesForAPokemon(CardPokemon* pokemon,
 int GameManager::displayAttacks(CardPokemon* card, bool blockRetreat)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
 #ifdef TESTS_UNITAIRES
@@ -702,7 +703,7 @@ int GameManager::displayAttacks(CardPokemon* card, bool blockRetreat)
 void GameManager::displayMessage(QString message)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
 #ifdef TESTS_UNITAIRES
@@ -740,7 +741,7 @@ unsigned short GameManager::headOrTail()
 unsigned short GameManager::headOrTail()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     unsigned short coin = Utils::headOrTail();
@@ -762,7 +763,7 @@ unsigned short GameManager::headOrTail()
 void GameManager::onEndOfTurn_Player()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     //On bloque tous les joueurs
@@ -799,7 +800,7 @@ void GameManager::onEndOfTurn_Player()
 void GameManager::setIndexCurrentPlayer(int index)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     //Sécurité pour ne pas dépasser l'index
@@ -821,7 +822,7 @@ void GameManager::setIndexCurrentPlayer(int index)
 bool GameManager::checkHandOfEachPlayer()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     foreach(Player* play, m_listPlayers)
@@ -862,7 +863,7 @@ bool GameManager::checkHandOfEachPlayer()
 void GameManager::drawFirstCards(Player* play)
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     for(int i=0;i<m_NUMBER_FIRST_CARDS;++i)
@@ -874,7 +875,7 @@ void GameManager::drawFirstCards(Player* play)
 void GameManager::checkPokemonDead()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     //Création de la liste pour connaître le nombre de récompense à piocher
@@ -958,7 +959,7 @@ void GameManager::checkPokemonDead()
 void GameManager::checkStatusPokemonForNewRound()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     //Status Confus
@@ -1016,7 +1017,7 @@ void GameManager::checkStatusPokemonForNewRound()
 void GameManager::checkAttacksBlocked()
 {
 #ifdef TRACAGE_PRECIS
-    emit logReceived(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     /*foreach (Player* play, m_listPlayers)

@@ -80,6 +80,7 @@ public:
 
 
 signals:
+    void logReceived(QString);
     void endOfTurn();
     void canPlayChanged();
     void initReadyChanged();

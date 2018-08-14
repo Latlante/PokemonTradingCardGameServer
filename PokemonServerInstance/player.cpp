@@ -6,6 +6,7 @@
 #include "src_Cards/cardenergy.h"
 #include "src_Cards/cardpokemon.h"
 #include "common/utils.h"
+#include "src_Log/log.h"
 #include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
 #include "src_Packets/packetdeck.h"
@@ -85,7 +86,7 @@ PacketTrash* Player::trash()
 void Player::fillDeck(QList<AbstractCard*> listCards)
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     foreach(AbstractCard* card, listCards)
@@ -111,7 +112,7 @@ void Player::fillDeck(QList<AbstractCard*> listCards)
 void Player::emptyingDeck()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     while(m_deck->countCard() > 0)
@@ -123,7 +124,7 @@ void Player::emptyingDeck()
 void Player::newTurn()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     setCanPlay(true);
@@ -134,7 +135,7 @@ void Player::newTurn()
 void Player::turnFinished()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     //On remet à 0 les historiques de dégats pour chaque pokémon
@@ -155,7 +156,7 @@ void Player::turnFinished()
 bool Player::isPlaying()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     return m_canPlay;
@@ -164,7 +165,7 @@ bool Player::isPlaying()
 void Player::drawOneCard()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     //qDebug() << m_name << " - "<< __PRETTY_FUNCTION__;
@@ -175,7 +176,7 @@ void Player::drawOneCard()
 void Player::drawOneReward(AbstractCard* cardReward)
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     moveCardFromRewardToHand(cardReward);
@@ -184,7 +185,7 @@ void Player::drawOneReward(AbstractCard* cardReward)
 bool Player::isLoser()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     //Conditions de victoire:
@@ -203,7 +204,7 @@ bool Player::isLoser()
 bool Player::initReady()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     return m_initReady;
@@ -212,7 +213,7 @@ bool Player::initReady()
 void Player::setInitReady(bool ready)
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
     if(m_initReady != ready)
     {
@@ -224,7 +225,7 @@ void Player::setInitReady(bool ready)
 bool Player::setInitReadyIfReady()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
     bool success = false;
 
@@ -241,7 +242,7 @@ bool Player::setInitReadyIfReady()
 bool Player::canPlay()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     return m_canPlay;
@@ -250,7 +251,7 @@ bool Player::canPlay()
 void Player::setCanPlay(bool status)
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
 #endif
 
     if(status != m_canPlay)
@@ -278,6 +279,7 @@ bool Player::moveCardFromDeckToReward(AbstractCard* cardDeckToMove)
 
 bool Player::moveCardFromHandToBench(int indexHand, int indexBench)
 {
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", indexHand:" + QString::number(indexHand) + ", indexBench:" + QString::number(indexBench));
     bool moveSuccess = false;
 
     AbstractCard* cardToMove = hand()->card(indexHand);
@@ -322,7 +324,8 @@ bool Player::moveCardFromHandToBench(int indexHand, int indexBench)
             }
             else
             {
-                qDebug() << __PRETTY_FUNCTION__ << ", cardPok est nullptr";
+                //qDebug() << __PRETTY_FUNCTION__ << ", cardPok est nullptr";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", cardPok est nullptr, countCard hand:" + QString::number(hand()->countCard()));
             }
         }
         else if (cardToMove->type() == AbstractCard::TypeOfCard_Energy)
@@ -368,12 +371,14 @@ bool Player::moveCardFromHandToBench(int indexHand, int indexBench)
         }
         else
         {
-            qDebug() << __PRETTY_FUNCTION__ << ", cardToMove n'est pas du bon type:" << cardToMove->type();
+            //qDebug() << __PRETTY_FUNCTION__ << ", cardToMove n'est pas du bon type:" << cardToMove->type();
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", cardToMove n'est pas du bon type:" + cardToMove->type());
         }
     }
     else
     {
-        qDebug() << __PRETTY_FUNCTION__ << ", cardToMove is nullptr";
+        //qDebug() << __PRETTY_FUNCTION__ << ", cardToMove is nullptr";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", cardToMove is nullptr");
     }
 
     return moveSuccess;
@@ -381,11 +386,15 @@ bool Player::moveCardFromHandToBench(int indexHand, int indexBench)
 
 bool Player::moveCardFromHandToDeck(AbstractCard *cardHandToMove)
 {
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
+
     return moveCardFromPacketToAnother(hand(), deck(), cardHandToMove);
 }
 
 bool Player::moveCardFromHandToFight(int indexHand)
 {
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", indexHand:" + QString::number(indexHand));
+
     bool moveSuccess = false;
 
     AbstractCard* cardToMove = hand()->card(indexHand);
@@ -405,23 +414,43 @@ bool Player::moveCardFromHandToFight(int indexHand)
             //Evolution
             else
             {
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", Evolution:" + cardPok->name());
                 //On récupére la carte Pokémon a laquelle l'associer
                 AbstractCard* cardToAssociate = fight()->pokemonFighter();
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", card taken");
 
-                if ((cardToAssociate != nullptr) && (cardToAssociate->type() == AbstractCard::TypeOfCard_Pokemon))
+                if (cardToAssociate != nullptr)
                 {
-                    CardPokemon* pokemonToAssociate = static_cast<CardPokemon*>(cardToAssociate);
-
-                    if (pokemonToAssociate != nullptr)
+                    if(cardToAssociate->type() == AbstractCard::TypeOfCard_Pokemon)
                     {
-                        //On l'associe au Pokémon et on peut la supprimer du paquet d'origine
-                        //pour ne pas l'avoir en doublon
-                        if(pokemonToAssociate->evolve(cardPok))
+                        CardPokemon* pokemonToAssociate = static_cast<CardPokemon*>(cardToAssociate);
+
+                        if (pokemonToAssociate != nullptr)
                         {
-                            hand()->removeFromPacketWithoutDelete(cardPok);
-                            moveSuccess = true;
+                            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", just before evolution");
+                            //On l'associe au Pokémon et on peut la supprimer du paquet d'origine
+                            //pour ne pas l'avoir en doublon
+                            if(pokemonToAssociate->evolve(cardPok))
+                            {
+                                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", Evolution done");
+                                hand()->removeFromPacketWithoutDelete(cardPok);
+                                moveSuccess = true;
+                            }
+                        }
+                        else
+                        {
+                            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + "pokemonToAssociate is nullptr");
                         }
                     }
+                    else
+                    {
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + "cardToAssociate is not a pokemon card");
+                    }
+
+                }
+                else
+                {
+                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", cardToAssociate is nullptr");
                 }
             }
         }
@@ -469,12 +498,15 @@ bool Player::moveCardFromHandToFight(int indexHand)
         }
         else
         {
-            qDebug() << __PRETTY_FUNCTION__ << ", cardToMove n'est pas du bon type:" << cardToMove->type();
+            //qDebug() << __PRETTY_FUNCTION__ << ", cardToMove n'est pas du bon type:" << cardToMove->type();
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", cardToMove n'est pas du bon type:" + cardToMove->type());
+
         }
     }
     else
     {
-        qDebug() << __PRETTY_FUNCTION__ << ", cardToMove is nullptr";
+        //qDebug() << __PRETTY_FUNCTION__ << ", cardToMove is nullptr";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", cardToMove is nullptr, countCard=" + QString::number(hand()->countCard()));
     }
 
     return moveSuccess;
@@ -482,11 +514,15 @@ bool Player::moveCardFromHandToFight(int indexHand)
 
 bool Player::moveCardFromHandToTrash(AbstractCard* cardHandToMove)
 {
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
+
     return moveCardFromPacketToAnother(hand(), trash(), cardHandToMove);
 }
 
 bool Player::moveCardFromBenchToFight(CardPokemon* pokemonToMove)
 {
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name);
+
     bool moveSuccess = false;
 
     if (pokemonToMove != nullptr)
@@ -498,12 +534,14 @@ bool Player::moveCardFromBenchToFight(CardPokemon* pokemonToMove)
         }
         else
         {
-            qDebug() << __PRETTY_FUNCTION__ << ", cardPok n'est pas une base";
+            //qDebug() << __PRETTY_FUNCTION__ << ", cardPok n'est pas une base";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", cardPok n'est pas une base");
         }
     }
     else
     {
-        qCritical() << __PRETTY_FUNCTION__ << ", pokemonToMove is nullptr";
+        //qCritical() << __PRETTY_FUNCTION__ << ", pokemonToMove is nullptr";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", pokemonToMove is nullptr");
     }
 
     return moveSuccess;
@@ -662,6 +700,8 @@ void Player::onEnergyRemoved_CardPokemon(int indexEnergy)
 ************************************************************/
 bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket *destination, int index)
 {
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", source:" + source->name() + ", destination:" + destination->name() + ", index:" + QString::number(index));
+
     bool moveSuccess = false;
 
     if (destination->isFull() == false)
@@ -685,7 +725,8 @@ bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket 
         }
         else
         {
-            qCritical() << __PRETTY_FUNCTION__ << "Card is nullptr";
+            //qCritical() << __PRETTY_FUNCTION__ << "Card is nullptr";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + "Card is nullptr");
 
         }
     }
@@ -699,6 +740,8 @@ bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket 
 
     if((source != nullptr) && (destination != nullptr) && (cardToMove != nullptr))
     {
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", source:" + source->name() + ", destination:" + destination->name() + ", cardToMove:" + cardToMove->name());
+
         if (destination->isFull() == false)
         {
             //get data before action
@@ -740,8 +783,8 @@ bool Player::moveCardFromPacketToAnother(AbstractPacket *source, AbstractPacket 
         else
             messageError += "  - source is " + cardToMove->name();
 
-        qCritical() << __PRETTY_FUNCTION__ << messageError;
-
+        //qCritical() << __PRETTY_FUNCTION__ << messageError;
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", error:" + messageError);
     }
 
     return moveSuccess;

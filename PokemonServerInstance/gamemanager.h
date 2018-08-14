@@ -83,7 +83,7 @@ signals:
     void headOrTailAsked();
     void selectionDisplayFinished();
 
-    void logReceived(QString);
+    //void logReceived(QString);
     void movingCardAnimationStartAsked();
 
     void initReadyChanged();

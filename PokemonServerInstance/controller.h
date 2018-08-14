@@ -38,7 +38,7 @@ private:
     StdListenerWritter* m_communication;
     GameManager* m_gameManager;
     HistoricalNotifications m_historicNotif;
-    Log m_log;
+    //Log m_log;
 
     QJsonObject getAllInfoOnTheGame(const QString& namePlayer);
     QJsonObject selectCardPerPlayer(const QString& namePlayer, QJsonArray tabCards);
