@@ -44,7 +44,7 @@ ThreadClient::~ThreadClient()
 ************************************************************/
 void ThreadClient::run()
 {
-    qDebug() << "Starting thread: " << m_socketDescriptor;
+    qDebug() << "Starting thread client: " << m_socketDescriptor;
 
     moveToThread(QApplication::instance()->thread());
 
