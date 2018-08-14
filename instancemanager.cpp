@@ -13,16 +13,16 @@ InstanceManager* InstanceManager::m_instance = new InstanceManager();
 unsigned int InstanceManager::m_indexGame = 1;
 
 InstanceManager::InstanceManager(QObject *parent) :
-    QObject(parent)
+    QAbstractTableModel(parent)
 {
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 }
 
 InstanceManager::~InstanceManager()
 {
-    while(m_listGame.count() > 0)
+    while(m_listGames.count() > 0)
     {
-        removeGame(m_listGame.keys().first());
+        removeGame(m_listGames.first());
     }
 }
 
@@ -64,18 +64,28 @@ unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigne
 		{
 			QString nameOfTheGame = name;
 			if(nameOfTheGame == "")
-				nameOfTheGame = "game #" + QString::number(m_listGame.count());
+                nameOfTheGame = "game #" + QString::number(m_listGames.count());
 
-			InstanceGame game = { process, nameOfTheGame, uidPlayCreator, uidPlayOpponent };
-			m_listGame.insert(m_indexGame, game);
+            InstanceGame game = { m_indexGame,
+                                  false,
+                                  process,
+                                  nameOfTheGame,
+                                  uidPlayCreator,
+                                  uidPlayOpponent,
+                                  QDateTime::currentDateTime()
+                                };
+            beginInsertRows(QModelIndex(), rowCount(), rowCount());
+            m_listGames.append(game);
+            endInsertRows();
+
 			indexNewGame = m_indexGame;
 			m_indexGame++;
 
 			sendNotifNewGameCreated(indexNewGame, uidPlayCreator, uidPlayOpponent);
-            emit newGameCreated(indexNewGame,
+            /*emit newGameCreated(indexNewGame,
                                 name,
                                 Authentification::namePlayerFromUid(uidPlayCreator),
-                                Authentification::namePlayerFromUid(uidPlayOpponent));
+                                Authentification::namePlayerFromUid(uidPlayOpponent));*/
 			qDebug() << "New process started";
 		}
 		else
@@ -93,31 +103,32 @@ unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigne
     return indexNewGame;
 }
 
-QProcess* InstanceManager::game(unsigned int index)
+QProcess* InstanceManager::game(int index)
 {
     QProcess* processToReturn = nullptr;
 
-    if(m_listGame.contains(index))
+    if((index >= 0) && (index < m_listGames.count()))
     {
-        processToReturn = m_listGame[index].process;
+        processToReturn = m_listGames[index].process;
     }
 
     return processToReturn;
 }
 
-bool InstanceManager::removeGame(unsigned int index)
+bool InstanceManager::removeGame(int index)
 {
     qDebug() << __PRETTY_FUNCTION__;
     bool success = false;
-    if(m_listGame.contains(index) == true)
+    if((index >= 0) && (index < m_listGames.count()))
     {
-        InstanceGame game = m_listGame.take(index);
+        InstanceGame game = m_listGames.takeAt(index);
         QProcess* process = game.process;
 
         if(process != nullptr)
         {
-            process->write("exit");
-            //if(process->waitForFinished(10000))
+            //process->write("exit");
+            process->close();
+            if(process->waitForFinished(10000))
             {
                 process->deleteLater();
                 emit gameRemoved(static_cast<int>(index));
@@ -177,6 +188,49 @@ unsigned int InstanceManager::uidGameFromQProcess(QProcess *process)
     }
 
     return uidGame;
+}
+
+QVariant InstanceManager::data(const QModelIndex &index, int role) const
+{
+    if((index.isValid()) &&
+            (index.row() >= 0) && (index.row() < rowCount()) &&
+            (index.column() >= 0) && (index.column() < columnCount()))
+    {
+        if(role == Qt::DisplayRole)
+        {
+            switch(index.column())
+            {
+            case ROLE_ID:               return m_listGames[index.row()].uid;
+            case ROLE_NAME:             return m_listGames[index.row()].nameGame;
+            case ROLE_PLAYER_CREATOR:
+            {
+                unsigned int uidPlayer = m_listGames[index.row()].uidPlayer1;
+                const QString namePlayer = Authentification::namePlayerFromUid(uidPlayer);
+                return namePlayer + " (" + QString::number(uidPlayer) + ")";
+            }
+            case ROLE_PLAYER_OPPONENT:
+            {
+                unsigned int uidPlayer = m_listGames[index.row()].uidPlayer2;
+                const QString namePlayer = Authentification::namePlayerFromUid(uidPlayer);
+                return namePlayer + " (" + QString::number(uidPlayer) + ")";
+            }
+            case ROLE_DATE_CREATION:    return m_listGames[index.row()].dateCreation.toString("dd/MM - hh:mm");
+            case ROLE_BUTTON_DELETE:    return "X";
+            }
+        }
+    }
+
+    return QVariant();
+}
+
+int InstanceManager::columnCount(const QModelIndex&) const
+{
+    return static_cast<int>(ROLE_COUNT);
+}
+
+int InstanceManager::rowCount(const QModelIndex&) const
+{
+    return m_listInfos.count();
 }
 
 bool InstanceManager::isInTheGame(unsigned int uidGame, unsigned int uidPlayer)

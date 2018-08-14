@@ -1,24 +1,40 @@
 #ifndef INSTANCEMANAGER_H
 #define INSTANCEMANAGER_H
 
-#include <QObject>
+#include <QAbstractTableModel>
+#include <QDateTime>
 #include <QMap>
 #include <QProcess>
 
-class InstanceManager : public QObject
+class InstanceManager : public QAbstractTableModel
 {
     Q_OBJECT
-    struct InstanceGame
-    {
-        QProcess* process;
-        QString name;
-        unsigned int m_uidPlayer1;
-        unsigned int m_uidPlayer2;
-    };
 
 public:
+    struct InstanceGame
+    {
+        unsigned int uid;
+        bool connected;
+        QProcess* process;
+        QString nameGame;
+        unsigned int uidPlayer1;
+        unsigned int uidPlayer2;
+        QDateTime dateCreation;
+    };
+
+    enum ColumnRole
+    {
+        ROLE_ID = 0,
+        ROLE_NAME,
+        ROLE_PLAYER_CREATOR,
+        ROLE_PLAYER_OPPONENT,
+        ROLE_DATE_CREATION,
+        ROLE_BUTTON_DELETE,
+        ROLE_COUNT
+    };
+
     explicit InstanceManager(QObject *parent = nullptr);
-    ~InstanceManager();
+    virtual ~InstanceManager() override;
 
     static InstanceManager* instance();
     static void deleteInstance();
@@ -26,7 +42,7 @@ public:
     //Handle game
     bool checkInstanceExeExists();
     unsigned int createNewGame(unsigned int uidPlayCreator, unsigned int uidPlayOpponent, const QString& name, QString& error);
-    QProcess* game(unsigned int index);
+    QProcess* game(int index);
     bool removeGame(unsigned int index);
 
     //Players
@@ -41,6 +57,11 @@ public:
     bool checkNameOfGameIsAvailable(const QString& nameGame);
     unsigned int uidGameFromQProcess(QProcess* process);
 
+    //Model
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual int columnCount(const QModelIndex & = QModelIndex()) const override;
+    virtual int rowCount(const QModelIndex & = QModelIndex()) const override;
+
 signals:
     void newGameCreated(unsigned int,QString,QString,QString);
     void gameRemoved(int);
@@ -54,7 +75,8 @@ private:
     static InstanceManager* m_instance;
     static unsigned int m_indexGame;
 
-    QMap<unsigned int, InstanceGame> m_listGame;
+    QList<InstanceGame> m_listGames;
+    //QMap<unsigned int, InstanceGame> m_listGame;
 
     void sendNotifNewGameCreated(unsigned int uidGame, unsigned int uidPlayerCreator, unsigned int uidPlayerOpponent);
 };
