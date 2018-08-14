@@ -29,7 +29,7 @@ private slots:
 
 private:
     bool m_isRunning;
-    QMap<unsigned int, ThreadClient*> m_mapThreadClients;
+    QMap<ThreadClient*, unsigned int> m_mapThreadClients;
 };
 
 #endif // TCPSERVERCLIENTS_H

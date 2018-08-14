@@ -30,7 +30,7 @@ private slots:
 
 private:
     bool m_isRunning;
-    QMap<unsigned int, ThreadInstance*> m_mapThreadInstance;
+    QMap<ThreadInstance*, unsigned int> m_mapThreadInstance;
 
 };
 

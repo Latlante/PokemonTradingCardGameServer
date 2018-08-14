@@ -34,9 +34,9 @@ bool TcpServerInstance::newMessage(unsigned int uid, QByteArray message)
 {
     bool success = false;
 
-    if((m_mapThreadInstance.contains(uid)) && (message.length() > 0))
+    if((m_mapThreadInstance.key(uid, nullptr) != nullptr) && (message.length() > 0))
     {
-        ThreadInstance* instance = m_mapThreadInstance.value(uid);
+        ThreadInstance* instance = m_mapThreadInstance.key(uid, nullptr);
         if(instance != nullptr)
         {
             instance->newMessage(message);
@@ -61,6 +61,8 @@ void TcpServerInstance::incomingConnection(qintptr socketDescriptor)
     connect(client, &QThread::finished, client, &ThreadInstance::deleteLater);
     //connect(InstanceManager::instance(), &InstanceManager::readyRead, client, &ThreadClient::onReadyRead_InstanceManager, Qt::QueuedConnection);
 
+    m_mapThreadInstance.insert(client, 0);
+
     client->start();
 }
 
@@ -70,13 +72,17 @@ void TcpServerInstance::incomingConnection(qintptr socketDescriptor)
 void TcpServerInstance::onInstanceAuthentified_ThreadInstance(unsigned int uid)
 {
     ThreadInstance* client = qobject_cast<ThreadInstance*>(sender());
-    m_mapThreadInstance.insert(uid, client);
+
+    if(m_mapThreadInstance.contains(client) == true)
+        m_mapThreadInstance[client] = uid;
+    else
+        qWarning() << __PRETTY_FUNCTION__ << "m_mapThreadInstance does not contains client " << uid;
 }
 
 void TcpServerInstance::onWriteToClient_ThreadInstance(QByteArray message)
 {
     ThreadInstance* instance = qobject_cast<ThreadInstance*>(sender());
-    const unsigned int uidGame = m_mapThreadInstance.key(instance, 0);
+    const unsigned int uidGame = m_mapThreadInstance.value(instance, 0);
 
     if(uidGame > 0)
     {
