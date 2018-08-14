@@ -40,7 +40,8 @@ SOURCES += \
     Models/modeltablegames.cpp \
     Models/modellistusers.cpp \
     CommunicationInstance/tcpserverinstance.cpp \
-    CommunicationInstance/threadinstance.cpp
+    CommunicationInstance/threadinstance.cpp \
+    gateway.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -52,7 +53,8 @@ HEADERS += \
     Models/modeltablegames.h \
     Models/modellistusers.h \
     CommunicationInstance/tcpserverinstance.h \
-    CommunicationInstance/threadinstance.h
+    CommunicationInstance/threadinstance.h \
+    gateway.h
 
 FORMS += \
         mainwindow.ui
