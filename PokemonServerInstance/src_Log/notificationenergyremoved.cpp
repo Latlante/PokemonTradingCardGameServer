@@ -4,7 +4,7 @@ NotificationEnergyRemoved::NotificationEnergyRemoved(const QString &namePlayer, 
     AbstractNotification(ConstantesShared::PHASE_NotifEnergyRemoved, namePlayer),
     m_packetOrigin(packetOrigin),
     m_packetDestination(packetDestination),
-    m_indexCard(indexCardOrigin),
+    m_indexCardOrigin(indexCardOrigin),
     m_indexCardDestination(indexCardDestination),
     m_indexEnergy(indexEnergy)
 {

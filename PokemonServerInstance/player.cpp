@@ -101,8 +101,7 @@ void Player::fillDeck(QList<AbstractCard*> listCards)
         {
             CardPokemon* pokemon = static_cast<CardPokemon*>(card);
             connect(pokemon, &CardPokemon::dataChanged, this, &Player::onDataChanged_CardPokemon);
-            connect(pokemon, &CardPokemon::energyAdded, this, &Player::onEnergyAdded_CardPokemon);
-            connect(pokemon, &CardPokemon::energyRemoved, this, &Player::onEnergyRemoved_CardPokemon);
+            connect(pokemon, &CardPokemon::energyRemovedToTrash, this, &Player::onEnergyRemovedToTrash_CardPokemon);
         }
     }
 
@@ -347,8 +346,12 @@ bool Player::moveCardFromHandToBench(int indexHand, int indexBench)
                         {
                             //On l'associe au Pokémon et on peut la supprimer du paquet d'origine
                             //pour ne pas l'avoir en doublon
-                            pokemonToAssociate->addEnergy(cardEn);
-                            hand()->removeFromPacketWithoutDelete(cardEn);
+                            if(pokemonToAssociate->addEnergy(cardEn))
+                            {
+                                hand()->removeFromPacketWithoutDelete(cardEn);
+                                emit energyAdded(name(), ConstantesShared::PACKET_Hand, indexHand, ConstantesShared::PACKET_Bench, indexBench, cardEn->id());
+                            }
+
 
                             m_energyPlayedForThisRound = true;
                             moveSuccess = true;
@@ -473,8 +476,11 @@ bool Player::moveCardFromHandToFight(int indexHand)
                         {
                             //On l'associe au Pokémon et on peut la supprimer du paquet d'origine
                             //pour ne pas l'avoir en doublon
-                            pokemonToAssociate->addEnergy(cardEn);
-                            hand()->removeFromPacketWithoutDelete(cardEn);
+                            if(pokemonToAssociate->addEnergy(cardEn))
+                            {
+                                hand()->removeFromPacketWithoutDelete(cardEn);
+                                emit energyAdded(name(), ConstantesShared::PACKET_Hand, indexHand, ConstantesShared::PACKET_Fight, 0, cardEn->id());
+                            }
 
                             m_energyPlayedForThisRound = true;
                             moveSuccess = true;
@@ -643,7 +649,7 @@ void Player::onDataChanged_CardPokemon()
     }
 }
 
-void Player::onEnergyAdded_CardPokemon(int idEnergy)
+void Player::onEnergyRemovedToTrash_CardPokemon(int indexEnergy)
 {
     CardPokemon* pokemon = qobject_cast<CardPokemon*>(sender());
     int indexCard = -1;
@@ -654,7 +660,7 @@ void Player::onEnergyAdded_CardPokemon(int idEnergy)
     //found
     if(indexCard >= 0)
     {
-        emit energyAdded(name(), ConstantesShared::PACKET_Fight, indexCard, idEnergy);
+        emit energyRemoved(name(), ConstantesShared::PACKET_Fight, indexCard, ConstantesShared::PACKET_Trash, 0, indexEnergy);
     }
     //try in bench area
     else
@@ -664,33 +670,7 @@ void Player::onEnergyAdded_CardPokemon(int idEnergy)
         //found
         if(indexCard >= 0)
         {
-            emit energyAdded(name(), ConstantesShared::PACKET_Bench, indexCard, idEnergy);
-        }
-    }
-}
-
-void Player::onEnergyRemoved_CardPokemon(int indexEnergy)
-{
-    CardPokemon* pokemon = qobject_cast<CardPokemon*>(sender());
-    int indexCard = -1;
-
-    //check if the card come from the fight area
-    indexCard = fight()->indexOf(pokemon);
-
-    //found
-    if(indexCard >= 0)
-    {
-        emit energyRemoved(name(), ConstantesShared::PACKET_Fight, indexCard, indexEnergy);
-    }
-    //try in bench area
-    else
-    {
-        indexCard = bench()->indexOf(pokemon);
-
-        //found
-        if(indexCard >= 0)
-        {
-            emit energyRemoved(name(), ConstantesShared::PACKET_Bench, indexCard, indexEnergy);
+            emit energyRemoved(name(), ConstantesShared::PACKET_Bench, indexCard, ConstantesShared::PACKET_Trash, 0, indexEnergy);
         }
     }
 }

@@ -89,8 +89,8 @@ signals:
     void initReadyChanged();
     void cardMoved(const QString&,ConstantesShared::EnumPacket,int,ConstantesShared::EnumPacket,int,bool);
     void dataPokemonChanged(const QString&,ConstantesShared::EnumPacket,int,CardPokemon*);
-    void energyAdded(const QString&, ConstantesShared::EnumPacket, int, int);
-    void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, int);
+    void energyAdded(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
+    void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
 
 private slots:
     void onEndOfTurn_Player();

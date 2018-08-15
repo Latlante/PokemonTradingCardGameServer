@@ -123,8 +123,8 @@ public:
     void setAttacks(int index, AttackData data);
 #endif
 	
-    void addEnergy(CardEnergy* energy);
-    CardEnergy* takeEnergy(int index);
+    bool addEnergy(CardEnergy* energy);
+    //CardEnergy* takeEnergy(int index);
     void moveEnergiesInTrash(QList<CardEnergy *> listEnergies);
     void moveAllEnergiesInTrash();
 	unsigned short countEnergies();
@@ -166,8 +166,7 @@ signals:
     void statusChanged();
     void listEnergiesChanged();
     void hasEvolved();
-    void energyAdded(int);
-    void energyRemoved(int);
+    void energyRemovedToTrash(int);
 
 private:
 	AbstractCard::Enum_element m_element;

@@ -184,14 +184,14 @@ void Controller::onDataPokemonChanged_GameManager(const QString& namePlayer, Con
     sendNotifDataPokemonChanged(namePlayer, packet, indexCard, pokemon);
 }
 
-void Controller::onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy)
+void Controller::onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy)
 {
-    sendNotifEnergyAdded(namePlayer, packet, indexCard, idEnergy);
+    sendNotifEnergyAdded(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, idEnergy);
 }
 
-void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy)
+void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy)
 {
-    sendNotifEnergyRemoved(namePlayer, packet, indexCard, indexEnergy);
+    sendNotifEnergyRemoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, indexEnergy);
 }
 
 
@@ -776,20 +776,24 @@ void Controller::sendNotifPokemonSwitched(const QString &namePlayer, ConstantesS
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifEnergyAdded(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy)
+void Controller::sendNotifEnergyAdded(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy)
 {
     AbstractNotification* notif = new NotificationEnergyAdded(namePlayer,
-                                                              packet,
-                                                              indexCard,
+                                                              packetOrigin,
+                                                              indexCardOrigin,
+                                                              packetDestination,
+                                                              indexCardDestination,
                                                               idEnergy);
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifEnergyRemoved(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy)
+void Controller::sendNotifEnergyRemoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy)
 {
     AbstractNotification* notif = new NotificationEnergyRemoved(namePlayer,
-                                                                packet,
-                                                                indexCard,
+                                                                packetOrigin,
+                                                                indexCardOrigin,
+                                                                packetDestination,
+                                                                indexCardDestination,
                                                                 indexEnergy);
     m_historicNotif.addNewNotification(notif);
 }

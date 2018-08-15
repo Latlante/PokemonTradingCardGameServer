@@ -550,28 +550,31 @@ void CardPokemon::setAttacks(int index, AttackData data)
 }
 #endif
 
-void CardPokemon::addEnergy(CardEnergy *energy)
+bool CardPokemon::addEnergy(CardEnergy *energy)
 {
 #ifdef TRACAGE_PRECIS
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
+
+    bool success = false;
 
     if(energy != nullptr)
     {
         m_modelListEnergies->addEnergy(energy);
-        emit energyAdded(energy->id());
+        success = true;
     }
+
+    return success;
 }
 
-CardEnergy* CardPokemon::takeEnergy(int index)
+/*CardEnergy* CardPokemon::takeEnergy(int index)
 {
 #ifdef TRACAGE_PRECIS
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
-    emit energyRemoved(index);
     return m_modelListEnergies->takeEnergy(index);
-}
+}*/
 
 void CardPokemon::moveEnergiesInTrash(QList<CardEnergy*> listEnergies)
 {
@@ -582,7 +585,7 @@ void CardPokemon::moveEnergiesInTrash(QList<CardEnergy*> listEnergies)
     //On les supprime
     foreach(CardEnergy* energy, listEnergies)
     {
-        emit energyRemoved(m_modelListEnergies->indexOf(energy));
+        emit energyRemovedToTrash(m_modelListEnergies->indexOf(energy));
         m_modelListEnergies->removeEnergy(energy);
     }
 
@@ -599,7 +602,7 @@ void CardPokemon::moveAllEnergiesInTrash()
 
     //Notification
     for(int i=0;i<m_modelListEnergies->countCard();++i)
-        emit energyRemoved(0);
+        emit energyRemovedToTrash(0);
 
     //On récupére les énergies
     QList<CardEnergy*> listEnergies = m_modelListEnergies->takeAllEnergies();
