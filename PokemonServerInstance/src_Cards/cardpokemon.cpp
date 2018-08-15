@@ -487,7 +487,7 @@ bool CardPokemon::replaceOneAttack(int index, AttackData data)
 short CardPokemon::numberOfTurnAttackStillBlocks(int indexAttack)
 {
 #ifdef TRACAGE_PRECIS
-    Log::instance()->write(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", index=" + QString::number(indexAttack));
 #endif
 
     unsigned short result = 0;

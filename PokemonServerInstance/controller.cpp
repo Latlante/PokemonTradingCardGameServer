@@ -749,9 +749,12 @@ void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, Constant
     }
 
     QList<unsigned int> listEnergies;
-    for(unsigned short i=0;i<pokemon->modelListOfEnergies()->countEnergies();++i)
+    for(unsigned short i=0;i<pokemon->modelListOfEnergies()->countCard();++i)
     {
-        listEnergies.append(pokemon->modelListOfEnergies()->energy(i)->id());
+        for(int indexQuantity=0;indexQuantity<pokemon->modelListOfEnergies()->energy(i)->quantity();++indexQuantity)
+        {
+            listEnergies.append(pokemon->modelListOfEnergies()->energy(i)->id());
+        }
     }
 
     AbstractNotification* notif = new NotificationDataPokemonChanged(namePlayer,
