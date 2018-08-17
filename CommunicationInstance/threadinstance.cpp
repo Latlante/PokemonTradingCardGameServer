@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QEventLoop>
 #include <QJsonArray>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QTcpSocket>
 #include <QTimer>

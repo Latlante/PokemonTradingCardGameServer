@@ -22,7 +22,7 @@ InstanceManager::~InstanceManager()
 {
     while(m_listGames.count() > 0)
     {
-        removeGame(m_listGames.first());
+        removeGame(0);
     }
 }
 
@@ -144,15 +144,12 @@ bool InstanceManager::removeGame(int index)
 
 bool InstanceManager::checkNameOfGameIsAvailable(const QString &nameGame)
 {
-    QList<unsigned int> listKeysGames = m_listGame.keys();
     int index = 0;
     bool nameFound = false;
 
-    while((index < listKeysGames.count()) && (nameFound == false))
+    while((index < m_listGames.count()) && (nameFound == false))
     {
-        InstanceGame inst = m_listGame[listKeysGames[index]];
-
-        if(nameGame == inst.name)
+        if(nameGame == m_listGames[index].nameGame)
             nameFound = true;
 
         index++;
@@ -164,9 +161,10 @@ bool InstanceManager::checkNameOfGameIsAvailable(const QString &nameGame)
 QString InstanceManager::nameOfTheGameFromUidGame(unsigned int uidGame)
 {
     QString name = "";
+    int index = indexOfUidGame(uidGame);
 
-    if(m_listGame.contains(uidGame))
-        name = m_listGame[uidGame].name;
+    if((index >= 0) && (index < m_listGames.count()))
+        name = m_listGames[index].nameGame;
 
     return name;
 }
@@ -174,17 +172,14 @@ QString InstanceManager::nameOfTheGameFromUidGame(unsigned int uidGame)
 unsigned int InstanceManager::uidGameFromQProcess(QProcess *process)
 {
     unsigned int uidGame = 0;
+    int index = 0;
 
-    for(QMap<unsigned int, InstanceGame>::iterator it=m_listGame.begin();
-        it != m_listGame.end();
-        ++it)
+    while((index < m_listGames.count()) && (uidGame == 0))
     {
-        InstanceGame instance = it.value();
-        if(instance.process == process)
-        {
-            uidGame = it.key();
-            break;
-        }
+        if(process == m_listGames[index].process)
+            uidGame = m_listGames[index].uid;
+
+        index++;
     }
 
     return uidGame;
@@ -230,7 +225,7 @@ int InstanceManager::columnCount(const QModelIndex&) const
 
 int InstanceManager::rowCount(const QModelIndex&) const
 {
-    return m_listInfos.count();
+    return m_listGames.count();
 }
 
 bool InstanceManager::isInTheGame(unsigned int uidGame, unsigned int uidPlayer)
@@ -270,15 +265,12 @@ QList<unsigned int> InstanceManager::listUidGamesFromUidPlayer(unsigned int uidP
 {
     QList<unsigned int> listUidGames;
 
-    for(QMap<unsigned int, InstanceGame>::iterator it=m_listGame.begin();
-        it != m_listGame.end();
-        ++it)
+    foreach(InstanceGame instance, m_listGames)
     {
-        InstanceGame instance = it.value();
-        if((instance.m_uidPlayer1 == uidPlayer) ||
-                (instance.m_uidPlayer2 == uidPlayer))
+        if((instance.uidPlayer1 == uidPlayer) ||
+                (instance.uidPlayer2 == uidPlayer))
         {
-            listUidGames.append(it.key());
+            listUidGames.append(instance.uid);
         }
     }
 
@@ -288,11 +280,12 @@ QList<unsigned int> InstanceManager::listUidGamesFromUidPlayer(unsigned int uidP
 QList<unsigned int> InstanceManager::listUidPlayersFromUidGame(unsigned int uidGame)
 {
     QList<unsigned int> listPlayers;
+    int index = indexOfUidGame(uidGame);
 
-    if(m_listGame.contains(uidGame))
+    if((index >= 0) && (index < m_listGames.count()))
     {
-        listPlayers.append(m_listGame[uidGame].m_uidPlayer1);
-        listPlayers.append(m_listGame[uidGame].m_uidPlayer2);
+        listPlayers.append(m_listGames[index].uidPlayer1);
+        listPlayers.append(m_listGames[index].uidPlayer2);
     }
 
     return listPlayers;
@@ -307,12 +300,28 @@ void InstanceManager::onFinished_Process(int exitCode)
     unsigned int uidGame = uidGameFromQProcess(process);
     qDebug() << __PRETTY_FUNCTION__ << ", the instance " << uidGame << " is closed with code " << exitCode;
 
-    removeGame(uidGame);
+    removeGame(indexOfUidGame(uidGame));
 }
 
 /************************************************************
 *****				FONCTIONS PRIVEES					*****
 ************************************************************/
+int InstanceManager::indexOfUidGame(unsigned int uidGame)
+{
+    int indexLoop = 0;
+    int indexList = -1;
+
+    while((indexLoop < m_listGames.count()) && (indexList == -1))
+    {
+        if(uidGame == m_listGames[indexLoop].uid)
+            indexList = indexLoop;
+
+        indexLoop++;
+    }
+
+    return indexList;
+}
+
 void InstanceManager::sendNotifNewGameCreated(unsigned int uidGame, unsigned int uidPlayerCreator, unsigned int uidPlayerOpponent)
 {
     QJsonObject jsonResponse;
@@ -322,7 +331,7 @@ void InstanceManager::sendNotifNewGameCreated(unsigned int uidGame, unsigned int
     QJsonObject jsonAction;
     jsonAction["phase"] = ConstantesShared::PHASE_NotifNewGameCreated;
     jsonAction["uidGame"] = static_cast<int>(uidGame);
-    jsonAction["nameGame"] = m_listGame[uidGame].name;
+    jsonAction["nameGame"] = nameOfTheGameFromUidGame(uidGame);
     jsonAction["opponent"] = namePlayerCreator;
 
     jsonResponse["indexBegin"] = 1;

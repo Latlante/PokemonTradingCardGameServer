@@ -2,6 +2,7 @@
 #define THREADINSTANCE_H
 
 #include <QThread>
+#include <QJsonDocument>
 
 class QTcpSocket;
 class QTimer;

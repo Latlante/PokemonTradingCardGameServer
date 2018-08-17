@@ -43,7 +43,7 @@ public:
     bool checkInstanceExeExists();
     unsigned int createNewGame(unsigned int uidPlayCreator, unsigned int uidPlayOpponent, const QString& name, QString& error);
     QProcess* game(int index);
-    bool removeGame(unsigned int index);
+    bool removeGame(int index);
 
     //Players
     QList<unsigned int> listUidPlayersFromUidGame(unsigned int uidGame);
@@ -78,6 +78,7 @@ private:
     QList<InstanceGame> m_listGames;
     //QMap<unsigned int, InstanceGame> m_listGame;
 
+    int indexOfUidGame(unsigned int uidGame);
     void sendNotifNewGameCreated(unsigned int uidGame, unsigned int uidPlayerCreator, unsigned int uidPlayerOpponent);
 };
 

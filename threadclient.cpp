@@ -27,7 +27,6 @@ ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
     m_uid(0),
     m_token("")
 {
-    connect(this, &ThreadClient::writeToInstance, InstanceManager::instance(), &InstanceManager::write);
 }
 
 ThreadClient::~ThreadClient()
@@ -71,7 +70,6 @@ void ThreadClient::run()
 
     connect(m_tcpSocket, &QTcpSocket::readyRead, this, &ThreadClient::onReadyRead_TcpSocket, Qt::DirectConnection);
     connect(m_tcpSocket, &QTcpSocket::disconnected, this, &ThreadClient::onDisconnected_TcpSocket, Qt::DirectConnection);
-    connect(InstanceManager::instance(), &InstanceManager::readyRead, this, &ThreadClient::onReadyRead_InstanceManager, Qt::QueuedConnection);
 
     exec();
 }
