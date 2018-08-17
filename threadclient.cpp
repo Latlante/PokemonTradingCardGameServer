@@ -31,11 +31,11 @@ ThreadClient::ThreadClient(int socketDescriptor, QObject *parent) :
 
 ThreadClient::~ThreadClient()
 {
-    /*if(m_timerWritting != nullptr)
+    if(m_timerWritting != nullptr)
     {
         delete m_timerWritting;
         m_timerWritting = nullptr;
-    }*/
+    }
 }
 
 /************************************************************
@@ -48,7 +48,7 @@ void ThreadClient::newMessage(QByteArray message)
 }
 
 /************************************************************
-*****				FONCTIONS PUBLIQUES					*****
+*****				FONCTIONS PROTEGEES					*****
 ************************************************************/
 void ThreadClient::run()
 {
