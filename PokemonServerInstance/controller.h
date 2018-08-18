@@ -5,6 +5,7 @@
 
 #include "player.h"
 #include "../Share/constantesshared.h"
+#include "src_Cards/abstractcard.h"
 #include "src_Log/historicalnotifications.h"
 #include "src_Log/log.h"
 
@@ -33,6 +34,8 @@ private slots:
     void onDataPokemonChanged_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, CardPokemon* pokemon);
     void onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy);
     void onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy);
+
+    void onDisplayPacketAsked(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
 
 private:
     StdListenerWritter* m_communication;

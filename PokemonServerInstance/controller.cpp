@@ -9,7 +9,6 @@
 #include "common/constantesqml.h"
 #include "common/database.h"
 #include "common/utils.h"
-#include "src_Cards/abstractcard.h"
 #include "src_Communication/stdlistenerwritter.h"
 #include "src_Models/modellistenergies.h"
 #include "src_Packets/bencharea.h"
@@ -40,7 +39,9 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     connect(m_gameManager, &GameManager::dataPokemonChanged, this, &Controller::onDataPokemonChanged_GameManager);
     connect(m_gameManager, &GameManager::energyAdded, this, &Controller::onEnergyAdded_GameManager);
     connect(m_gameManager, &GameManager::energyRemoved, this, &Controller::onEnergyRemoved_GameManager);
-    //connect(m_gameManager, &GameManager::logReceived, this, &Controller::onLogReceived);
+
+    connect(m_gameManager, &GameManager::displayPacketAsked, this, &Controller::onDisplayPacketAsked);
+
     m_gameManager->setNumberMaxOfPlayers(2);
 
     Log::instance()->write("Creation of the game");
@@ -194,6 +195,51 @@ void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, Constant
     sendNotifEnergyRemoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, indexEnergy);
 }
 
+void Controller::onDisplayPacketAsked(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
+{
+    QJsonObject jsonDisplay;
+    jsonDisplay["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDisplayPacket);
+
+    QJsonArray arrayCards;
+    for(int i=0;i<packet->countCard();++i)
+    {
+        QJsonObject objCard;
+        AbstractCard* abCard = packet->card(i);
+
+        if(abCard != nullptr)
+        {
+            objCard["idCard"] = abCard->id();
+            objCard["indexPacket"] = i;
+        }
+        else
+            m_log.write(QString(__PRETTY_FUNCTION__) + "abCard is nullptr");
+    }
+
+    /*Player* playerReady = m_gameManager->playerByName(namePlayer);
+
+    m_log.write(QString(__PRETTY_FUNCTION__));
+
+    if(playerReady != nullptr)
+    {
+        m_gameManager->setInitReady(playerReady);
+        if(playerReady->initReady())
+        {
+            jsonResponse["success"] = "ok";
+            sendNotifPlayerIsReady();
+        }
+        else
+        {
+            jsonResponse["success"] = "ko";
+            jsonResponse["error"] = "error, no pokemon in fight area";
+        }
+    }
+    else
+    {
+        jsonResponse["success"] = "ko";
+        jsonResponse["error"] = "error, name of player not found";
+    }*/
+
+}
 
 /************************************************************
 *****               FONCTIONS PRIVEES					*****
@@ -551,7 +597,7 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
                 play->emptyingDeck();
 
                 jsonResponse["success"] = "ko";
-                jsonResponse["error"] = "No enough base to play";
+;                jsonResponse["error"] = "No enough base to play";
                 Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough base to play");
             }
         }
