@@ -11,6 +11,8 @@ build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit-Release/Makefile
 build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit3-Debug
 build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit3-Release
 *.exe
+*.pro.user*
+*.rcc
 PokemonServerInstance/PokemonServerInstance.pro.user
 build-PokemonServerInstance-Desktop_Qt_5_11_0_MinGW_32bit-Release/release/PokemonServerInstance.exe
 PokemonTradingCardGameServer.pro.user
