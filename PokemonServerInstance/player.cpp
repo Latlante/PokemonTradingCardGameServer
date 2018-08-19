@@ -315,6 +315,7 @@ bool Player::moveCardFromHandToBench(int indexHand, int indexBench)
                             if(pokemonToAssociate->evolve(cardPok))
                             {
                                 hand()->removeFromPacketWithoutDelete(cardPok);
+                                emit pokemonSwitched(name(), ConstantesShared::EnumPacketFromName(bench()->name()), indexBench, cardPok->id(), true);
                                 moveSuccess = true;
                             }
                         }
@@ -433,6 +434,7 @@ bool Player::moveCardFromHandToFight(int indexHand)
                             Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", just before evolution");
                             //On l'associe au Pokémon et on peut la supprimer du paquet d'origine
                             //pour ne pas l'avoir en doublon
+                            emit pokemonSwitched(name(), ConstantesShared::EnumPacketFromName(fight()->name()), 0, cardPok->id(), true);
                             if(pokemonToAssociate->evolve(cardPok))
                             {
                                 Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", name:" + m_name + ", Evolution done");

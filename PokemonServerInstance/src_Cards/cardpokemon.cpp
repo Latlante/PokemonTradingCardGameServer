@@ -817,7 +817,7 @@ bool CardPokemon::evolve(CardPokemon *evolution)
             connect(m_cardEvolution, &CardPokemon::lifeLeftChanged, this, &CardPokemon::lifeLeftChanged);
             connect(m_cardEvolution, &CardPokemon::statusChanged, this, &CardPokemon::statusChanged);
             connect(m_cardEvolution, &CardPokemon::listEnergiesChanged, this, &CardPokemon::listEnergiesChanged);
-            connect(m_cardEvolution, &CardPokemon::hasEvolved, this, &CardPokemon::hasEvolved);
+            //connect(m_cardEvolution, &CardPokemon::hasEvolved, this, &CardPokemon::hasEvolved);
 
             evolutionOk = true;
         }

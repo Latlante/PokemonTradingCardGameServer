@@ -37,6 +37,7 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     connect(m_gameManager, &GameManager::initReadyChanged, this, &Controller::onInitReadyChanged_GameManager);
     connect(m_gameManager, &GameManager::cardMoved, this, &Controller::onCardMoved_GameManager);
     connect(m_gameManager, &GameManager::dataPokemonChanged, this, &Controller::onDataPokemonChanged_GameManager);
+    connect(m_gameManager, &GameManager::pokemonSwitched, this, &Controller::onPokemonSwitched_GameManager);
     connect(m_gameManager, &GameManager::energyAdded, this, &Controller::onEnergyAdded_GameManager);
     connect(m_gameManager, &GameManager::energyRemoved, this, &Controller::onEnergyRemoved_GameManager);
 
@@ -185,6 +186,11 @@ void Controller::onDataPokemonChanged_GameManager(const QString& namePlayer, Con
     sendNotifDataPokemonChanged(namePlayer, packet, indexCard, pokemon);
 }
 
+void Controller::onPokemonSwitched_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard, bool keepEnergy)
+{
+    sendNotifPokemonSwitched(namePlayer, packet, indexCard, newIdCard, keepEnergy);
+}
+
 void Controller::onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy)
 {
     sendNotifEnergyAdded(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, idEnergy);
@@ -212,7 +218,7 @@ void Controller::onDisplayPacketAsked(AbstractPacket *packet, unsigned short qua
             objCard["indexPacket"] = i;
         }
         else
-            m_log.write(QString(__PRETTY_FUNCTION__) + "abCard is nullptr");
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "abCard is nullptr");
     }
 
     /*Player* playerReady = m_gameManager->playerByName(namePlayer);
@@ -812,12 +818,13 @@ void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, Constant
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifPokemonSwitched(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard)
+void Controller::sendNotifPokemonSwitched(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard, bool keepEnergy)
 {
     AbstractNotification* notif = new NotificationPokemonSwitched(namePlayer,
                                                                   packet,
                                                                   indexCard,
-                                                                  newIdCard);
+                                                                  newIdCard,
+                                                                  keepEnergy);
 
     m_historicNotif.addNewNotification(notif);
 }

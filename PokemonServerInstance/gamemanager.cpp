@@ -149,7 +149,7 @@ Player* GameManager::playerAt(int index)
     }
     else
     {
-        qCritical() << __PRETTY_FUNCTION__ << "Erreur avec le Player" << index << "/" << m_listPlayers.count();
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Erreur avec le Player" + index + "/" + m_listPlayers.count());
     }
 
     return play;
@@ -308,6 +308,7 @@ Player *GameManager::addNewPlayer(QString name)
         connect(newPlayer, &Player::endOfTurn, this, &GameManager::onEndOfTurn_Player);
         connect(newPlayer, &Player::cardMoved, this ,&GameManager::cardMoved);
         connect(newPlayer, &Player::dataPokemonChanged, this, &GameManager::dataPokemonChanged);
+        connect(newPlayer, &Player::pokemonSwitched, this, &GameManager::pokemonSwitched);
         connect(newPlayer, &Player::energyAdded, this, &GameManager::energyAdded);
         connect(newPlayer, &Player::energyRemoved, this, &GameManager::energyRemoved);
 
@@ -460,18 +461,18 @@ CardPokemon::Enum_StatusOfAttack GameManager::attack(CardPokemon *pokemonAttacki
         {
             CardPokemon *pokemonAttacked = playerAttacked->fight()->pokemonFighting(0);
 
-            qDebug() << __PRETTY_FUNCTION__ << pokemonAttacking->name() << " Attack " << pokemonAttacked->name();
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + pokemonAttacking->name() + " Attack " + pokemonAttacked->name());
             statusOfAttack = pokemonAttacking->tryToAttack(index, pokemonAttacked);
 
-            qDebug() << "Résultat du combat:" << static_cast<int>(statusOfAttack);
-            qDebug() << "\t-> Attaquant:" << pokemonAttacking->name() << " - " << pokemonAttacking->lifeLeft() << "/" << pokemonAttacking->lifeTotal() << " - " << pokemonAttacking->status();
-            qDebug() << "\t-> Attaqué:" << pokemonAttacked->name() << " - " << pokemonAttacked->lifeLeft() << "/" << pokemonAttacked->lifeTotal() << " - " << pokemonAttacked->status();
+            Log::instance()->write("Résultat du combat:" + static_cast<int>(statusOfAttack));
+            Log::instance()->write("\t-> Attaquant:" + pokemonAttacking->name() + " - " + pokemonAttacking->lifeLeft() + "/" + pokemonAttacking->lifeTotal() + " - " + pokemonAttacking->status());
+            Log::instance()->write("\t-> Attaqué:" + pokemonAttacked->name() + " - " + pokemonAttacked->lifeLeft() + "/" + pokemonAttacked->lifeTotal() + " - " + pokemonAttacked->status());
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << "playerAttacked is null";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "playerAttacked is null");
     }
     else
-        qCritical() << __PRETTY_FUNCTION__ << "pokemonAttacking is null";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "pokemonAttacking is null");
 
     return statusOfAttack;
 }
@@ -502,16 +503,18 @@ bool GameManager::retreat(CardPokemon *pokemonToRetreat)
             listCardsBench = displayPacket(playerAttacking->bench(), 1);
 
             if(listCardsBench.first()->type() == AbstractCard::TypeOfCard_Pokemon)
+            {
                 success = playerAttacking->swapCardsBetweenBenchAndFight(static_cast<CardPokemon*>(listCardsBench.first()));
+            }
             else
                 success = false;
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << "pokemonToRetreat->owner() is null";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "pokemonToRetreat->owner() is null");
 
     }
     else
-        qCritical() << __PRETTY_FUNCTION__ << "pokemonToRetreat->canRetreat() is false";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "pokemonToRetreat->canRetreat() is false");
 
     return success;
 }
@@ -935,7 +938,7 @@ void GameManager::checkPokemonDead()
             if(listPokemonToReplace.first()->type() == AbstractCard::TypeOfCard_Pokemon)
                 play->moveCardFromBenchToFight(static_cast<CardPokemon*>(listPokemonToReplace.first()));
             else
-                qCritical() << __PRETTY_FUNCTION__ << "Card non pokemon sur le banc";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Card non pokemon sur le banc");
 #endif
         }
     }
@@ -1037,7 +1040,7 @@ void GameManager::checkAttacksBlocked()
             currentPlayer()->fight()->pokemonFighting(index)->decrementNumberOfTurnAttackStillBlocks();
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << "pokemonFighting" << index << " is nullptr";
+           Log::instance()->write(QString(__PRETTY_FUNCTION__) + "pokemonFighting" + index + " is nullptr");
     }
 
     for(int index=0;index<currentPlayer()->bench()->countCard();index++)
@@ -1047,6 +1050,6 @@ void GameManager::checkAttacksBlocked()
             currentPlayer()->bench()->cardPok(index)->decrementNumberOfTurnAttackStillBlocks();
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << "pokemonBench" << index << " is nullptr";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "pokemonBench" + index + " is nullptr");
     }
 }
