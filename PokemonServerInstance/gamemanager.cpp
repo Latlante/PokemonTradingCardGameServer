@@ -461,18 +461,18 @@ CardPokemon::Enum_StatusOfAttack GameManager::attack(CardPokemon *pokemonAttacki
         {
             CardPokemon *pokemonAttacked = playerAttacked->fight()->pokemonFighting(0);
 
-            Log::instance()->write(QString(__PRETTY_FUNCTION__) + pokemonAttacking->name() + " Attack " + pokemonAttacked->name());
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + pokemonAttacking->name() + " Attack " + pokemonAttacked->name());
             statusOfAttack = pokemonAttacking->tryToAttack(index, pokemonAttacked);
 
             Log::instance()->write("Résultat du combat:" + static_cast<int>(statusOfAttack));
-            Log::instance()->write("\t-> Attaquant:" + pokemonAttacking->name() + " - " + pokemonAttacking->lifeLeft() + "/" + pokemonAttacking->lifeTotal() + " - " + pokemonAttacking->status());
-            Log::instance()->write("\t-> Attaqué:" + pokemonAttacked->name() + " - " + pokemonAttacked->lifeLeft() + "/" + pokemonAttacked->lifeTotal() + " - " + pokemonAttacked->status());
+            Log::instance()->write("\t-> Attaquant:" + pokemonAttacking->name() + " - " + QString::number(pokemonAttacking->lifeLeft()) + "/" + QString::number(pokemonAttacking->lifeTotal()) + " - " + QString::number(pokemonAttacking->status()));
+            Log::instance()->write("\t-> Attaqué:" + pokemonAttacked->name() + " - " + QString::number(pokemonAttacked->lifeLeft()) + "/" + QString::number(pokemonAttacked->lifeTotal()) + " - " + QString::number(pokemonAttacked->status()));
         }
         else
-            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "playerAttacked is null");
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " playerAttacked is null");
     }
     else
-        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "pokemonAttacking is null");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " pokemonAttacking is null");
 
     return statusOfAttack;
 }
