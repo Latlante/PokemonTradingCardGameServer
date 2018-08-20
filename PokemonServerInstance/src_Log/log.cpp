@@ -3,7 +3,9 @@
 #include <QDateTime>
 #include <QFile>
 
-Log::Log(QString name) :
+Log* Log::m_instance = nullptr;
+
+Log::Log(const QString &name) :
     m_file(new QFile("Logs/log_" + name + ".txt"))
 {
 }
@@ -11,6 +13,33 @@ Log::Log(QString name) :
 Log::~Log()
 {
     delete m_file;
+}
+
+/************************************************************
+*****				FONCTIONS STATIQUES					*****
+************************************************************/
+Log* Log::createInstance(const QString &nameFile)
+{
+    if(m_instance == nullptr)
+    {
+        m_instance = new Log(nameFile);
+    }
+
+    return m_instance;
+}
+
+void Log::deleteInstance()
+{
+    if(m_instance != nullptr)
+    {
+        delete m_instance;
+        m_instance = nullptr;
+    }
+}
+
+Log* Log::instance()
+{
+    return m_instance;
 }
 
 /************************************************************

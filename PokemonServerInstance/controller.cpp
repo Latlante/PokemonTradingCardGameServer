@@ -9,7 +9,6 @@
 #include "common/constantesqml.h"
 #include "common/database.h"
 #include "common/utils.h"
-#include "src_Cards/abstractcard.h"
 #include "src_Communication/stdlistenerwritter.h"
 #include "src_Models/modellistenergies.h"
 #include "src_Packets/bencharea.h"
@@ -25,10 +24,11 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     QObject(parent),
     m_communication(new StdListenerWritter()),
     m_gameManager(GameManager::createInstance()),
-    m_historicNotif(HistoricalNotifications()),
-    m_log(Log(nameGame))
+    m_historicNotif(HistoricalNotifications())
 {
     qDebug() << "Constructeur Controller";
+    Log::createInstance(nameGame);
+
     connect(m_communication, &StdListenerWritter::messageReceived, this, &Controller::onMessageReceived_Communication);
     connect(m_communication, &StdListenerWritter::logReceived, this, &Controller::onLogReceived);
     m_communication->startListening();
@@ -37,13 +37,16 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
     connect(m_gameManager, &GameManager::initReadyChanged, this, &Controller::onInitReadyChanged_GameManager);
     connect(m_gameManager, &GameManager::cardMoved, this, &Controller::onCardMoved_GameManager);
     connect(m_gameManager, &GameManager::dataPokemonChanged, this, &Controller::onDataPokemonChanged_GameManager);
+    connect(m_gameManager, &GameManager::pokemonSwitched, this, &Controller::onPokemonSwitched_GameManager);
     connect(m_gameManager, &GameManager::energyAdded, this, &Controller::onEnergyAdded_GameManager);
     connect(m_gameManager, &GameManager::energyRemoved, this, &Controller::onEnergyRemoved_GameManager);
-    connect(m_gameManager, &GameManager::logReceived, this, &Controller::onLogReceived);
+
+    connect(m_gameManager, &GameManager::displayPacketAsked, this, &Controller::onDisplayPacketAsked);
+
     m_gameManager->setNumberMaxOfPlayers(2);
 
-    m_log.write("Creation of the game");
-    m_log.write("Players: " + player1 + " versus " + player2);
+    Log::instance()->write("Creation of the game");
+    Log::instance()->write("Players: " + player1 + " versus " + player2);
 
     m_gameManager->addNewPlayer(player1);
     m_gameManager->addNewPlayer(player2);
@@ -51,12 +54,13 @@ Controller::Controller(const QString &nameGame, const QString &player1, const QS
 
 Controller::~Controller()
 {
-    m_log.write("Destructeur Controller");
+    Log::instance()->write("Destructeur Controller");
     qDebug() << "Destructeur Controller";
 
     m_communication->stopListening();
     m_communication->deleteLater();
-    delete m_gameManager;
+    GameManager::deleteInstance();
+    Log::deleteInstance();
 }
 
 /************************************************************
@@ -64,7 +68,7 @@ Controller::~Controller()
 ************************************************************/
 void Controller::onMessageReceived_Communication(QString message)
 {
-    m_log.write(QString(__PRETTY_FUNCTION__) + "Message received: " + message);
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Message received: " + message);
 
     if(message == "exit")
     {
@@ -84,7 +88,7 @@ void Controller::onMessageReceived_Communication(QString message)
         if(!valuePhase.isNull())
         {
             int phase = valuePhase.toInt();
-            m_log.write("Message - Phase= " + QString::number(phase));
+            Log::instance()->write("Message - Phase= " + QString::number(phase));
 
             switch(static_cast<ConstantesShared::GamePhase>(phase))
             {
@@ -121,7 +125,7 @@ void Controller::onMessageReceived_Communication(QString message)
                 const QString error = "error with the phase:" + QString::number(phase);
                 jsonResponseOwner["success"] = "ko";
                 jsonResponseOwner["error"] = error;
-                m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
             }
 
             jsonResponseOwner["phase"] = jsonReceived["phase"];
@@ -131,7 +135,7 @@ void Controller::onMessageReceived_Communication(QString message)
             const QString error = "No phase entered";
             jsonResponseOwner["success"] = "ko";
             jsonResponseOwner["error"] = error;
-            m_log.write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error: " + error);
         }
 
         //On envoit la réponse avec/sans les actions en fonction de si tout s'est bien passé ou non
@@ -152,14 +156,14 @@ void Controller::onMessageReceived_Communication(QString message)
     }
     else
     {
-        m_log.write(QString(__PRETTY_FUNCTION__) + ", error: jsonReceived is empty");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error: jsonReceived is empty");
     }
 
 }
 
 void Controller::onLogReceived(QString message)
 {
-    m_log.write(message);
+    Log::instance()->write(message);
 }
 
 void Controller::onInitReadyChanged_GameManager()
@@ -182,16 +186,66 @@ void Controller::onDataPokemonChanged_GameManager(const QString& namePlayer, Con
     sendNotifDataPokemonChanged(namePlayer, packet, indexCard, pokemon);
 }
 
-void Controller::onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy)
+void Controller::onPokemonSwitched_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard, bool keepEnergy)
 {
-    sendNotifEnergyAdded(namePlayer, packet, indexCard, idEnergy);
+    sendNotifPokemonSwitched(namePlayer, packet, indexCard, newIdCard, keepEnergy);
 }
 
-void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy)
+void Controller::onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy)
 {
-    sendNotifEnergyRemoved(namePlayer, packet, indexCard, indexEnergy);
+    sendNotifEnergyAdded(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, idEnergy);
 }
 
+void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy)
+{
+    sendNotifEnergyRemoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, indexEnergy);
+}
+
+void Controller::onDisplayPacketAsked(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
+{
+    QJsonObject jsonDisplay;
+    jsonDisplay["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDisplayPacket);
+
+    QJsonArray arrayCards;
+    for(int i=0;i<packet->countCard();++i)
+    {
+        QJsonObject objCard;
+        AbstractCard* abCard = packet->card(i);
+
+        if(abCard != nullptr)
+        {
+            objCard["idCard"] = abCard->id();
+            objCard["indexPacket"] = i;
+        }
+        else
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "abCard is nullptr");
+    }
+
+    /*Player* playerReady = m_gameManager->playerByName(namePlayer);
+
+    m_log.write(QString(__PRETTY_FUNCTION__));
+
+    if(playerReady != nullptr)
+    {
+        m_gameManager->setInitReady(playerReady);
+        if(playerReady->initReady())
+        {
+            jsonResponse["success"] = "ok";
+            sendNotifPlayerIsReady();
+        }
+        else
+        {
+            jsonResponse["success"] = "ko";
+            jsonResponse["error"] = "error, no pokemon in fight area";
+        }
+    }
+    else
+    {
+        jsonResponse["success"] = "ko";
+        jsonResponse["error"] = "error, name of player not found";
+    }*/
+
+}
 
 /************************************************************
 *****               FONCTIONS PRIVEES					*****
@@ -234,7 +288,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                     if(cardEn != nullptr)
                         arrayEnemyBenchPokemonEnergies.append(static_cast<int>(cardEn->element()));
                     else
-                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
                 }
 
                 objEnemyBenchPokemon["energies"] = arrayEnemyBenchPokemonEnergies;
@@ -265,7 +319,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                     if(cardEn != nullptr)
                         arrayEnemyFightPokemonEnergies.append(static_cast<int>(cardEn->element()));
                     else
-                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
                 }
 
                 objEnemyFight["energies"] = arrayEnemyFightPokemonEnergies;
@@ -273,7 +327,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
             }
             else
             {
-                m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, pokemon fighter is nullptr");
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Enemy, pokemon fighter is nullptr");
             }
 
                 //Hand
@@ -320,7 +374,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                     if(cardEn != nullptr)
                         arrayYouBenchPokemonEnergies.append(static_cast<int>(cardEn->element()));
                     else
-                        m_log.write(QString(__PRETTY_FUNCTION__) + "you, an energy (" + QString::number(iEnergy).toLatin1() + ") card is nullptr");
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "you, an energy (" + QString::number(iEnergy).toLatin1() + ") card is nullptr");
                 }
 
                 objYouBenchPokemon["energies"] = arrayYouBenchPokemonEnergies;
@@ -350,7 +404,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                     if(cardEn != nullptr)
                         arrayYouFightPokemonEnergies.append(static_cast<int>(cardEn->element()));
                     else
-                        m_log.write(QString(__PRETTY_FUNCTION__) + "you, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "you, an energy (" + QString::number(iEnergy) + ") card is nullptr");
                 }
 
                 objYouFight["energies"] = arrayYouFightPokemonEnergies;
@@ -358,7 +412,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
             }
             else
             {
-                m_log.write(QString(__PRETTY_FUNCTION__) + "you, pokemon fighter is nullptr");
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + "you, pokemon fighter is nullptr");
             }
             objYou["fight"] = objYouFight;
 
@@ -370,7 +424,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                 if(cardHand != nullptr)
                     arrayYouHand.append(cardHand->id());
                 else
-                    m_log.write(QString(__PRETTY_FUNCTION__) + "you, an card hand (" + QString::number(iHand) + ") is nullptr");
+                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + "you, an card hand (" + QString::number(iHand) + ") is nullptr");
             }
             objYou["hand"] = arrayYouHand;
 
@@ -409,7 +463,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                     if(cardEn != nullptr)
                         arrayEnemyBenchPokemonEnergies.append(static_cast<int>(cardEn->element()));
                     else
-                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
                 }
 
                 objEnemyBenchPokemon["energies"] = arrayEnemyBenchPokemonEnergies;
@@ -439,7 +493,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
                     if(cardEn != nullptr)
                         arrayEnemyFightPokemonEnergies.append(static_cast<int>(cardEn->element()));
                     else
-                        m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Enemy, an energy (" + QString::number(iEnergy) + ") card is nullptr");
                 }
 
                 objEnemyFight["energies"] = arrayEnemyFightPokemonEnergies;
@@ -447,7 +501,7 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
             }
             else
             {
-                m_log.write(QString(__PRETTY_FUNCTION__) + "Enemy, pokemon fighter is nullptr");
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Enemy, pokemon fighter is nullptr");
             }
             objEnemy["fight"] = objEnemyFight;
 
@@ -481,7 +535,7 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
     QList<AbstractCard*> listCards;
     Database db;
 
-    m_log.write(QString(__PRETTY_FUNCTION__) + ", namePlayer=" + namePlayer + ", tabCards.count=" + QString::number(tabCards.count()));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", namePlayer=" + namePlayer + ", tabCards.count=" + QString::number(tabCards.count()));
 
     //Fill the packet
     for(int indexTabCards=0;indexTabCards<tabCards.count();++indexTabCards)
@@ -494,7 +548,7 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
             int idCard = objectCard["id"].toInt();
             int quantity = objectCard["quantity"].toInt();
 
-            m_log.write(QString(__PRETTY_FUNCTION__) + ", idCard=" + QString::number(idCard) + ", quantity=" + QString::number(quantity));
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", idCard=" + QString::number(idCard) + ", quantity=" + QString::number(quantity));
 
             for(int indexQuantity=0;indexQuantity<quantity;++indexQuantity)
             {
@@ -502,18 +556,18 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
 
                 if(abCard != nullptr)
                 {
-                    m_log.write(QString(__PRETTY_FUNCTION__) + ", abCard.name=" + abCard->name());
+                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", abCard.name=" + abCard->name());
                     listCards.append(abCard);
                 }
                 else
                 {
-                    m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": id unknown (" + QString::number(idCard) + ")");
+                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": id unknown (" + QString::number(idCard) + ")");
                 }
             }
         }
         else
         {
-            m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": valueCard is not an jsonObject");
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": valueCard is not an jsonObject");
         }
     }
 
@@ -522,13 +576,13 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
     {
         jsonResponse["success"] = "ko";
         jsonResponse["error"] = "No enough card in packet";
-        m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough card in packet");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough card in packet");
     }
     else if(listCards.count() > MAXCARDS_DECK)
     {
         jsonResponse["success"] = "ko";
         jsonResponse["error"] = "Too many cards in packet";
-        m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Too many cards in packet");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Too many cards in packet");
     }
     else
     {
@@ -542,22 +596,22 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
                 jsonResponse["success"] = "ok";
                 jsonResponse["deck"] = MAXCARDS_DECK;
                 jsonResponse["rewards"] = MAXCARDS_REWARD;
-                m_log.write(QString(__PRETTY_FUNCTION__) + ", " + namePlayer + " created");
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", " + namePlayer + " created");
             }
             else
             {
                 play->emptyingDeck();
 
                 jsonResponse["success"] = "ko";
-                jsonResponse["error"] = "No enough base to play";
-                m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough base to play");
+;                jsonResponse["error"] = "No enough base to play";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough base to play");
             }
         }
         else
         {
             jsonResponse["success"] = "ko";
             jsonResponse["error"] = "Player " + namePlayer + " is nullptr";
-            m_log.write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": player is nullptr");
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": player is nullptr");
         }
     }
 
@@ -568,7 +622,7 @@ QJsonObject Controller::moveACard(const QString &namePlayer, Player::EnumPacket 
 {
     QJsonObject jsonResponse;
 
-    m_log.write(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 
     if(m_gameManager->moveACard(namePlayer, packetOrigin, packetDestination, indexCardOrigin, indexCardDestination))
     {
@@ -588,7 +642,7 @@ QJsonObject Controller::setInitReadyForAPlayer(const QString &namePlayer)
     QJsonObject jsonResponse;
     Player* playerReady = m_gameManager->playerByName(namePlayer);
 
-    m_log.write(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 
     if(playerReady != nullptr)
     {
@@ -630,21 +684,29 @@ QJsonObject Controller::attack_retreat(const QString &namePlayer, unsigned short
             switch(statusOfAttack)
             {
             case CardPokemon::Attack_OK:
+                jsonResponse["success"] = "ok";
                 m_gameManager->endOfTurn();
                 break;
             case CardPokemon::Attack_AttackBlocked:
-                m_gameManager->displayMessage("Impossible d'utiliser cette attaque pendant ce tour");
+                jsonResponse["success"] = "ko";
+                jsonResponse["error"] = "you cannot use this attack for this turn";
                 break;
             case CardPokemon::Attack_NotEnoughEnergies:
-                m_gameManager->displayMessage("Vous n'avez pas assez d'énergies");
+                jsonResponse["success"] = "ko";
+                jsonResponse["error"] = "you don't have enough energies";
                 break;
             case CardPokemon::Attack_WrongStatus:
-                m_gameManager->displayMessage("Vous ne pouvez pas attaquer pendant que vous êtes " + pokemonAttacking->statusFormatString());
+                jsonResponse["success"] = "ko";
+                jsonResponse["error"] = "you cannot attack because you are " + pokemonAttacking->statusFormatString();
                 break;
             case CardPokemon::Attack_IndexNOK:
+                jsonResponse["success"] = "ko";
+                jsonResponse["error"] = "error index";
                 qCritical() << __PRETTY_FUNCTION__ << "Erreur d'index";
                 break;
             case CardPokemon::Attack_UnknownError:
+                jsonResponse["success"] = "ko";
+                jsonResponse["error"] = "error unknown";
                 qCritical() << __PRETTY_FUNCTION__ << "Erreur inconnue";
                 break;
             }
@@ -720,7 +782,7 @@ void Controller::sendNotifEndOfTurn(const QString &oldPlayer, const QString &new
 
 void Controller::sendNotifCardMoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard, bool showCardToEveryone)
 {
-    m_log.write(QString(__PRETTY_FUNCTION__) +
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) +
                 ", namePlayer: " + namePlayer +
                 ", historic: " + QString::number(m_historicNotif.count()) +
                 ", packetOrigin: " + QString::number(packetOrigin) +
@@ -747,9 +809,12 @@ void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, Constant
     }
 
     QList<unsigned int> listEnergies;
-    for(unsigned short i=0;i<pokemon->modelListOfEnergies()->countEnergies();++i)
+    for(unsigned short i=0;i<pokemon->modelListOfEnergies()->countCard();++i)
     {
-        listEnergies.append(pokemon->modelListOfEnergies()->energy(i)->id());
+        for(int indexQuantity=0;indexQuantity<pokemon->modelListOfEnergies()->energy(i)->quantity();++indexQuantity)
+        {
+            listEnergies.append(pokemon->modelListOfEnergies()->energy(i)->id());
+        }
     }
 
     AbstractNotification* notif = new NotificationDataPokemonChanged(namePlayer,
@@ -761,30 +826,35 @@ void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, Constant
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifPokemonSwitched(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard)
+void Controller::sendNotifPokemonSwitched(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard, bool keepEnergy)
 {
     AbstractNotification* notif = new NotificationPokemonSwitched(namePlayer,
                                                                   packet,
                                                                   indexCard,
-                                                                  newIdCard);
+                                                                  newIdCard,
+                                                                  keepEnergy);
 
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifEnergyAdded(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int idEnergy)
+void Controller::sendNotifEnergyAdded(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy)
 {
     AbstractNotification* notif = new NotificationEnergyAdded(namePlayer,
-                                                              packet,
-                                                              indexCard,
+                                                              packetOrigin,
+                                                              indexCardOrigin,
+                                                              packetDestination,
+                                                              indexCardDestination,
                                                               idEnergy);
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifEnergyRemoved(const QString &namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int indexEnergy)
+void Controller::sendNotifEnergyRemoved(const QString &namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy)
 {
     AbstractNotification* notif = new NotificationEnergyRemoved(namePlayer,
-                                                                packet,
-                                                                indexCard,
+                                                                packetOrigin,
+                                                                indexCardOrigin,
+                                                                packetDestination,
+                                                                indexCardDestination,
                                                                 indexEnergy);
     m_historicNotif.addNewNotification(notif);
 }
