@@ -41,7 +41,7 @@ bool SocketToServer::tryToConnect()
 {
     bool success = false;
     const QString ipAddress = "127.0.0.1";
-    const int port = 23002;
+    const int port = 23003;
 
     qDebug() << __PRETTY_FUNCTION__ << ipAddress << ":" << port;
 

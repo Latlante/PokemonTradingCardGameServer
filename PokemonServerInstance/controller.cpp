@@ -29,9 +29,15 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     qDebug() << "Constructeur Controller";
     Log::createInstance(nameGame);
 
-    m_communication->write("{ \"uidGame\":" + uidGame.toLatin1() + " }");
+    if(m_communication->tryToConnect())
+    {
+        m_communication->write("{ \"uidGame\":" + uidGame.toLatin1() + " }");
 
-    connect(m_communication, &SocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
+        connect(m_communication, &SocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
+    }
+    else
+        Log::instance()->write("Error: Impossible to connect to the server");
+
 
     connect(m_gameManager, &GameManager::indexCurrentPlayerChanged, this, &Controller::onIndexCurrentPlayerChanged_GameManager);
     connect(m_gameManager, &GameManager::initReadyChanged, this, &Controller::onInitReadyChanged_GameManager);

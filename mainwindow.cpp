@@ -3,15 +3,17 @@
 
 #include <QMessageBox>
 #include "instancemanager.h"
-
+#include "gateway.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_gateway(new Gateway())
 {
     ui->setupUi(this);
     new InstanceManager();
 
+    m_gateway->startServers();
 
     ui->listView_Users->setModel(&m_modelUsers);
     //connect(m_serverClient, &TcpServerClients::newUserConnected, &m_modelUsers, &ModelListUsers::addNewUser);
@@ -26,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     InstanceManager::deleteInstance();
+    delete m_gateway;
 
     delete ui;
 }

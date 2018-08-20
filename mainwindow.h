@@ -5,6 +5,7 @@
 #include "Models/modellistusers.h"
 #include "Models/modeltablegames.h"
 
+class Gateway;
 class TcpServerClients;
 
 namespace Ui {
@@ -24,7 +25,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    TcpServerClients* m_serverClient;
+    Gateway *m_gateway;
 
     ModelListUsers m_modelUsers;
     ModelTableGames m_modelGames;
