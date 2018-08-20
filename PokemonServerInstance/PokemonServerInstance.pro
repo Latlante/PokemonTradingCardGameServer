@@ -1,4 +1,5 @@
 QT -= gui
+QT += network
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -102,7 +103,8 @@ SOURCES += \
     src_Log/notificationenergyadded.cpp \
     src_Log/notificationenergyremoved.cpp \
     ../Share/constantesshared.cpp \
-    src_Log/notificationdisplaypackets.cpp
+    src_Log/notificationdisplaypackets.cpp \
+    src_Communication/sockettoserver.cpp
 
 HEADERS += \
     common/constantesqml.h \
@@ -184,4 +186,5 @@ HEADERS += \
     src_Log/notificationenergyadded.h \
     src_Log/notificationenergyremoved.h \
     ../Share/constantesshared.h \
-    src_Log/notificationdisplaypackets.h
+    src_Log/notificationdisplaypackets.h \
+    src_Communication/sockettoserver.h

@@ -10,13 +10,14 @@
 #include "src_Log/log.h"
 
 class GameManager;
-class StdListenerWritter;
+class SocketToServer;
 
 class Controller : public QObject
 {
     Q_OBJECT
 public:
-    explicit Controller(const QString& nameGame,
+    explicit Controller(const QString& uidGame,
+                        const QString& nameGame,
                         const QString& player1,
                         const QString& player2,
                         QObject *parent = nullptr);
@@ -25,7 +26,7 @@ public:
 signals:
 
 private slots:
-    void onMessageReceived_Communication(QString message);
+    void onMessageReceived_Communication(QByteArray message);
     void onLogReceived(QString message);
 
     void onInitReadyChanged_GameManager();
@@ -39,7 +40,7 @@ private slots:
     void onDisplayPacketAsked(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
 
 private:
-    StdListenerWritter* m_communication;
+    SocketToServer* m_communication;
     GameManager* m_gameManager;
     HistoricalNotifications m_historicNotif;
     //Log m_log;

@@ -58,7 +58,7 @@ unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigne
         const QString namePlayerCreator = Authentification::namePlayerFromUid(uidPlayCreator);
         const QString namePlayerOpponent = Authentification::namePlayerFromUid(uidPlayOpponent);
 		connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &InstanceManager::onFinished_Process);
-        process->start(m_PATH_INSTANCE, {name, namePlayerCreator, namePlayerOpponent});
+        process->start(m_PATH_INSTANCE, {QString::number(m_indexGame), name, namePlayerCreator, namePlayerOpponent});
 
         if(process->waitForStarted())
 		{

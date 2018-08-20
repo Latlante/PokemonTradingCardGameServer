@@ -9,7 +9,7 @@
 #include "common/constantesqml.h"
 #include "common/database.h"
 #include "common/utils.h"
-#include "src_Communication/stdlistenerwritter.h"
+#include "src_Communication/sockettoserver.h"
 #include "src_Models/modellistenergies.h"
 #include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
@@ -20,18 +20,18 @@
 #include "../Share/constantesshared.h"
 #include <QCoreApplication>
 
-Controller::Controller(const QString &nameGame, const QString &player1, const QString &player2, QObject *parent) :
+Controller::Controller(const QString &uidGame, const QString &nameGame, const QString &player1, const QString &player2, QObject *parent) :
     QObject(parent),
-    m_communication(new StdListenerWritter()),
+    m_communication(new SocketToServer()),
     m_gameManager(GameManager::createInstance()),
     m_historicNotif(HistoricalNotifications())
 {
     qDebug() << "Constructeur Controller";
     Log::createInstance(nameGame);
 
-    connect(m_communication, &StdListenerWritter::messageReceived, this, &Controller::onMessageReceived_Communication);
-    connect(m_communication, &StdListenerWritter::logReceived, this, &Controller::onLogReceived);
-    m_communication->startListening();
+    m_communication->write("{ \"uidGame\":" + uidGame.toLatin1() + " }");
+
+    connect(m_communication, &SocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
 
     connect(m_gameManager, &GameManager::indexCurrentPlayerChanged, this, &Controller::onIndexCurrentPlayerChanged_GameManager);
     connect(m_gameManager, &GameManager::initReadyChanged, this, &Controller::onInitReadyChanged_GameManager);
@@ -57,8 +57,7 @@ Controller::~Controller()
     Log::instance()->write("Destructeur Controller");
     qDebug() << "Destructeur Controller";
 
-    m_communication->stopListening();
-    m_communication->deleteLater();
+    delete m_communication;
     GameManager::deleteInstance();
     Log::deleteInstance();
 }
@@ -66,18 +65,17 @@ Controller::~Controller()
 /************************************************************
 *****			FONCTIONS SLOTS PRIVEES					*****
 ************************************************************/
-void Controller::onMessageReceived_Communication(QString message)
+void Controller::onMessageReceived_Communication(QByteArray message)
 {
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + "Message received: " + message);
 
     if(message == "exit")
     {
-        m_communication->stopListening();
         qApp->quit();
         return;
     }
 
-    QJsonDocument jsonReceived = QJsonDocument::fromJson(message.toLatin1());
+    QJsonDocument jsonReceived = QJsonDocument::fromJson(message);
 
     if(!jsonReceived.isEmpty())
     {

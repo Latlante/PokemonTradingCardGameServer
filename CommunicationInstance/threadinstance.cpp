@@ -62,6 +62,8 @@ void ThreadInstance::run()
 ************************************************************/
 void ThreadInstance::onReadyRead_TcpSocket()
 {
+    qDebug() << __PRETTY_FUNCTION__ << "data incoming (" << m_tcpSocket->bytesAvailable() << ")";
+
     //init the answer
     QByteArray responseSerialize;
     QDataStream requestToRead(m_tcpSocket);
