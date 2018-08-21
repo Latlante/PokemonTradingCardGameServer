@@ -22,7 +22,7 @@ InstanceManager::~InstanceManager()
 {
     while(m_listGames.count() > 0)
     {
-        removeGame(0);
+        removeGame(data(index(0, ROLE_ID)).toUInt());
     }
 }
 
@@ -103,25 +103,28 @@ unsigned int InstanceManager::createNewGame(unsigned int uidPlayCreator, unsigne
     return indexNewGame;
 }
 
-QProcess* InstanceManager::game(int index)
+QProcess* InstanceManager::game(unsigned int uidGame)
 {
     QProcess* processToReturn = nullptr;
+    int indexList = indexOfUidGame(uidGame);
 
-    if((index >= 0) && (index < m_listGames.count()))
+    if((indexList >= 0) && (indexList < m_listGames.count()))
     {
-        processToReturn = m_listGames[index].process;
+        processToReturn = m_listGames[indexList].process;
     }
 
     return processToReturn;
 }
 
-bool InstanceManager::removeGame(int index)
+bool InstanceManager::removeGame(unsigned int uidGame)
 {
     qDebug() << __PRETTY_FUNCTION__;
     bool success = false;
-    if((index >= 0) && (index < m_listGames.count()))
+    int indexList = indexOfUidGame(uidGame);
+
+    if((indexList >= 0) && (indexList < m_listGames.count()))
     {
-        InstanceGame game = m_listGames.takeAt(index);
+        InstanceGame game = m_listGames.takeAt(indexList);
         QProcess* process = game.process;
 
         if(process != nullptr)
@@ -131,7 +134,7 @@ bool InstanceManager::removeGame(int index)
             if(process->waitForFinished(10000))
             {
                 process->deleteLater();
-                emit gameRemoved(static_cast<int>(index));
+                emit gameRemoved(static_cast<int>(uidGame));
                 success = true;
             }
             /*else
@@ -300,7 +303,7 @@ void InstanceManager::onFinished_Process(int exitCode)
     unsigned int uidGame = uidGameFromQProcess(process);
     qDebug() << __PRETTY_FUNCTION__ << ", the instance " << uidGame << " is closed with code " << exitCode;
 
-    removeGame(indexOfUidGame(uidGame));
+    removeGame(uidGame);
 }
 
 /************************************************************

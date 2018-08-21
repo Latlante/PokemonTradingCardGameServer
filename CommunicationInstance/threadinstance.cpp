@@ -140,8 +140,11 @@ void ThreadInstance::executeRequest(const QJsonDocument &jsonReceived)
     if(jsonReceived.object().contains("phase") == false)
     {
         unsigned int uidGame = static_cast<unsigned int>(jsonReceived["uidGame"].toInt());
+        const QString nameGame = jsonReceived["nameGame"].toString();
+        const QString namePlayer1 = jsonReceived["namePlayer1"].toString();
+        const QString namePlayer2 = jsonReceived["namePlayer2"].toString();
         if(uidGame > 0)
-            emit instanceAuthentified(uidGame);
+            emit instanceAuthentified(m_socketDescriptor, uidGame, nameGame, namePlayer1, namePlayer2);
         else
             qWarning() << __PRETTY_FUNCTION__ << "error during authentification of the instance: " << jsonReceived.toJson(QJsonDocument::Compact);
     }

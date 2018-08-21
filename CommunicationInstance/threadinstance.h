@@ -19,7 +19,7 @@ protected:
     void run() override;
 
 signals:
-    void instanceAuthentified(unsigned int);
+    void instanceAuthentified(int,unsigned int,const QString&,const QString&,const QString&);
     void instanceDisconnected(int);
     void messageReceived(QJsonDocument);
 

@@ -27,8 +27,9 @@ public:
     virtual int rowCount(const QModelIndex & = QModelIndex()) const override;
 
 public slots:
-    void addNewGame(unsigned int id, const QString& nameGame, const QString& creator, const QString& opponent);
-    void removeAGame(int index);
+    void addNewGame(int socketDescriptor);
+    void gameAuthentified(int socketDescriptor, unsigned int id, const QString& nameGame, const QString& creator, const QString& opponent);
+    void removeAGame(int socketDescriptor);
 
 signals:
 
@@ -40,8 +41,11 @@ private:
         QString playerCreator;
         QString playerOpponent;
         QDateTime dateCreation;
+        int socketDescriptor;
     };
     QList<InfoGame> m_listInfos;
+
+    int indexListFromSocketDescriptor(int socketDescriptor);
 };
 
 #endif // MODELTABLEGAMES_H

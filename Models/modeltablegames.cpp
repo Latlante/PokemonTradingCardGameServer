@@ -46,21 +46,56 @@ int ModelTableGames::rowCount(const QModelIndex&) const
 /************************************************************
 *****			  FONCTIONS SLOT PUBLIQUES              *****
 ************************************************************/
-void ModelTableGames::addNewGame(unsigned int id, const QString& nameGame, const QString& creator, const QString& opponent)
+void ModelTableGames::addNewGame(int socketDescriptor)
 {
-    InfoGame info = { id, nameGame, creator, opponent, QDateTime::currentDateTime() };
+    InfoGame info = { 0, "", "", "", QDateTime::currentDateTime(), socketDescriptor };
 
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     m_listInfos.append(info);
     endInsertRows();
 }
 
-void ModelTableGames::removeAGame(int index)
+void ModelTableGames::gameAuthentified(int socketDescriptor, unsigned int id, const QString& nameGame, const QString& creator, const QString& opponent)
 {
+    int indexList = indexListFromSocketDescriptor(socketDescriptor);
+
+    InfoGame info = m_listInfos[indexList];
+    info.id = id;
+    info.nameGame = nameGame;
+    info.playerCreator = creator;
+    info.playerOpponent = opponent;
+    m_listInfos.replace(indexList, info);
+
+    emit dataChanged(index(indexList, 0), index(indexList, ROLE_COUNT));
+}
+
+void ModelTableGames::removeAGame(int socketDescriptor)
+{
+    int index = indexListFromSocketDescriptor(socketDescriptor);
+
     if((index >= 0) && (index < m_listInfos.count()))
     {
         beginRemoveRows(QModelIndex(), index, index);
         m_listInfos.removeAt(index);
         endRemoveRows();
     }
+}
+
+/************************************************************
+*****				FONCTIONS PRIVEES					*****
+************************************************************/
+int ModelTableGames::indexListFromSocketDescriptor(int socketDescriptor)
+{
+    int indexFound = -1;
+    int indexLoop = 0;
+
+    while((indexFound == -1) && (indexLoop < m_listInfos.count()))
+    {
+        if(m_listInfos[indexLoop].socketDescriptor == socketDescriptor)
+            indexFound = indexLoop;
+        else
+            indexLoop++;
+    }
+
+    return indexFound;
 }

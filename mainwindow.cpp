@@ -16,10 +16,14 @@ MainWindow::MainWindow(QWidget *parent) :
     m_gateway->startServers();
 
     ui->listView_Users->setModel(&m_modelUsers);
-    //connect(m_serverClient, &TcpServerClients::newUserConnected, &m_modelUsers, &ModelListUsers::addNewUser);
-    //connect(m_serverClient, &TcpServerClients::userDisconnected, &m_modelUsers, &ModelListUsers::removeAUser);
+    connect(m_gateway, &Gateway::newUserConnected, &m_modelUsers, &ModelListUsers::addNewUser);
+    connect(m_gateway, &Gateway::userDisconnected, &m_modelUsers, &ModelListUsers::removeAnUser);
 
     ui->tableView_Games->setModel(&m_modelGames);
+    connect(m_gateway, &Gateway::newInstanceConnected, &m_modelGames, &ModelTableGames::addNewGame);
+    connect(m_gateway, &Gateway::instanceAuthentified, &m_modelGames, &ModelTableGames::gameAuthentified);
+    connect(m_gateway, &Gateway::instanceDisconnected, &m_modelGames, &ModelTableGames::removeAGame);
+
     connect(InstanceManager::instance(), &InstanceManager::newGameCreated, &m_modelGames, &ModelTableGames::addNewGame);
     connect(InstanceManager::instance(), &InstanceManager::gameRemoved, &m_modelGames, &ModelTableGames::removeAGame);
     connect(ui->tableView_Games, &QTableView::doubleClicked, this, &MainWindow::onDClicked_TableView_Games);

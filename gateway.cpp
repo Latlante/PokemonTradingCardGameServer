@@ -11,7 +11,14 @@ Gateway::Gateway(QObject *parent) :
     m_serverClients(new TcpServerClients()),
     m_serverInstance(new TcpServerInstance())
 {
+    connect(m_serverClients, &TcpServerClients::newUserConnected, this, &Gateway::newUserConnected);
+    connect(m_serverClients, &TcpServerClients::userDisconnected, this, &Gateway::userDisconnected);
     connect(m_serverClients, &TcpServerClients::writeToInstance, this, &Gateway::onWriteToInstance_serverClients);
+
+    connect(m_serverInstance, &TcpServerInstance::newInstanceConnected, this, &Gateway::newInstanceConnected);
+    connect(m_serverInstance, &TcpServerInstance::instanceAuthentified, this, &Gateway::instanceAuthentified);
+    connect(m_serverInstance, &TcpServerInstance::instanceDisconnected, this, &Gateway::instanceDisconnected);
+    connect(m_serverInstance, &TcpServerInstance::writeToClient, this, &Gateway::onWriteToClient_serverInstances);
 }
 
 Gateway::~Gateway()

@@ -16,6 +16,11 @@ public:
     bool startServers();
 
 signals:
+    void newUserConnected(int,QString);
+    void userDisconnected(int);
+    void newInstanceConnected(int);
+    void instanceAuthentified(int,unsigned int,const QString&,const QString&,const QString&);
+    void instanceDisconnected(int);
 
 private slots:
     void onWriteToInstance_serverClients(unsigned int uidGame, QByteArray message);

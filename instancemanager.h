@@ -42,8 +42,8 @@ public:
     //Handle game
     bool checkInstanceExeExists();
     unsigned int createNewGame(unsigned int uidPlayCreator, unsigned int uidPlayOpponent, const QString& name, QString& error);
-    QProcess* game(int index);
-    bool removeGame(int index);
+    QProcess* game(unsigned int uidGame);
+    bool removeGame(unsigned int uidGame);
 
     //Players
     QList<unsigned int> listUidPlayersFromUidGame(unsigned int uidGame);

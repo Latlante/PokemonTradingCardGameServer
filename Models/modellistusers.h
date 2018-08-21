@@ -14,7 +14,7 @@ public:
 
 public slots:
     void addNewUser(int socketDescriptor, const QString& nameUser);
-    void removeAUser(int socketDescriptor);
+    void removeAnUser(int socketDescriptor);
 
 private:
     struct InfoUser

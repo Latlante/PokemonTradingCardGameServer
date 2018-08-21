@@ -21,11 +21,12 @@ protected:
 
 signals:
     void newInstanceConnected(int);
+    void instanceAuthentified(int,unsigned int,const QString&,const QString&,const QString&);
     void instanceDisconnected(int);
     void writeToClient(unsigned int,QByteArray);
 
 private slots:
-    void onInstanceAuthentified_ThreadInstance(unsigned int uid);
+    void onInstanceAuthentified_ThreadInstance(int socketDescriptor, unsigned int uid, const QString &nameGame, const QString &namePlayer1, const QString &namePlayer2);
     void onWriteToClient_ThreadInstance(QByteArray message);
 
 private:

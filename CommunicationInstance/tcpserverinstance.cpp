@@ -62,6 +62,7 @@ void TcpServerInstance::incomingConnection(qintptr socketDescriptor)
     //connect(InstanceManager::instance(), &InstanceManager::readyRead, client, &ThreadClient::onReadyRead_InstanceManager, Qt::QueuedConnection);
 
     m_mapThreadInstance.insert(client, 0);
+    emit newInstanceConnected(socketDescriptor);
 
     client->start();
 }
@@ -69,12 +70,15 @@ void TcpServerInstance::incomingConnection(qintptr socketDescriptor)
 /************************************************************
 *****			  FONCTIONS SLOT PRIVEES				*****
 ************************************************************/
-void TcpServerInstance::onInstanceAuthentified_ThreadInstance(unsigned int uid)
+void TcpServerInstance::onInstanceAuthentified_ThreadInstance(int socketDescriptor, unsigned int uid, const QString &nameGame, const QString &namePlayer1, const QString &namePlayer2)
 {
     ThreadInstance* client = qobject_cast<ThreadInstance*>(sender());
 
     if(m_mapThreadInstance.contains(client) == true)
+    {
         m_mapThreadInstance[client] = uid;
+        emit instanceAuthentified(socketDescriptor, uid, nameGame, namePlayer1, namePlayer2);
+    }
     else
         qWarning() << __PRETTY_FUNCTION__ << "m_mapThreadInstance does not contains client " << uid;
 }
