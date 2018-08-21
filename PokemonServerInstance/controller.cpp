@@ -31,7 +31,14 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
 
     if(m_communication->tryToConnect())
     {
-        m_communication->write("{ \"uidGame\":" + uidGame.toLatin1() + " }");
+        QString requestBoot = "boot;";
+        requestBoot += "{";
+        requestBoot += "\"uidGame\":" + uidGame.toLatin1() + ",";
+        requestBoot += "\"nameGame\":\"" + nameGame + "\",";
+        requestBoot += "\"namePlayer1\":\"" + player1 + "\",";
+        requestBoot += "\"namePlayer2\":\"" + player2 + "\"";
+        requestBoot += "}";
+        m_communication->write(requestBoot.toLatin1());
 
         connect(m_communication, &SocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
     }

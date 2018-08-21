@@ -21,7 +21,7 @@ protected:
 signals:
     void instanceAuthentified(int,unsigned int,const QString&,const QString&,const QString&);
     void instanceDisconnected(int);
-    void messageReceived(QJsonDocument);
+    void writeToClient(QByteArray);
 
 private slots:
     void onReadyRead_TcpSocket();
@@ -37,7 +37,7 @@ private:
     QTimer *m_timerWritting;
     QList<QByteArray> m_listMessageToSend;
 
-    void executeRequest(const QJsonDocument &jsonReceived);
+    void executeRequest(const QByteArray &jsonReceived);
 };
 
 #endif // THREADINSTANCE_H

@@ -83,25 +83,9 @@ void ThreadInstance::onReadyRead_TcpSocket()
 
     //From here, we have everything, so we can get all the message
     requestToRead >> responseSerialize;
-    QJsonParseError jsonError;
-    QJsonDocument docNotif = QJsonDocument::fromJson(responseSerialize, &jsonError);
 
-    if(jsonError.error == QJsonParseError::NoError)
-    {
-        executeRequest(docNotif);
-        m_sizeAnswerAsynchrone = 0;
-    }
-    else
-    {
-        QJsonObject jsonResponse;
-        const QString error = "error during the creation of the json document";
-        jsonResponse["success"] = "ko";
-        jsonResponse["error"] = error;
-        qCritical() << error;
-
-        m_listMessageToSend.append(QJsonDocument(jsonResponse).toJson(QJsonDocument::Compact));
-    }
-
+    executeRequest(responseSerialize);
+    m_sizeAnswerAsynchrone = 0;
 }
 
 void ThreadInstance::onDisconnected_TcpSocket()
@@ -132,24 +116,45 @@ void ThreadInstance::onTimeOut_timerWritting()
 /************************************************************
 *****				FONCTIONS PRIVEES					*****
 ************************************************************/
-void ThreadInstance::executeRequest(const QJsonDocument &jsonReceived)
+void ThreadInstance::executeRequest(const QByteArray &jsonReceived)
 {
-    qDebug() << __PRETTY_FUNCTION__ << "message received:" << jsonReceived.toJson(QJsonDocument::Compact);
+    qDebug() << __PRETTY_FUNCTION__ << "message received:" << jsonReceived;
 
-    //Authentification
-    if(jsonReceived.object().contains("phase") == false)
+    if(jsonReceived.count(';') >= 1)
     {
-        unsigned int uidGame = static_cast<unsigned int>(jsonReceived["uidGame"].toInt());
-        const QString nameGame = jsonReceived["nameGame"].toString();
-        const QString namePlayer1 = jsonReceived["namePlayer1"].toString();
-        const QString namePlayer2 = jsonReceived["namePlayer2"].toString();
-        if(uidGame > 0)
-            emit instanceAuthentified(m_socketDescriptor, uidGame, nameGame, namePlayer1, namePlayer2);
+        const QString owner = QString(jsonReceived).section(';', 0, 0);
+
+        if(owner == "boot")
+        {
+            const QByteArray dataSerialize = jsonReceived.split(';')[1];
+            const QJsonDocument jsonData = QJsonDocument::fromJson(dataSerialize);
+
+            //Authentification
+            if((jsonData.object().contains("phase") == false) &&
+                    (jsonData.object().contains("uidGame") == true) &&
+                    (jsonData.object().contains("nameGame") == true) &&
+                    (jsonData.object().contains("namePlayer1") == true) &&
+                    (jsonData.object().contains("namePlayer2") == true))
+            {
+                unsigned int uidGame = static_cast<unsigned int>(jsonData["uidGame"].toInt());
+                const QString nameGame = jsonData["nameGame"].toString();
+                const QString namePlayer1 = jsonData["namePlayer1"].toString();
+                const QString namePlayer2 = jsonData["namePlayer2"].toString();
+                if(uidGame > 0)
+                    emit instanceAuthentified(m_socketDescriptor, uidGame, nameGame, namePlayer1, namePlayer2);
+                else
+                    qWarning() << __PRETTY_FUNCTION__ << "error during authentification of the instance: " << jsonReceived;
+            }
+            else
+            {
+                qCritical() << __PRETTY_FUNCTION__ << "data missing for initialization";
+            }
+        }
         else
-            qWarning() << __PRETTY_FUNCTION__ << "error during authentification of the instance: " << jsonReceived.toJson(QJsonDocument::Compact);
+        {
+            emit writeToClient(jsonReceived);
+        }
     }
-    else
-    {
-        emit messageReceived(jsonReceived);
-    }
+
+
 }
