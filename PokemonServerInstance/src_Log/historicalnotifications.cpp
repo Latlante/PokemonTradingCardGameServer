@@ -30,7 +30,7 @@ int HistoricalNotifications::count()
     return m_listNotifications.count();
 }
 
-QJsonObject HistoricalNotifications::buildJsonOwnerFrom(unsigned int index)
+QJsonObject HistoricalNotifications::buildJsonNotificationFrom(unsigned int index, const QString &namePlayer)
 {
     qDebug() << __PRETTY_FUNCTION__ << index << "/" << count();
 
@@ -42,26 +42,10 @@ QJsonObject HistoricalNotifications::buildJsonOwnerFrom(unsigned int index)
     {
         for(int i=index;i<m_listNotifications.count();++i)
         {
-            objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOwner();
-        }
-    }
-
-    return objToReturn;
-}
-
-QJsonObject HistoricalNotifications::buildJsonOthersFrom(unsigned int index)
-{
-    qDebug() << __PRETTY_FUNCTION__ << index << "/" << count();
-
-    QJsonObject objToReturn;
-    objToReturn["indexBegin"] = static_cast<int>(index);
-    objToReturn["indexEnd"] = m_listNotifications.count();
-
-    if(index < static_cast<unsigned int>(m_listNotifications.count()))
-    {
-        for(int i=index;i<m_listNotifications.count();++i)
-        {
-            objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOthers();
+            if(m_listNotifications[i]->namePlayer() == namePlayer)
+                objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOwner();
+            else
+                objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOthers();
         }
     }
 
