@@ -70,10 +70,10 @@ GameManager* GameManager::instance()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
-bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, unsigned int indexCardOrigin, unsigned int indexCardDestination)
+bool GameManager::moveACard(const unsigned int uidPlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination)
 {
     bool success = false;
-    Player* play = playerByName(namePlayer);
+    Player* play = playerByUid(uidPlayer);
 
     /*if((packetOrigin == Player::PCK_Bench) && (packetDestination == Player::PCK_Fight))
         success = play->moveCardFromBenchToFight(play->bench()->cardPok(indexCardOrigin));
@@ -108,7 +108,7 @@ bool GameManager::moveACard(const QString &namePlayer, Player::EnumPacket packet
             success = play->moveCardFromHandToFight(indexCardOrigin);
     }
     else
-        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "player (" + namePlayer + ") is nullptr");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "player (" + QString::number(uidPlayer) + ") is nullptr");
 
 
     return success;
@@ -164,6 +164,27 @@ Player* GameManager::playerByName(const QString &name)
     {
         Player* play = m_listPlayers[index];
         if((play != nullptr) && (play->name() == name))
+        {
+            playToReturn = play;
+        }
+        else
+        {
+            index++;
+        }
+    }
+
+    return playToReturn;
+}
+
+Player* GameManager::playerByUid(const unsigned int uid)
+{
+    Player* playToReturn = nullptr;
+    int index = 0;
+
+    while((playToReturn == nullptr) && (index < m_listPlayers.count()))
+    {
+        Player* play = m_listPlayers[index];
+        if((play != nullptr) && (play->uid() == uid))
         {
             playToReturn = play;
         }

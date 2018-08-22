@@ -23,7 +23,7 @@ public:
     static void deleteInstance();
     static GameManager* instance();
 	
-    bool moveACard(const QString& namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, unsigned int indexCardOrigin = 0, unsigned int indexCardDestination = 0);
+    bool moveACard(const unsigned int uidPlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin = 0, int indexCardDestination = 0);
 
     //Accesseurs
     QList<Player*> listOfPlayers();
@@ -31,6 +31,7 @@ public:
     Player* playerAttacked();
     Player* playerAt(int index);
     Player* playerByName(const QString& name);
+    Player* playerByUid(const unsigned int uid);
     Player* enemyOf(Player* play);
     ConstantesQML::StepGame gameStatus();
     void setGameStatus(ConstantesQML::StepGame step);

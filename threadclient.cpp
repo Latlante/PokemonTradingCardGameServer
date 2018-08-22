@@ -232,7 +232,7 @@ void ThreadClient::executeRequest(const QJsonDocument &jsonReceived)
 
                 //add name player in json
                 QJsonObject objectReceived = jsonReceived.object();
-                objectReceived["namePlayer"] = m_user;
+                objectReceived["uidPlayer"] = static_cast<int>(m_uid);
 
                 //remove data useless
                 objectReceived.remove("token");

@@ -47,12 +47,12 @@ private:
     HistoricalNotifications m_historicNotif;
     //Log m_log;
 
-    QJsonObject getAllInfoOnTheGame(const QString& namePlayer);
-    QJsonObject selectCardPerPlayer(const QString& namePlayer, QJsonArray tabCards);
-    QJsonObject moveACard(const QString& namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination);
-    QJsonObject setInitReadyForAPlayer(const QString& namePlayer);
-    QJsonObject attack_retreat(const QString& namePlayer, unsigned short indexAttack);
-    QJsonObject skipTurn(const QString& namePlayer);
+    QJsonObject getAllInfoOnTheGame(const unsigned int uidPlayer);
+    QJsonObject selectCardPerPlayer(const unsigned int uidPlayer, QJsonArray tabCards);
+    QJsonObject moveACard(const unsigned int uidPlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination);
+    QJsonObject setInitReadyForAPlayer(const unsigned int uidPlayer);
+    QJsonObject attack_retreat(const unsigned int uidPlayer, unsigned short indexAttack);
+    QJsonObject skipTurn(const unsigned int uidPlayer);
 
     void sendNotifPlayerIsReady();
     void sendNotifEndOfTurn(const QString& oldPlayer, const QString& newPlayer);

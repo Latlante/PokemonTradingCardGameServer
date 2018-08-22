@@ -59,7 +59,7 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     m_gameManager->setNumberMaxOfPlayers(2);
 
     Log::instance()->write("Creation of the game");
-    Log::instance()->write("Players: " + uidPlayer1 + " versus " + namePlayer1);
+    Log::instance()->write("Players: " + namePlayer1 + " versus " + namePlayer2);
 
     m_gameManager->addNewPlayer(uidPlayer1, uidPlayer1.toUInt());
     m_gameManager->addNewPlayer(namePlayer1, uidPlayer2.toUInt());
@@ -95,6 +95,7 @@ void Controller::onMessageReceived_Communication(QByteArray message)
         QJsonObject jsonResponseOwner;
         unsigned int readPoint = m_historicNotif.readPoint();
         QJsonValue valuePhase = jsonReceived["phase"];
+        unsigned int uidPlayer = static_cast<unsigned int>(jsonReceived["uidPlayer"].toInt(0));
 
         if(!valuePhase.isNull())
         {
@@ -104,19 +105,19 @@ void Controller::onMessageReceived_Communication(QByteArray message)
             switch(static_cast<ConstantesShared::GamePhase>(phase))
             {
             case ConstantesShared::PHASE_GetAllInfoOnGame:
-                jsonResponseOwner = getAllInfoOnTheGame(jsonReceived["namePlayer"].toString());
+                jsonResponseOwner = getAllInfoOnTheGame(uidPlayer);
                 break;
             case ConstantesShared::PHASE_SelectCards:
-                jsonResponseOwner = selectCardPerPlayer(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = selectCardPerPlayer(uidPlayer,
                                                    jsonReceived["cards"].toArray());
                 break;
 
             case ConstantesShared::PHASE_InitReady:
-                jsonResponseOwner = setInitReadyForAPlayer(jsonReceived["namePlayer"].toString());
+                jsonResponseOwner = setInitReadyForAPlayer(uidPlayer);
                 break;
 
             case ConstantesShared::PHASE_MoveACard:
-                jsonResponseOwner = moveACard(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = moveACard(uidPlayer,
                                          static_cast<Player::EnumPacket>(jsonReceived["idPacketOrigin"].toInt()),
                                          static_cast<Player::EnumPacket>(jsonReceived["idPacketDestination"].toInt()),
                                          jsonReceived["idCardOrigin"].toInt(),
@@ -124,12 +125,12 @@ void Controller::onMessageReceived_Communication(QByteArray message)
                 break;
 
             case ConstantesShared::PHASE_Attack_Retreat:
-                jsonResponseOwner = attack_retreat(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = attack_retreat(uidPlayer,
                                                    jsonReceived["indexAttack"].toInt());
                 break;
 
             case ConstantesShared::PHASE_SkipTheTurn:
-                jsonResponseOwner = skipTurn(jsonReceived["namePlayer"].toString());
+                jsonResponseOwner = skipTurn(uidPlayer);
                 break;
 
             default:
@@ -155,13 +156,13 @@ void Controller::onMessageReceived_Communication(QByteArray message)
             QJsonObject objOwner = m_historicNotif.buildJsonOwnerFrom(readPoint);
             jsonResponseOwner["actions"] = objOwner;
 
-            m_communication->write(jsonReceived["namePlayer"].toString().toLatin1() + ";" +
+            m_communication->write(QString::number(uidPlayer).toLatin1() + ";" +
                                     QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact) + ";" +
                                     QJsonDocument(m_historicNotif.buildJsonOthersFrom(readPoint)).toJson(QJsonDocument::Compact));
         }
         else
         {
-            m_communication->write(jsonReceived["namePlayer"].toString().toLatin1() + ";" +
+            m_communication->write(QString::number(uidPlayer).toLatin1() + ";" +
                                     QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact));
         }
     }
@@ -261,10 +262,10 @@ void Controller::onDisplayPacketAsked(AbstractPacket *packet, unsigned short qua
 /************************************************************
 *****               FONCTIONS PRIVEES					*****
 ************************************************************/
-QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
+QJsonObject Controller::getAllInfoOnTheGame(const unsigned int uidPlayer)
 {
     QJsonObject jsonResponse;
-    Player* playerYou = m_gameManager->playerByName(namePlayer);
+    Player* playerYou = m_gameManager->playerByUid(uidPlayer);
 
     if(m_gameManager->gameStatus() == ConstantesQML::StepPreparation)
     {
@@ -540,13 +541,13 @@ QJsonObject Controller::getAllInfoOnTheGame(const QString &namePlayer)
     return jsonResponse;
 }
 
-QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArray tabCards)
+QJsonObject Controller::selectCardPerPlayer(const unsigned int uidPlayer, QJsonArray tabCards)
 {
     QJsonObject jsonResponse;
     QList<AbstractCard*> listCards;
     Database db;
 
-    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", namePlayer=" + namePlayer + ", tabCards.count=" + QString::number(tabCards.count()));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", uidPlayer=" + QString::number(uidPlayer) + ", tabCards.count=" + QString::number(tabCards.count()));
 
     //Fill the packet
     for(int indexTabCards=0;indexTabCards<tabCards.count();++indexTabCards)
@@ -572,13 +573,13 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
                 }
                 else
                 {
-                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": id unknown (" + QString::number(idCard) + ")");
+                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + QString::number(uidPlayer) + ": id unknown (" + QString::number(idCard) + ")");
                 }
             }
         }
         else
         {
-            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": valueCard is not an jsonObject");
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + QString::number(uidPlayer) + ": valueCard is not an jsonObject");
         }
     }
 
@@ -587,17 +588,17 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
     {
         jsonResponse["success"] = "ko";
         jsonResponse["error"] = "No enough card in packet";
-        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough card in packet");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + QString::number(uidPlayer) + ": No enough card in packet");
     }
     else if(listCards.count() > MAXCARDS_DECK)
     {
         jsonResponse["success"] = "ko";
         jsonResponse["error"] = "Too many cards in packet";
-        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": Too many cards in packet");
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + QString::number(uidPlayer) + ": Too many cards in packet");
     }
     else
     {
-        Player* play = m_gameManager->playerByName(namePlayer);
+        Player* play = m_gameManager->playerByUid(uidPlayer);
 
         if(play != nullptr)
         {
@@ -607,7 +608,7 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
                 jsonResponse["success"] = "ok";
                 jsonResponse["deck"] = MAXCARDS_DECK;
                 jsonResponse["rewards"] = MAXCARDS_REWARD;
-                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", " + namePlayer + " created");
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", " + QString::number(uidPlayer) + " created");
             }
             else
             {
@@ -615,27 +616,27 @@ QJsonObject Controller::selectCardPerPlayer(const QString &namePlayer, QJsonArra
 
                 jsonResponse["success"] = "ko";
 ;                jsonResponse["error"] = "No enough base to play";
-                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": No enough base to play");
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + QString::number(uidPlayer) + ": No enough base to play");
             }
         }
         else
         {
             jsonResponse["success"] = "ko";
-            jsonResponse["error"] = "Player " + namePlayer + " is nullptr";
-            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + namePlayer + ": player is nullptr");
+            jsonResponse["error"] = "Player " + QString::number(uidPlayer) + " is nullptr";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error for " + QString::number(uidPlayer) + ": player is nullptr");
         }
     }
 
     return jsonResponse;
 }
 
-QJsonObject Controller::moveACard(const QString &namePlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination)
+QJsonObject Controller::moveACard(const unsigned int uidPlayer, Player::EnumPacket packetOrigin, Player::EnumPacket packetDestination, int indexCardOrigin, int indexCardDestination)
 {
     QJsonObject jsonResponse;
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
 
-    if(m_gameManager->moveACard(namePlayer, packetOrigin, packetDestination, indexCardOrigin, indexCardDestination))
+    if(m_gameManager->moveACard(uidPlayer, packetOrigin, packetDestination, indexCardOrigin, indexCardDestination))
     {
         jsonResponse["success"] = "ok";
     }
@@ -648,10 +649,10 @@ QJsonObject Controller::moveACard(const QString &namePlayer, Player::EnumPacket 
     return jsonResponse;
 }
 
-QJsonObject Controller::setInitReadyForAPlayer(const QString &namePlayer)
+QJsonObject Controller::setInitReadyForAPlayer(const unsigned int uidPlayer)
 {
     QJsonObject jsonResponse;
-    Player* playerReady = m_gameManager->playerByName(namePlayer);
+    Player* playerReady = m_gameManager->playerByUid(uidPlayer);
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
 
@@ -678,10 +679,10 @@ QJsonObject Controller::setInitReadyForAPlayer(const QString &namePlayer)
     return jsonResponse;
 }
 
-QJsonObject Controller::attack_retreat(const QString &namePlayer, unsigned short indexAttack)
+QJsonObject Controller::attack_retreat(const unsigned int uidPlayer, unsigned short indexAttack)
 {
     QJsonObject jsonResponse;
-    Player* currentPlayer = m_gameManager->playerByName(namePlayer);
+    Player* currentPlayer = m_gameManager->playerByUid(uidPlayer);
 
     if(currentPlayer == m_gameManager->currentPlayer())
     {
@@ -753,10 +754,10 @@ QJsonObject Controller::attack_retreat(const QString &namePlayer, unsigned short
     return jsonResponse;
 }
 
-QJsonObject Controller::skipTurn(const QString &namePlayer)
+QJsonObject Controller::skipTurn(const unsigned int uidPlayer)
 {
     QJsonObject jsonResponse;
-    Player* currentPlayer = m_gameManager->playerByName(namePlayer);
+    Player* currentPlayer = m_gameManager->playerByUid(uidPlayer);
 
     if(currentPlayer == m_gameManager->currentPlayer())
     {
