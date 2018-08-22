@@ -2,6 +2,7 @@
 
 #include <QDebug>
 
+#include "authentification.h"
 #include "instancemanager.h"
 #include "tcpserverclients.h"
 #include "CommunicationInstance/tcpserverinstance.h"
@@ -60,11 +61,11 @@ void Gateway::onWriteToClient_serverInstances(unsigned int uidGame, QByteArray m
     qDebug() << __PRETTY_FUNCTION__ << uidGame << message;
     QList<QString> messageSplit = QString(message).split(";");
     QList<unsigned int> listUidPlayers = InstanceManager::instance()->listUidPlayersFromUidGame(uidGame);
-    unsigned int currentUidPlayer = messageSplit[0].toUInt();
+    const QString currentNamePlayer = messageSplit[0];
 
     foreach(unsigned int uidPlayer, listUidPlayers)
     {
-        if(uidPlayer == currentUidPlayer)
+        if(Authentification::namePlayerFromUid(uidPlayer) == currentNamePlayer)
             m_serverClients->newMessage(uidPlayer, messageSplit[1].toLatin1());
         else if(messageSplit.count() >= 2)
         {
