@@ -20,7 +20,7 @@
 #include "../Share/constantesshared.h"
 #include <QCoreApplication>
 
-Controller::Controller(const QString &uidGame, const QString &nameGame, const QString &player1, const QString &player2, QObject *parent) :
+Controller::Controller(const QString &uidGame, const QString &nameGame, const QString &uidPlayer1, const QString &namePlayer1, const QString &uidPlayer2, const QString &namePlayer2, QObject *parent) :
     QObject(parent),
     m_communication(new SocketToServer()),
     m_gameManager(GameManager::createInstance()),
@@ -35,8 +35,8 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
         requestBoot += "{";
         requestBoot += "\"uidGame\":" + uidGame.toLatin1() + ",";
         requestBoot += "\"nameGame\":\"" + nameGame + "\",";
-        requestBoot += "\"namePlayer1\":\"" + player1 + "\",";
-        requestBoot += "\"namePlayer2\":\"" + player2 + "\"";
+        requestBoot += "\"namePlayer1\":\"" + namePlayer1 + "\",";
+        requestBoot += "\"namePlayer2\":\"" + namePlayer2 + "\"";
         requestBoot += "}";
         m_communication->write(requestBoot.toLatin1());
 
@@ -59,10 +59,10 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     m_gameManager->setNumberMaxOfPlayers(2);
 
     Log::instance()->write("Creation of the game");
-    Log::instance()->write("Players: " + player1 + " versus " + player2);
+    Log::instance()->write("Players: " + uidPlayer1 + " versus " + namePlayer1);
 
-    m_gameManager->addNewPlayer(player1);
-    m_gameManager->addNewPlayer(player2);
+    m_gameManager->addNewPlayer(uidPlayer1, uidPlayer1.toUInt());
+    m_gameManager->addNewPlayer(namePlayer1, uidPlayer2.toUInt());
 }
 
 Controller::~Controller()

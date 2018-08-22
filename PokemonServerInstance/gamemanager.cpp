@@ -282,7 +282,7 @@ void GameManager::setNumberMaxOfPlayers(unsigned short max)
     m_numberMaxOfPlayers = max;
 }
 
-Player *GameManager::addNewPlayer(QString name)
+Player *GameManager::addNewPlayer(QString name, unsigned int uid)
 {
 #ifdef TRACAGE_PRECIS
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
@@ -303,7 +303,7 @@ Player *GameManager::addNewPlayer(QString name)
 
     if((m_listPlayers.count() < numberMaxOfPlayers()) && (playerFound == false))
     {
-        newPlayer = new Player(name);
+        newPlayer = new Player(name, uid);
 
         connect(newPlayer, &Player::endOfTurn, this, &GameManager::onEndOfTurn_Player);
         connect(newPlayer, &Player::cardMoved, this ,&GameManager::cardMoved);

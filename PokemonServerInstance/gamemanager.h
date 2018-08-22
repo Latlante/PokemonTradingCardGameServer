@@ -39,7 +39,7 @@ public:
     bool initGame();
     unsigned short numberMaxOfPlayers();
     void setNumberMaxOfPlayers(unsigned short max);
-    Player* addNewPlayer(QString name);
+    Player* addNewPlayer(QString name, unsigned int uid);
     void removePlayer(Player* play);
     bool initPlayer(Player* play);
     void selectFirstPlayer();

@@ -18,8 +18,10 @@ class Controller : public QObject
 public:
     explicit Controller(const QString& uidGame,
                         const QString& nameGame,
-                        const QString& player1,
-                        const QString& player2,
+                        const QString& uidPlayer1,
+                        const QString& namePlayer1,
+                        const QString& uidPlayer2,
+                        const QString& namePlayer2,
                         QObject *parent = nullptr);
     ~Controller();
 

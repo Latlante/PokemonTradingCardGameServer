@@ -17,12 +17,12 @@ int main(int argc, char *argv[])
     for(int i=0;i<argc;++i)
         qDebug() << i << ": " << argv[i];*/
 
-    if((argc >= 5) && (QFile::exists("Resources/cards.rcc")))
+    if((argc >= 7) && (QFile::exists("Resources/cards.rcc")))
     {
         qDebug() << "OK";
         QResource::registerResource("Resources/cards.rcc");
 
-        Controller ctrl(argv[1], argv[2], argv[3], argv[4]);
+        Controller ctrl(argv[1], argv[2], argv[3], argv[4], argv[5], argv[5]);
         return a.exec();
     }
     else

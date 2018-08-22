@@ -15,9 +15,10 @@
 #include "src_Packets/packettrash.h"
 #include "../Share/constantesshared.h"
 
-Player::Player(QString name, QObject *parent) :
+Player::Player(QString name, unsigned int uid, QObject *parent) :
 	QObject(parent),
     m_name(name),
+    m_uid(uid),
     m_bench(new BenchArea(NAME_BENCH)),
     m_deck(new PacketDeck(NAME_DECK)),
     m_fight(new FightArea(NAME_FIGHT)),
@@ -51,6 +52,11 @@ Player::~Player()
 const QString Player::name()
 {
     return m_name;
+}
+
+unsigned int Player::uid()
+{
+    return m_uid;
 }
 
 BenchArea* Player::bench()

@@ -35,9 +35,10 @@ public:
         PCK_Trash
     };
 
-    Player(QString name, QObject *parent = NULL);
+    Player(QString name, unsigned int uid, QObject *parent = NULL);
 	~Player();
 	
+    unsigned int uid();
     const QString name();
     BenchArea* bench();
     PacketDeck* deck();
@@ -97,6 +98,7 @@ private slots:
 
 private:
 	QString m_name;
+    unsigned int m_uid;
 
     BenchArea* m_bench;
 	PacketDeck* m_deck;
