@@ -93,7 +93,6 @@ void ThreadInstance::onDisconnected_TcpSocket()
     qDebug() << __PRETTY_FUNCTION__;
     emit instanceDisconnected(m_socketDescriptor);
 
-    delete m_timerWritting;
     m_tcpSocket->deleteLater();
     exit(0);
 }

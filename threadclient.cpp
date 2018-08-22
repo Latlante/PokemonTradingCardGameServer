@@ -43,7 +43,7 @@ ThreadClient::~ThreadClient()
 ************************************************************/
 void ThreadClient::newMessage(QByteArray message)
 {
-    if(message.length() > 0)
+    if((message.length() > 0) && (m_tcpSocket != nullptr))
         m_listMessageToSend.append(message);
 }
 
@@ -124,7 +124,6 @@ void ThreadClient::onDisconnected_TcpSocket()
     qDebug() << m_user << __PRETTY_FUNCTION__;
     emit userDisconnected(m_socketDescriptor);
 
-    delete m_timerWritting;
     m_tcpSocket->deleteLater();
     exit(0);
 }
