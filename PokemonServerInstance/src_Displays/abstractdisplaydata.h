@@ -11,7 +11,7 @@ class AbstractDisplayData : public QObject
 {
     Q_OBJECT
 public:
-    explicit AbstractDisplayData(QObject *parent = nullptr);
+    explicit AbstractDisplayData(const QString &namePlayer);
     virtual ~AbstractDisplayData();
 
     bool success();
@@ -23,6 +23,7 @@ public:
     virtual QJsonObject messageResultToClient() = 0;
 
 protected:
+    QString m_namePlayer;
     bool m_success;
     QString m_error;
     QVariant m_argument;

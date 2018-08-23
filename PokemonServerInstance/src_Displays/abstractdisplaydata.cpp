@@ -1,7 +1,8 @@
 #include "abstractdisplaydata.h"
 
-AbstractDisplayData::AbstractDisplayData(QObject *parent) :
-    QObject(parent),
+AbstractDisplayData::AbstractDisplayData(const QString &namePlayer) :
+    QObject(),
+    m_namePlayer(namePlayer),
     m_success(false),
     m_error("")
 {

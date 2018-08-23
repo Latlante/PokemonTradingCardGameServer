@@ -30,7 +30,9 @@ public:
         PHASE_NotifEnergyRemoved,
 
         PHASE_NotifDisplayPacket = 120,
-        PHASE_DisplayPacketResponse
+        PHASE_DisplayPacketResponse,
+        PHASE_NotifDisplayHiddenPacket = 122,
+        PHASE_DisplayHiddenPacketResponse
     };
 
     enum EnumPacket

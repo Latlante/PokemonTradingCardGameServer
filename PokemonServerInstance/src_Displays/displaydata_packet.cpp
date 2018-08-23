@@ -5,8 +5,7 @@
 #include "../Share/constantesshared.h"
 
 DisplayData_Packet::DisplayData_Packet(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard) :
-    AbstractDisplayData (),
-    m_namePlayer(namePlayer),
+    AbstractDisplayData (namePlayer),
     m_packet(packet),
     m_quantity(quantity),
     m_typeOfCard(typeOfCard)

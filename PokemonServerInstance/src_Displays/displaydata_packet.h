@@ -17,7 +17,6 @@ public:
     virtual QJsonObject messageResultToClient() override;
 
 private:
-    QString m_namePlayer;
     AbstractPacket* m_packet;
     unsigned short m_quantity;
     AbstractCard::Enum_typeOfCard m_typeOfCard;

@@ -11,6 +11,7 @@
 #include "common/utils.h"
 #include "src_Communication/sockettoserver.h"
 #include "src_Displays/displaydata_packet.h"
+#include "src_Displays/displaydata_hiddenpacket.h"
 #include "src_Models/modellistenergies.h"
 #include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
@@ -57,6 +58,7 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     connect(m_gameManager, &GameManager::energyRemoved, this, &Controller::onEnergyRemoved_GameManager);
 
     connect(m_gameManager, &GameManager::displayPacketAsked, this, &Controller::onDisplayPacketAsked);
+    connect(m_gameManager, &GameManager::displaySelectHiddenCardAsked, this, &Controller::onDisplayHiddenPacketAsked);
 
     m_gameManager->setNumberMaxOfPlayers(2);
 
@@ -141,6 +143,7 @@ void Controller::onMessageReceived_Communication(QByteArray message)
                 break;
 
             case ConstantesShared::PHASE_DisplayPacketResponse:
+            case ConstantesShared::PHASE_DisplayHiddenPacketResponse:
                 jsonResponseOwner = displayPacketResponse(jsonReceived);
                 break;
 
@@ -231,6 +234,19 @@ void Controller::onDisplayPacketAsked(const QString &namePlayer, AbstractPacket 
 #endif
 
     m_displayData = new DisplayData_Packet(namePlayer, packet, quantity, typeOfCard);
+    QJsonDocument docToSend = m_displayData->messageInfoToClient();
+
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
+    m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+}
+
+void Controller::onDisplayHiddenPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity)
+{
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + namePlayer + " " + QString::number(quantity));
+#endif
+
+    m_displayData = new DisplayData_HiddenPacket(namePlayer, packet, quantity);
     QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));

@@ -643,7 +643,7 @@ QList<AbstractCard *> GameManager::displaySelectHiddenCard(PacketRewards *packet
 
     return {rewards->card(0)};
 #else
-    emit displaySelectHiddenCardAsked(packet, quantity);
+    emit displaySelectHiddenCardAsked(currentPlayer()->name(), packet, quantity);
 
     return m_elementFromDisplays.value<QList<AbstractCard*> >();
 #endif
