@@ -661,7 +661,7 @@ QList<CardEnergy*> GameManager::displayEnergiesForAPokemon(CardPokemon* pokemon,
     Q_UNUSED(element)
     return {pokemon->modelListOfEnergies()->energy(0)};
 #else
-    emit displayEnergiesForAPokemonAsked(pokemon, quantity, element);
+    /*emit displayEnergiesForAPokemonAsked(pokemon, quantity, element);
 
     QList<CardEnergy*> listEnergies;
     QList<AbstractCard *> listSelectionCards = m_elementFromDisplays.value<QList<AbstractCard *> >();
@@ -671,6 +671,22 @@ QList<CardEnergy*> GameManager::displayEnergiesForAPokemon(CardPokemon* pokemon,
         if(abCard->type() == AbstractCard::TypeOfCard_Energy)
         {
             listEnergies.append(static_cast<CardEnergy*>(abCard));
+        }
+    }*/
+
+    QList<CardEnergy*> listEnergies;
+
+    if(pokemon != nullptr)
+    {
+        int indexLoop = 0;
+        ModelListEnergies* modelEnergies = pokemon->modelListOfEnergies();
+        while((indexLoop < modelEnergies->countCard()) && (listEnergies.count() < quantity))
+        {
+            CardEnergy* energy = modelEnergies->energy(indexLoop);
+            if(energy->element() == element)
+                listEnergies.append(energy);
+
+            indexLoop++;
         }
     }
 
