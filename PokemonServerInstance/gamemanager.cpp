@@ -45,7 +45,7 @@ GameManager::~GameManager()
 ************************************************************/
 GameManager* GameManager::createInstance()
 {
-    if(m_instance == NULL)
+    if(m_instance == nullptr)
     {
         m_instance = new GameManager();
     }
@@ -55,10 +55,10 @@ GameManager* GameManager::createInstance()
 
 void GameManager::deleteInstance()
 {
-    if(m_instance != NULL)
+    if(m_instance != nullptr)
     {
         delete m_instance;
-        m_instance = NULL;
+        m_instance = nullptr;
     }
 }
 
@@ -591,7 +591,7 @@ QList<AbstractCard *> GameManager::displayPacket(AbstractPacket *packet, unsigne
 
     return {packet->card(0)};
 #else
-    emit displayPacketAsked(packet, quantity, typeOfCard);
+    emit displayPacketAsked(currentPlayer()->name(), packet, quantity, typeOfCard);
 
     QEventLoop loop;
     connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);

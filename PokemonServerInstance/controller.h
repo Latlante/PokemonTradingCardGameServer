@@ -9,6 +9,7 @@
 #include "src_Log/historicalnotifications.h"
 #include "src_Log/log.h"
 
+class AbstractDisplayData;
 class GameManager;
 class SocketToServer;
 
@@ -37,13 +38,13 @@ private slots:
     void onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy);
     void onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy);
 
-    void onDisplayPacketAsked(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
+    void onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
 
 private:
     SocketToServer* m_communication;
     GameManager* m_gameManager;
     HistoricalNotifications m_historicNotif;
-    //Log m_log;
+    AbstractDisplayData *m_displayData;
 
     QJsonObject getAllInfoOnTheGame(const QString& namePlayer);
     QJsonObject selectCardPerPlayer(const QString& namePlayer, QJsonArray tabCards);
@@ -51,6 +52,8 @@ private:
     QJsonObject setInitReadyForAPlayer(const QString& namePlayer);
     QJsonObject attack_retreat(const QString& namePlayer, unsigned short indexAttack);
     QJsonObject skipTurn(const QString& namePlayer);
+
+    QJsonObject displayPacketResponse(const QJsonDocument &document);
 
     void sendNotifPlayerIsReady();
     void sendNotifEndOfTurn(const QString& oldPlayer, const QString& newPlayer);

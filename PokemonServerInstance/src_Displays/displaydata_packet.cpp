@@ -9,9 +9,7 @@ DisplayData_Packet::DisplayData_Packet(const QString &namePlayer, AbstractPacket
     m_namePlayer(namePlayer),
     m_packet(packet),
     m_quantity(quantity),
-    m_typeOfCard(typeOfCard),
-    m_success(false),
-    m_error("")
+    m_typeOfCard(typeOfCard)
 {
 
 }
@@ -57,20 +55,19 @@ QJsonDocument DisplayData_Packet::messageInfoToClient()
     return docToReturn;
 }
 
-bool DisplayData_Packet::messageResponseFromClient(QByteArray message)
+bool DisplayData_Packet::messageResponseFromClient(const QJsonDocument &document)
 {
-    QJsonParseError errorJson;
-    QJsonDocument docJson = QJsonDocument::fromJson(message, &errorJson);
-
-    if(errorJson.error == QJsonParseError::NoError)
+    if(document.isObject())
     {
-        QJsonObject objJson = docJson.object();
+        QJsonObject objJson = document.object();
         if(objJson.contains("indexPacket"))
         {
             QJsonArray arrayIndexPacket = objJson["indexPacket"].toArray();
             if(arrayIndexPacket.count() >= m_quantity)
             {
+                QList<AbstractCard*> listCards;
                 bool hasAllGoodTypeOfCard = true;
+                //Check each card
                 for(int i=0;i<arrayIndexPacket.count();++i)
                 {
                     AbstractCard* card = m_packet->card(arrayIndexPacket[i].toInt());
@@ -79,7 +76,9 @@ bool DisplayData_Packet::messageResponseFromClient(QByteArray message)
                     {
                         bool hasGoodTypeOfCard = (card->type() == m_typeOfCard) || (card->type() == AbstractCard::TypeOfCard_Whatever);
 
-                        if(hasGoodTypeOfCard == false)
+                        if(hasGoodTypeOfCard == true)
+                            listCards.append(card);
+                        else
                             m_error += "index " + QString::number(arrayIndexPacket[i].toInt()) + " has not the good type in the packet " + m_packet->name() + ". ";
 
                         hasAllGoodTypeOfCard &= hasGoodTypeOfCard;
@@ -88,10 +87,13 @@ bool DisplayData_Packet::messageResponseFromClient(QByteArray message)
                         m_error += "index " + QString::number(arrayIndexPacket[i].toInt()) + " is not in the packet " + m_packet->name() + ". ";
                 }
 
-                if(hasAllGoodTypeOfCard == true)
+                if((hasAllGoodTypeOfCard == true) && (listCards.count() >= m_quantity))
                 {
+                    m_argument = QVariant::fromValue(listCards);
                     m_success = true;
                 }
+                else
+                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error " + QString::number(hasAllGoodTypeOfCard) + ", " + QString::number(listCards.count()));
             }
             else
                 m_error = "array \"indexPacket\" does not contain enough card " + QString::number(arrayIndexPacket.count()) + "/" + QString::number(m_quantity);
@@ -100,12 +102,12 @@ bool DisplayData_Packet::messageResponseFromClient(QByteArray message)
             m_error = "data \"indexPacket\" is missing";
     }
     else
-        m_error = errorJson.errorString();
+        m_error = "document json is not an object";
 
     return m_success;
 }
 
-QJsonDocument DisplayData_Packet::messageResultToClient()
+QJsonObject DisplayData_Packet::messageResultToClient()
 {
     QJsonObject jsonToReturn;
 
@@ -119,5 +121,5 @@ QJsonDocument DisplayData_Packet::messageResultToClient()
         jsonToReturn["error"] = m_error;
     }
 
-    return QJsonDocument(jsonToReturn);
+    return jsonToReturn;
 }

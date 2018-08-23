@@ -12,18 +12,15 @@ class DisplayData_Packet : public AbstractDisplayData
 public:
     DisplayData_Packet(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
 
-    virtual QJsonDocument messageInfoToClient();
-    virtual bool messageResponseFromClient(QByteArray message);
-    virtual QJsonDocument messageResultToClient();
+    virtual QJsonDocument messageInfoToClient() override;
+    virtual bool messageResponseFromClient(const QJsonDocument &document) override;
+    virtual QJsonObject messageResultToClient() override;
 
 private:
     QString m_namePlayer;
     AbstractPacket* m_packet;
     unsigned short m_quantity;
     AbstractCard::Enum_typeOfCard m_typeOfCard;
-
-    bool m_success;
-    QString m_error;
 };
 
 #endif // DISPLAYDATA_PACKET_H

@@ -74,7 +74,7 @@ signals:
     void gameStatusChanged();
     void replacePokemonFighter(Player*);
 
-    void displayPacketAsked(AbstractPacket*, unsigned short, AbstractCard::Enum_typeOfCard);
+    void displayPacketAsked(const QString&,AbstractPacket*, unsigned short, AbstractCard::Enum_typeOfCard);
     void displayAllElementsAsked(unsigned short);
     void displaySelectHiddenCardAsked(PacketRewards *, unsigned short);
     void displayEnergiesForAPokemonAsked(CardPokemon*, unsigned short, AbstractCard::Enum_element);

@@ -10,6 +10,7 @@
 #include "common/database.h"
 #include "common/utils.h"
 #include "src_Communication/sockettoserver.h"
+#include "src_Displays/displaydata_packet.h"
 #include "src_Models/modellistenergies.h"
 #include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
@@ -24,7 +25,8 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     QObject(parent),
     m_communication(new SocketToServer()),
     m_gameManager(GameManager::createInstance()),
-    m_historicNotif(HistoricalNotifications())
+    m_historicNotif(HistoricalNotifications()),
+    m_displayData(nullptr)
 {
     qDebug() << "Constructeur Controller";
     Log::createInstance(nameGame);
@@ -69,6 +71,12 @@ Controller::~Controller()
 {
     Log::instance()->write("Destructeur Controller");
     qDebug() << "Destructeur Controller";
+
+    if(m_displayData != nullptr)
+    {
+        delete m_displayData;
+        m_displayData = nullptr;
+    }
 
     delete m_communication;
     GameManager::deleteInstance();
@@ -130,6 +138,10 @@ void Controller::onMessageReceived_Communication(QByteArray message)
 
             case ConstantesShared::PHASE_SkipTheTurn:
                 jsonResponseOwner = skipTurn(jsonReceived["namePlayer"].toString());
+                break;
+
+            case ConstantesShared::PHASE_DisplayPacketResponse:
+                jsonResponseOwner = displayPacketResponse(jsonReceived);
                 break;
 
             default:
@@ -212,50 +224,17 @@ void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, Constant
     sendNotifEnergyRemoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, indexEnergy);
 }
 
-void Controller::onDisplayPacketAsked(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
+void Controller::onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
 {
-    QJsonObject jsonDisplay;
-    jsonDisplay["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDisplayPacket);
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + namePlayer + " " + QString::number(quantity) + " " + QString::number(typeOfCard));
+#endif
 
-    QJsonArray arrayCards;
-    for(int i=0;i<packet->countCard();++i)
-    {
-        QJsonObject objCard;
-        AbstractCard* abCard = packet->card(i);
+    m_displayData = new DisplayData_Packet(namePlayer, packet, quantity, typeOfCard);
+    QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
-        if(abCard != nullptr)
-        {
-            objCard["idCard"] = abCard->id();
-            objCard["indexPacket"] = i;
-        }
-        else
-            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "abCard is nullptr");
-    }
-
-    /*Player* playerReady = m_gameManager->playerByName(namePlayer);
-
-    m_log.write(QString(__PRETTY_FUNCTION__));
-
-    if(playerReady != nullptr)
-    {
-        m_gameManager->setInitReady(playerReady);
-        if(playerReady->initReady())
-        {
-            jsonResponse["success"] = "ok";
-            sendNotifPlayerIsReady();
-        }
-        else
-        {
-            jsonResponse["success"] = "ko";
-            jsonResponse["error"] = "error, no pokemon in fight area";
-        }
-    }
-    else
-    {
-        jsonResponse["success"] = "ko";
-        jsonResponse["error"] = "error, name of player not found";
-    }*/
-
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
+    m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
 }
 
 /************************************************************
@@ -767,6 +746,41 @@ QJsonObject Controller::skipTurn(const QString &namePlayer)
     {
         jsonResponse["success"] = "ko";
         jsonResponse["error"] = "not your turn";
+    }
+
+    return jsonResponse;
+}
+
+QJsonObject Controller::displayPacketResponse(const QJsonDocument &document)
+{
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
+#endif
+
+    QJsonObject jsonResponse;
+    if(m_displayData != nullptr)
+    {
+        //Check data
+        if(m_displayData->messageResponseFromClient(document) == true)
+        {
+            m_gameManager->endOfSelectionDisplay(m_displayData->argument());
+        }
+        else
+        {
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", the document is incorrect");
+        }
+
+        //Send the result to the client whatever is the result
+        jsonResponse = m_displayData->messageResultToClient();
+
+        //Finish with the display, wa can delete it
+        delete m_displayData;
+        m_displayData = nullptr;
+    }
+    else
+    {
+        jsonResponse["success"] = "ko";
+        jsonResponse["error"] = "no display awaiting";
     }
 
     return jsonResponse;
