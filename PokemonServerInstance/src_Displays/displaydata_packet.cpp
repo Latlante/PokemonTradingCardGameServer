@@ -24,6 +24,7 @@ QJsonDocument DisplayData_Packet::messageInfoToClient()
     {
         QJsonObject jsonDisplay;
         jsonDisplay["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDisplayPacket);
+        jsonDisplay["quantity"] = static_cast<short>(m_quantity);
 
         QJsonArray arrayCards;
         for(int i=0;i<m_packet->countCard();++i)

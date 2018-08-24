@@ -22,6 +22,7 @@ QJsonDocument DisplayData_HiddenPacket::messageInfoToClient()
 
     jsonToReturn["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDisplayHiddenPacket);
     jsonToReturn["numberOfCards"] = m_packet->countCard();
+    jsonToReturn["quantity"] = static_cast<short>(m_quantity);
 
     return QJsonDocument(jsonToReturn);
 }
