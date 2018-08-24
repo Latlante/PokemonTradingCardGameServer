@@ -77,7 +77,7 @@ bool DisplayData_AllElements::messageResponseFromClient(const QJsonDocument &doc
                 m_error = "array \"elements\" does not contain enough energies " + QString::number(arrayIdsElements.count()) + "/" + QString::number(m_quantity);
         }
         else
-            m_error = "data \"indexPacket\" is missing";
+            m_error = "data \"elements\" is missing";
     }
     else
         m_error = "document json is not an object";

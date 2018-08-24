@@ -701,7 +701,7 @@ int GameManager::displayAttacks(CardPokemon* card, bool blockRetreat)
     if(blockRetreat == false)
         authorizeRetreat = card->canRetreat();
 
-    emit displayAttacksAsked(card, authorizeRetreat);
+    emit displayAttacksAsked(currentPlayer()->name(), card, authorizeRetreat);
 
     qDebug() << __PRETTY_FUNCTION__ << m_elementFromDisplays.toInt();
 

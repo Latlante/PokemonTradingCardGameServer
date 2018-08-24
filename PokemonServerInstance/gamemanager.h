@@ -78,7 +78,7 @@ signals:
     void displayAllElementsAsked(const QString&,unsigned short);
     void displaySelectHiddenCardAsked(const QString&,AbstractPacket*, unsigned short);
     void displayEnergiesForAPokemonAsked(CardPokemon*, unsigned short, AbstractCard::Enum_element);
-    void displayAttacksAsked(CardPokemon*, bool);
+    void displayAttacksAsked(const QString&,CardPokemon*, bool);
     void displayMessageAsked(QString);
     void headOrTailAsked();
     void selectionDisplayFinished();

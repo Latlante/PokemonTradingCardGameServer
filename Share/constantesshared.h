@@ -34,7 +34,9 @@ public:
         PHASE_NotifDisplayAllElements = 122,
         PHASE_DisplayAllElementsResponse,
         PHASE_NotifDisplayHiddenPacket = 124,
-        PHASE_DisplayHiddenPacketResponse
+        PHASE_DisplayHiddenPacketResponse,
+        PHASE_NotifDisplayAttacksPokemon = 128,
+        PHASE_DisplayAttakcsPokemonResponse
     };
 
     enum EnumPacket

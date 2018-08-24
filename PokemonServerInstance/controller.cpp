@@ -11,6 +11,7 @@
 #include "common/utils.h"
 #include "src_Communication/sockettoserver.h"
 #include "src_Displays/displaydata_allelements.h"
+#include "src_Displays/displaydata_attackspokemon.h"
 #include "src_Displays/displaydata_packet.h"
 #include "src_Displays/displaydata_hiddenpacket.h"
 #include "src_Models/modellistenergies.h"
@@ -61,6 +62,7 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     connect(m_gameManager, &GameManager::displayPacketAsked, this, &Controller::onDisplayPacketAsked);
     connect(m_gameManager, &GameManager::displayAllElementsAsked, this, &Controller::onDisplayAllElementsAsked);
     connect(m_gameManager, &GameManager::displaySelectHiddenCardAsked, this, &Controller::onDisplayHiddenPacketAsked);
+    connect(m_gameManager, &GameManager::displayAttacksAsked, this, &Controller::onDisplayAttacksAsked);
 
     m_gameManager->setNumberMaxOfPlayers(2);
 
@@ -147,6 +149,7 @@ void Controller::onMessageReceived_Communication(QByteArray message)
             case ConstantesShared::PHASE_DisplayPacketResponse:
             case ConstantesShared::PHASE_DisplayAllElementsResponse:
             case ConstantesShared::PHASE_DisplayHiddenPacketResponse:
+            case ConstantesShared::PHASE_DisplayAttakcsPokemonResponse:
                 jsonResponseOwner = displayPacketResponse(jsonReceived);
                 break;
 
@@ -267,6 +270,24 @@ void Controller::onDisplayHiddenPacketAsked(const QString &namePlayer, AbstractP
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
     m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+}
+
+void Controller::onDisplayAttacksAsked(const QString& namePlayer, CardPokemon* pokemon, bool retreatEnable)
+{
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + namePlayer + " " + QString::number(retreatEnable));
+#endif
+
+    if(pokemon != nullptr)
+    {
+        m_displayData = new DisplayData_AttacksPokemon(namePlayer, pokemon->id(), retreatEnable);
+        QJsonDocument docToSend = m_displayData->messageInfoToClient();
+
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
+        m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+    }
+    else
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + namePlayer + ", pokemon is nullptr");
 }
 
 /************************************************************
