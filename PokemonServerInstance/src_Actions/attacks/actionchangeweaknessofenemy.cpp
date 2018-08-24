@@ -1,6 +1,7 @@
 #include "actionchangeweaknessofenemy.h"
 
 #include "src_Cards/cardenergy.h"
+#include "src_Log/log.h"
 
 ActionChangeWeaknessOfEnemy::ActionChangeWeaknessOfEnemy() :
     AbstractAction()
@@ -29,10 +30,10 @@ void ActionChangeWeaknessOfEnemy::actionAfterAttack()
         if(elements.count() > 0)
             pokemonAttacked()->setWeaknessElement(elements[0]);
         else
-            qCritical() << __PRETTY_FUNCTION__ << "list of elements has only " << elements.count() << " elements";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " list of elements has only " + QString::number(elements.count()) + " elements");
     }
     else
-        qCritical() << __PRETTY_FUNCTION__ << "gameManager or pokemonAttacked is null";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " gameManager or pokemonAttacked is null");
 }
 
 /************************************************************

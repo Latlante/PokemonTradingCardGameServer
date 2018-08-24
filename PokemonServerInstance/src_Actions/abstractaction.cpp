@@ -1,5 +1,7 @@
 #include "abstractaction.h"
 
+#include "src_Log/log.h"
+
 AbstractAction::AbstractAction() :
     m_arg1(QVariant()),
     m_arg2(QVariant()),
@@ -111,7 +113,7 @@ void AbstractAction::executeActionBeforeAttack(CardPokemon *pokemonAttached, sho
             statusCanBeExecuted &= checkBenchPlayerAttacking();
             break;
         default:
-            qCritical() << __PRETTY_FUNCTION__ << "Erreur elementToCheck" << element;
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " Erreur elementToCheck " + QString::number(element));
             statusCanBeExecuted = false;
         }
     }
@@ -123,7 +125,7 @@ void AbstractAction::executeActionBeforeAttack(CardPokemon *pokemonAttached, sho
     }
     else
     {
-        qCritical() << __PRETTY_FUNCTION__ << "L'action n'a pas pu être executée";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " L'action n'a pas pu être executée");
     }
 }
 
@@ -177,7 +179,7 @@ void AbstractAction::executeActionAfterAttack(CardPokemon *pokemonAttached, shor
     }
     else
     {
-        qCritical() << __PRETTY_FUNCTION__ << "L'action n'a pas pu être executée";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " L'action n'a pas pu être executée");
     }
 }
 
@@ -275,7 +277,7 @@ bool AbstractAction::checkGameManager()
         return true;
     }
 
-    qCritical() << __PRETTY_FUNCTION__ << ", manager is NULL";
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", manager is NULL");
     return false;
 }
 
@@ -291,7 +293,7 @@ bool AbstractAction::checkPlayerAttacked()
             return true;
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << ", playerAttacked is NULL";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", playerAttacked is NULL");
     }
 
     return false;
@@ -309,7 +311,7 @@ bool AbstractAction::checkPlayerAttacking()
             return true;
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << ", playerAttacking is NULL";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", playerAttacking is NULL");
     }
 
     return false;
@@ -339,10 +341,10 @@ bool AbstractAction::checkPokemonAttacked()
                 return true;
             }
             else
-                qCritical() << __PRETTY_FUNCTION__ << ", pokemonAttacked is NULL";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", pokemonAttacked is NULL");
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << ", fightAr is NULL";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", fightAr is NULL");
     }
 
     return false;
@@ -364,10 +366,10 @@ bool AbstractAction::checkPokemonAttacking()
                 return true;
             }
             else
-                qCritical() << __PRETTY_FUNCTION__ << ", pokemonAttacking is NULL";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", pokemonAttacking is NULL");
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << ", fightAr is NULL";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", fightAr is NULL");
     }
 
     return false;
@@ -385,7 +387,7 @@ bool AbstractAction::checkBenchPlayerAttacked()
             return true;
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << ", bench is NULL";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", bench is NULL");
     }
 
     return false;
@@ -403,7 +405,7 @@ bool AbstractAction::checkBenchPlayerAttacking()
             return true;
         }
         else
-            qCritical() << __PRETTY_FUNCTION__ << ", bench is NULL";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", bench is NULL");
     }
 
     return false;

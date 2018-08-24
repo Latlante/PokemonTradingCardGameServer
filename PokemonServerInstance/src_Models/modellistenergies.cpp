@@ -213,7 +213,7 @@ QVariant ModelListEnergies::data(const QModelIndex &index, int role) const
     int iRow = index.row();
     if ((iRow < 0) || (iRow >= rowCount()))
     {
-        qCritical() << __PRETTY_FUNCTION__ << "bad row num : " << iRow;
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " bad row num : " + QString::number(iRow));
         return QVariant();
     }
 

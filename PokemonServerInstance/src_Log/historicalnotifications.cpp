@@ -1,6 +1,8 @@
 #include "historicalnotifications.h"
 #include <QDebug>
 
+#include "src_Log/log.h"
+
 //#include "abstractnotification.h"
 
 HistoricalNotifications::HistoricalNotifications()
@@ -13,7 +15,7 @@ HistoricalNotifications::HistoricalNotifications()
 ************************************************************/
 int HistoricalNotifications::addNewNotification(AbstractNotification *notif)
 {
-    qDebug() << __PRETTY_FUNCTION__ << count();
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + QString::number(count()));
 
     m_listNotifications.append(notif);
 
@@ -32,7 +34,7 @@ int HistoricalNotifications::count()
 
 QJsonObject HistoricalNotifications::buildJsonNotificationFrom(unsigned int index, const QString &namePlayer)
 {
-    qDebug() << __PRETTY_FUNCTION__ << index << "/" << count();
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + QString::number(index) + " / " + QString::number(count()));
 
     QJsonObject objToReturn;
     objToReturn["indexBegin"] = static_cast<int>(index);

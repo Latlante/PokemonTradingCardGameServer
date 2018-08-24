@@ -703,7 +703,7 @@ int GameManager::displayAttacks(CardPokemon* card, bool blockRetreat)
 
     emit displayAttacksAsked(currentPlayer()->name(), card, authorizeRetreat);
 
-    qDebug() << __PRETTY_FUNCTION__ << m_elementFromDisplays.toInt();
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + QString::number(m_elementFromDisplays.toInt()));
 
     return m_elementFromDisplays.toInt();
 #endif
@@ -725,7 +725,7 @@ void GameManager::displayMessage(QString message)
 void GameManager::endOfSelectionDisplay(QVariant element)
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__ << element;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + element.toString());
 #endif
 
     m_elementFromDisplays = element;
@@ -754,7 +754,7 @@ unsigned short GameManager::headOrTail()
 #endif
 
     unsigned short coin = Utils::headOrTail();
-    qDebug() << __PRETTY_FUNCTION__ << "coin=" << coin;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " coin=" + QString::number(coin));
 
     emit headOrTailAsked();
 

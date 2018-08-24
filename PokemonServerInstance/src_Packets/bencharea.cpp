@@ -4,6 +4,7 @@
 #include <QVariant>
 #include "src_Cards/abstractcard.h"
 #include "src_Cards/cardpokemon.h"
+#include "src_Log/log.h"
 #include "src_Models/modellistenergies.h"
 
 BenchArea::BenchArea(const QString &namePacket, QList<AbstractCard*> listCards) :
@@ -38,7 +39,7 @@ CardPokemon* BenchArea::cardPok(int index)
 
 ModelListEnergies* BenchArea::modelFromCardPokemon(int index)
 {
-    qDebug() << __PRETTY_FUNCTION__ << index;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + QString::number(index));
 
     ModelListEnergies* modelToReturn = nullptr;
 

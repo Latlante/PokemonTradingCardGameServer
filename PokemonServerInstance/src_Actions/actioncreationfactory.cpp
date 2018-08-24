@@ -54,6 +54,8 @@
 #include "src_Actions/trainers/actiontrainer_removeenergy.h"
 #include "src_Actions/trainers/actiontrainer_potion.h"
 
+#include "src_Log/log.h"
+
 ActionCreationFactory::ActionCreationFactory()
 {
 
@@ -216,7 +218,7 @@ AbstractAction* ActionCreationFactory::createAction(AbstractAction::Enum_typeOfA
         actionToReturn = new ActionTrainer_Potion();
         break;
     default:
-        qWarning() << __PRETTY_FUNCTION__ << idAction << " is not ready yet";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + QString::number(idAction) + " is not ready yet");
         break;
     }
 

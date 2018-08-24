@@ -31,8 +31,8 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     m_historicNotif(HistoricalNotifications()),
     m_displayData(nullptr)
 {
-    qDebug() << "Constructeur Controller";
     Log::createInstance(nameGame);
+    Log::instance()->write("Constructeur Controller");
 
     if(m_communication->tryToConnect())
     {
@@ -745,12 +745,12 @@ QJsonObject Controller::attack_retreat(const QString &namePlayer, unsigned short
             case CardPokemon::Attack_IndexNOK:
                 jsonResponse["success"] = "ko";
                 jsonResponse["error"] = "error index";
-                qCritical() << __PRETTY_FUNCTION__ << "Erreur d'index";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + " Erreur d'index");
                 break;
             case CardPokemon::Attack_UnknownError:
                 jsonResponse["success"] = "ko";
                 jsonResponse["error"] = "error unknown";
-                qCritical() << __PRETTY_FUNCTION__ << "Erreur inconnue";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + " Erreur inconnue");
                 break;
             }
 
@@ -763,14 +763,14 @@ QJsonObject Controller::attack_retreat(const QString &namePlayer, unsigned short
                 jsonResponse["success"] = "ok";
             else
             {
-                qCritical() << __PRETTY_FUNCTION__ << "Erreur lors de l'échange";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) + " Erreur lors de l'échange");
                 jsonResponse["success"] = "ko";
                 jsonResponse["error"] = "error during the retreat";
             }
         }
         else
         {
-            qCritical() << __PRETTY_FUNCTION__ << "erreur de indexAttack=" << indexAttack;
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " erreur de indexAttack=" + QString::number(indexAttack));
             jsonResponse["success"] = "ko";
             jsonResponse["error"] = "error of indexAttack = " + QString::number(indexAttack);
         }

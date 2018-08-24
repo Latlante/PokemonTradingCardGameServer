@@ -1,5 +1,7 @@
 #include "actionswappokemonbetweenfigthandbench.h"
 
+#include "src_Log/log.h"
+
 ActionSwapPokemonBetweenFigthAndBench::ActionSwapPokemonBetweenFigthAndBench() :
     AbstractAction()
 {
@@ -31,7 +33,7 @@ void ActionSwapPokemonBetweenFigthAndBench::actionAfterAttack()
                 playerAttacked()->swapCardsBetweenBenchAndFight(static_cast<CardPokemon*>(listPokemonChoose.first()));
         }
         else
-            qWarning() << __PRETTY_FUNCTION__ << "Bench is empty";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " Bench is empty");
     }
     else
     {
@@ -39,7 +41,7 @@ void ActionSwapPokemonBetweenFigthAndBench::actionAfterAttack()
         messageError += pokemonAttacked() == nullptr ? "  - err: pokemonAttacked is nullptr\n" : "  - pokemonAttacked " + pokemonAttacked()->name();
         messageError += benchPlayerAttacked() == nullptr ? "  - err: benchPlayerAttacked is nullptr\n" : "  - benchPlayerAttacked " + benchPlayerAttacked()->name();
 
-        qCritical() << __PRETTY_FUNCTION__ << messageError;
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + messageError);
     }
 }
 

@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include "src_Cards/cardpokemon.h"
+#include "src_Log/log.h"
 #include "common/utils.h"
 
 FightArea::FightArea(const QString &namePacket, QList<AbstractCard*> listCards) :
@@ -30,7 +31,7 @@ int FightArea::maxCards() const
 CardPokemon* FightArea::pokemonFighter()
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     return pokemonFighting(0);
@@ -39,7 +40,7 @@ CardPokemon* FightArea::pokemonFighter()
 CardPokemon* FightArea::pokemonFighting(int index)
 {
 #ifdef TRACAGE_PRECIS
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
     CardPokemon* pokemon = NULL;

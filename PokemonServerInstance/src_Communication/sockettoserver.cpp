@@ -9,6 +9,8 @@
 #include <QTcpSocket>
 #include <QTimer>
 
+#include "src_Log/log.h"
+
 SocketToServer::SocketToServer(QObject *parent) :
     QObject(parent),
     m_socket(new QTcpSocket(this)),
@@ -43,7 +45,7 @@ bool SocketToServer::tryToConnect()
     const QString ipAddress = "127.0.0.1";
     const int port = 23003;
 
-    qDebug() << __PRETTY_FUNCTION__ << ipAddress << ":" << port;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + ipAddress + ":" + QString::number(port));
 
     if((ipAddress != "") && (port > 0))
     {
@@ -72,7 +74,7 @@ bool SocketToServer::tryToConnect()
 
 bool SocketToServer::write(QByteArray message)
 {
-    qDebug() << __PRETTY_FUNCTION__ << "message: " << message;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " message: " + message);
 
     //init request
     QByteArray requestToSend;
@@ -96,7 +98,7 @@ void SocketToServer::onConnected_Socket()
 
 void SocketToServer::onReadyRead_Socket()
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
 
     //init the answer
     QByteArray responseSerialize;

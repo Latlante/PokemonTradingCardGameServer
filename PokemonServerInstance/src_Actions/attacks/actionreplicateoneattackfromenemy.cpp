@@ -1,5 +1,7 @@
 #include "actionreplicateoneattackfromenemy.h"
 
+#include "src_Log/log.h"
+
 ActionReplicateOneAttackFromEnemy::ActionReplicateOneAttackFromEnemy() :
     AbstractAction()
 {
@@ -32,11 +34,11 @@ void ActionReplicateOneAttackFromEnemy::actionAfterAttack()
                                                  pokemonAttacked()->listAttacks()[indexAttackToReplicate]);
         }
         else
-            qCritical() << __PRETTY_FUNCTION__
-                        << "Impossible d'exécuter l'action, indexAttackToReplicate="
-                        << indexAttackToReplicate
-                        << ", indexLastAttack="
-                        << indexLastAttack;
+            Log::instance()->write(QString(__PRETTY_FUNCTION__)
+                        + " Impossible d'exécuter l'action, indexAttackToReplicate="
+                        + QString::number(indexAttackToReplicate)
+                        + ", indexLastAttack="
+                        + QString::number(indexLastAttack));
     }
 }
 

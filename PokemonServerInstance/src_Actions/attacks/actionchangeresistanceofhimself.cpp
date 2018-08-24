@@ -1,5 +1,7 @@
 #include "actionchangeresistanceofhimself.h"
 
+#include "src_Log/log.h"
+
 ActionChangeResistanceOfHimself::ActionChangeResistanceOfHimself() :
     AbstractAction()
 {
@@ -27,10 +29,10 @@ void ActionChangeResistanceOfHimself::actionAfterAttack()
         if(elements.count() > 0)
             pokemonAttacking()->setResistanceElement(elements[0]);
         else
-            qCritical() << __PRETTY_FUNCTION__ << "list of elements has only " << elements.count() << " elements";
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " list of elements has only " + QString::number(elements.count()) + " elements");
     }
     else
-        qCritical() << __PRETTY_FUNCTION__ << "gameManager or pokemonAttacking is null";
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " gameManager or pokemonAttacking is null");
 }
 
 /************************************************************
