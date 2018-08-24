@@ -25,9 +25,14 @@ void ActionChangeWeaknessOfEnemy::actionAfterAttack()
 {
     if((gameManager() != nullptr) && (pokemonAttacked() != nullptr))
     {
-        AbstractCard::Enum_element element = gameManager()->displayAllElements(1);
-        pokemonAttacked()->setWeaknessElement(element);
+        QList<AbstractCard::Enum_element> elements = gameManager()->displayAllElements(1);
+        if(elements.count() > 0)
+            pokemonAttacked()->setWeaknessElement(elements[0]);
+        else
+            qCritical() << __PRETTY_FUNCTION__ << "list of elements has only " << elements.count() << " elements";
     }
+    else
+        qCritical() << __PRETTY_FUNCTION__ << "gameManager or pokemonAttacked is null";
 }
 
 /************************************************************

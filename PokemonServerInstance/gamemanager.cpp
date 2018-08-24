@@ -601,7 +601,7 @@ QList<AbstractCard *> GameManager::displayPacket(AbstractPacket *packet, unsigne
 #endif
 }
 
-AbstractCard::Enum_element GameManager::displayAllElements(unsigned short quantity)
+QList<AbstractCard::Enum_element> GameManager::displayAllElements(unsigned short quantity)
 {
 #ifdef TRACAGE_PRECIS
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
@@ -612,23 +612,13 @@ AbstractCard::Enum_element GameManager::displayAllElements(unsigned short quanti
 
     return AbstractCard::Element_Electric;
 #else
-    emit displayAllElementsAsked(quantity);
+    emit displayAllElementsAsked(currentPlayer()->name(), quantity);
 
-    AbstractCard::Enum_element elementToReturn = AbstractCard::Element_None;
+    QEventLoop loop;
+    connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
+    loop.exec();
 
-    QList<AbstractCard *> listSelectionCards = m_elementFromDisplays.value<QList<AbstractCard *> >();
-    if(listSelectionCards.count() > 0)
-    {
-        AbstractCard *abCard = listSelectionCards.first();
-
-        if(abCard->type() == AbstractCard::TypeOfCard_Energy)
-        {
-            CardEnergy* energy = static_cast<CardEnergy*>(abCard);
-            elementToReturn = energy->element();
-        }
-    }
-
-    return elementToReturn;
+    return m_elementFromDisplays.value<QList<AbstractCard::Enum_element> >();
 #endif
 }
 

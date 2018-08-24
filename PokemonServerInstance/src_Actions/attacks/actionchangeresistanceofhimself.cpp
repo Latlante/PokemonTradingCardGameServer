@@ -23,11 +23,14 @@ void ActionChangeResistanceOfHimself::actionAfterAttack()
 {
     if((gameManager() != nullptr) && (pokemonAttacking() != nullptr))
     {
-        AbstractCard::Enum_element element = gameManager()->displayAllElements(1);
-        pokemonAttacking()->setResistanceElement(element);
+        QList<AbstractCard::Enum_element> elements = gameManager()->displayAllElements(1);
+        if(elements.count() > 0)
+            pokemonAttacking()->setResistanceElement(elements[0]);
+        else
+            qCritical() << __PRETTY_FUNCTION__ << "list of elements has only " << elements.count() << " elements";
     }
     else
-        qCritical() << __PRETTY_FUNCTION__ << "Element null";
+        qCritical() << __PRETTY_FUNCTION__ << "gameManager or pokemonAttacking is null";
 }
 
 /************************************************************

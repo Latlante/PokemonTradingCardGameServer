@@ -107,7 +107,8 @@ SOURCES += \
     src_Communication/sockettoserver.cpp \
     src_Displays/abstractdisplaydata.cpp \
     src_Displays/displaydata_packet.cpp \
-    src_Displays/displaydata_hiddenpacket.cpp
+    src_Displays/displaydata_hiddenpacket.cpp \
+    src_Displays/displaydata_allelements.cpp
 
 HEADERS += \
     common/constantesqml.h \
@@ -193,4 +194,5 @@ HEADERS += \
     src_Communication/sockettoserver.h \
     src_Displays/abstractdisplaydata.h \
     src_Displays/displaydata_packet.h \
-    src_Displays/displaydata_hiddenpacket.h
+    src_Displays/displaydata_hiddenpacket.h \
+    src_Displays/displaydata_allelements.h

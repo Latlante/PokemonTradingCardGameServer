@@ -8,7 +8,7 @@ AbstractCard::AbstractCard(unsigned short id, const QString& name) :
 	m_id(id),
     m_name(name)
 {
-	
+
 }
 
 AbstractCard::AbstractCard()

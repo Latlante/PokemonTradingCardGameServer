@@ -70,4 +70,6 @@ protected:
     AbstractCard();
 };
 
+Q_DECLARE_METATYPE(AbstractCard::Enum_element)
+
 #endif // ABSTRACTCARD_H

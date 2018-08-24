@@ -31,7 +31,9 @@ public:
 
         PHASE_NotifDisplayPacket = 120,
         PHASE_DisplayPacketResponse,
-        PHASE_NotifDisplayHiddenPacket = 122,
+        PHASE_NotifDisplayAllElements = 122,
+        PHASE_DisplayAllElementsResponse,
+        PHASE_NotifDisplayHiddenPacket = 124,
         PHASE_DisplayHiddenPacketResponse
     };
 
