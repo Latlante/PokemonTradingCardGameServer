@@ -109,7 +109,9 @@ SOURCES += \
     src_Displays/displaydata_packet.cpp \
     src_Displays/displaydata_hiddenpacket.cpp \
     src_Displays/displaydata_allelements.cpp \
-    src_Displays/displaydata_attackspokemon.cpp
+    src_Displays/displaydata_attackspokemon.cpp \
+    src_Log/notificationauthentificationserver.cpp \
+    src_Log/notificationnewgamecreated.cpp
 
 HEADERS += \
     common/constantesqml.h \
@@ -197,4 +199,6 @@ HEADERS += \
     src_Displays/displaydata_packet.h \
     src_Displays/displaydata_hiddenpacket.h \
     src_Displays/displaydata_allelements.h \
-    src_Displays/displaydata_attackspokemon.h
+    src_Displays/displaydata_attackspokemon.h \
+    src_Log/notificationauthentificationserver.h \
+    src_Log/notificationnewgamecreated.h

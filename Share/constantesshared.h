@@ -8,6 +8,7 @@ class ConstantesShared
 public:
     enum GamePhase
     {
+        PHASE_None = 0,
         PHASE_Identification = 1,
         PHASE_ListOfGameForThePlayer = 2,
         PHASE_GetAllInfoOnInstance = 3,

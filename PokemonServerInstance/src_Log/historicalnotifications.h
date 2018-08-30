@@ -3,11 +3,13 @@
 
 #include <QObject>
 
+#include "src_Log/notificationauthentificationserver.h"
 #include "src_Log/notificationcardmoved.h"
 #include "src_Log/notificationdatapokemonchanged.h"
 #include "src_Log/notificationendofturn.h"
 #include "src_Log/notificationenergyadded.h"
 #include "src_Log/notificationenergyremoved.h"
+#include "src_Log/notificationnewgamecreated.h"
 #include "src_Log/notificationplayerisready.h"
 #include "src_Log/notificationpokemonswitched.h"
 

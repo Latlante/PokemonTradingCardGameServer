@@ -36,16 +36,24 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
 
     if(m_communication->tryToConnect())
     {
-        QString requestBoot = "boot;";
+        connect(m_communication, &SocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
+
+        //Authentification for the server
+        /*QString requestBoot = "boot;";
         requestBoot += "{";
         requestBoot += "\"uidGame\":" + uidGame.toLatin1() + ",";
         requestBoot += "\"nameGame\":\"" + nameGame + "\",";
         requestBoot += "\"namePlayer1\":\"" + player1 + "\",";
         requestBoot += "\"namePlayer2\":\"" + player2 + "\"";
         requestBoot += "}";
-        m_communication->write(requestBoot.toLatin1());
+        m_communication->write(requestBoot.toLatin1());*/
 
-        connect(m_communication, &SocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
+        NotificationAuthentificationServer notifAuthentification("boot", uidGame, nameGame, player1, player2);
+        m_communication->write(notifAuthentification.messageJsonComplete());
+
+        //Notification for the player 2
+        NotificationNewGameCreated notifNewGame(player2, player1);
+        m_communication->write(notifNewGame.messageJsonComplete());
     }
     else
         Log::instance()->write("Error: Impossible to connect to the server");

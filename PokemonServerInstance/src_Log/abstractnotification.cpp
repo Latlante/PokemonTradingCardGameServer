@@ -54,7 +54,8 @@ QJsonObject AbstractNotification::initObject()
     QJsonObject obj;
 
     //obj["indexAction"] = static_cast<int>(indexAction());
-    obj["phase"] = static_cast<int>(m_phase);
+    if(m_phase != ConstantesShared::PHASE_None)
+        obj["phase"] = static_cast<int>(m_phase);
 
     if(namePlayer() != "")
         obj["namePlayer"] = namePlayer();
