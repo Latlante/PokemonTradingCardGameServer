@@ -95,7 +95,7 @@ QJsonObject DisplayData_EnergiesForAPokemon::messageResultToClient()
 {
     QJsonObject jsonToReturn;
 
-    jsonToReturn["phase"] = static_cast<int>(ConstantesShared::PHASE_DisplayAllElementsResponse);
+    jsonToReturn["phase"] = static_cast<int>(ConstantesShared::PHASE_DisplayEnergiesForAPokemonResponse);
 
     if(m_success)
         jsonToReturn["success"] = "ok";

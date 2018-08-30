@@ -12,6 +12,7 @@
 #include "src_Communication/sockettoserver.h"
 #include "src_Displays/displaydata_allelements.h"
 #include "src_Displays/displaydata_attackspokemon.h"
+#include "src_Displays/displaydata_energiesforapokemon.h"
 #include "src_Displays/displaydata_packet.h"
 #include "src_Displays/displaydata_hiddenpacket.h"
 #include "src_Models/modellistenergies.h"
@@ -70,6 +71,7 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     connect(m_gameManager, &GameManager::displayPacketAsked, this, &Controller::onDisplayPacketAsked);
     connect(m_gameManager, &GameManager::displayAllElementsAsked, this, &Controller::onDisplayAllElementsAsked);
     connect(m_gameManager, &GameManager::displaySelectHiddenCardAsked, this, &Controller::onDisplayHiddenPacketAsked);
+    connect(m_gameManager, &GameManager::displayEnergiesForAPokemonAsked, this, &Controller::onDisplayEnergiesForAPokemonAsked);
     connect(m_gameManager, &GameManager::displayAttacksAsked, this, &Controller::onDisplayAttacksAsked);
 
     m_gameManager->setNumberMaxOfPlayers(2);
@@ -279,6 +281,19 @@ void Controller::onDisplayHiddenPacketAsked(const QString &namePlayer, AbstractP
 #endif
 
     m_displayData = new DisplayData_HiddenPacket(namePlayer, packet, quantity);
+    QJsonDocument docToSend = m_displayData->messageInfoToClient();
+
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
+    m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+}
+
+void Controller::onDisplayEnergiesForAPokemonAsked(const QString &namePlayer, CardPokemon* pokemon, unsigned short quantity, AbstractCard::Enum_element element)
+{
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + namePlayer + " " + QString::number(quantity) + " " + QString::number(element));
+#endif
+
+    m_displayData = new DisplayData_EnergiesForAPokemon(namePlayer, pokemon, quantity, element);
     QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));

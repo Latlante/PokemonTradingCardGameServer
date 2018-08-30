@@ -41,6 +41,7 @@ private slots:
     void onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
     void onDisplayAllElementsAsked(const QString &namePlayer, unsigned short quantity);
     void onDisplayHiddenPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity);
+    void onDisplayEnergiesForAPokemonAsked(const QString &namePlayer, CardPokemon* pokemon, unsigned short quantity, AbstractCard::Enum_element element);
     void onDisplayAttacksAsked(const QString& namePlayer, CardPokemon* pokemon, bool retreatEnable);
 
 private:

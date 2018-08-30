@@ -635,6 +635,10 @@ QList<AbstractCard *> GameManager::displaySelectHiddenCard(PacketRewards *packet
 #else
     emit displaySelectHiddenCardAsked(currentPlayer()->name(), packet, quantity);
 
+    QEventLoop loop;
+    connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
+    loop.exec();
+
     return m_elementFromDisplays.value<QList<AbstractCard*> >();
 #endif
 
@@ -664,7 +668,7 @@ QList<CardEnergy*> GameManager::displayEnergiesForAPokemon(CardPokemon* pokemon,
         }
     }*/
 
-    QList<CardEnergy*> listEnergies;
+    /*QList<CardEnergy*> listEnergies;
 
     if(pokemon != nullptr)
     {
@@ -680,7 +684,16 @@ QList<CardEnergy*> GameManager::displayEnergiesForAPokemon(CardPokemon* pokemon,
         }
     }
 
-    return listEnergies;
+    return listEnergies;*/
+
+    emit displayEnergiesForAPokemonAsked(pokemon, quantity, element);
+
+    QEventLoop loop;
+    connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    return m_elementFromDisplays.value<QList<CardEnergy*> >();
+
 #endif
 }
 
