@@ -111,7 +111,8 @@ SOURCES += \
     src_Displays/displaydata_allelements.cpp \
     src_Displays/displaydata_attackspokemon.cpp \
     src_Log/notificationauthentificationserver.cpp \
-    src_Log/notificationnewgamecreated.cpp
+    src_Log/notificationnewgamecreated.cpp \
+    src_Displays/displaydata_energiesforapokemon.cpp
 
 HEADERS += \
     common/constantesqml.h \
@@ -201,4 +202,5 @@ HEADERS += \
     src_Displays/displaydata_allelements.h \
     src_Displays/displaydata_attackspokemon.h \
     src_Log/notificationauthentificationserver.h \
-    src_Log/notificationnewgamecreated.h
+    src_Log/notificationnewgamecreated.h \
+    src_Displays/displaydata_energiesforapokemon.h
