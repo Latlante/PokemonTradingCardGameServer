@@ -173,12 +173,17 @@ void Controller::onMessageReceived_Communication(QByteArray message)
         //On envoit la réponse avec/sans les actions en fonction de si tout s'est bien passé ou non
         if(jsonResponseOwner["success"] == "ok")
         {
+            //owner
             QJsonObject objOwner = m_historicNotif.buildJsonNotificationFrom(readPoint, jsonReceived["namePlayer"].toString());
             jsonResponseOwner["actions"] = objOwner;
 
+            //others
+            QJsonObject objOther;
+            objOther["actions"] = m_historicNotif.buildJsonNotificationFrom(readPoint);
+
             m_communication->write(jsonReceived["namePlayer"].toString().toLatin1() + ";" +
                                     QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact) + ";" +
-                                    QJsonDocument(m_historicNotif.buildJsonNotificationFrom(readPoint)).toJson(QJsonDocument::Compact));
+                                    QJsonDocument(objOther).toJson(QJsonDocument::Compact));
         }
         else
         {
