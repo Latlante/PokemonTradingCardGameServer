@@ -45,7 +45,7 @@ CardEnergy* ModelListEnergies::takeEnergy(int index)
 
     CardEnergy* energyToReturn = nullptr;
 
-    if((index >= 0) && (index < rowCount()))
+    if((index >= 0) && (index < countCard()))
     {
         energyToReturn = energy(index);
         beginRemoveRows(QModelIndex(), index, index+(energyToReturn->quantity()-1));
@@ -64,7 +64,7 @@ CardEnergy* ModelListEnergies::energy(int index)
 
     CardEnergy* energyToReturn = nullptr;
 
-    if((index >= 0) && (index < rowCount()))
+    if((index >= 0) && (index < countCard()))
     {
         energyToReturn = m_listEnergies[index];
     }
