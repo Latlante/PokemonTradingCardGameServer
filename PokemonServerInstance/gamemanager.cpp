@@ -686,7 +686,7 @@ QList<CardEnergy*> GameManager::displayEnergiesForAPokemon(CardPokemon* pokemon,
 
     return listEnergies;*/
 
-    emit displayEnergiesForAPokemonAsked(pokemon, quantity, element);
+    emit displayEnergiesForAPokemonAsked(currentPlayer()->name(), pokemon, quantity, element);
 
     QEventLoop loop;
     connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);

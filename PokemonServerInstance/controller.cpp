@@ -53,8 +53,8 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
         m_communication->write(notifAuthentification.messageJsonComplete());
 
         //Notification for the player 2
-        NotificationNewGameCreated notifNewGame(player2, player1);
-        m_communication->write(notifNewGame.messageJsonComplete());
+        /*NotificationNewGameCreated notifNewGame(player2, player1);
+        m_communication->write(notifNewGame.messageJsonComplete());*/
     }
     else
         Log::instance()->write("Error: Impossible to connect to the server");

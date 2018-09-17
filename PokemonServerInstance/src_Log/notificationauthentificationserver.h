@@ -5,7 +5,6 @@
 
 class NotificationAuthentificationServer : public AbstractNotification
 {
-    Q_OBJECT
 public:
     explicit NotificationAuthentificationServer(const QString& namePlayer, const QString &uidGame, const QString &nameGame, const QString &namePlayer1, const QString &namePlayer2);
     virtual ~NotificationAuthentificationServer() override;

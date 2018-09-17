@@ -135,7 +135,7 @@ void ThreadInstance::executeRequest(const QByteArray &jsonReceived)
                     (jsonData.object().contains("namePlayer1") == true) &&
                     (jsonData.object().contains("namePlayer2") == true))
             {
-                unsigned int uidGame = static_cast<unsigned int>(jsonData["uidGame"].toInt());
+                unsigned int uidGame = jsonData["uidGame"].toString().toUInt();
                 const QString nameGame = jsonData["nameGame"].toString();
                 const QString namePlayer1 = jsonData["namePlayer1"].toString();
                 const QString namePlayer2 = jsonData["namePlayer2"].toString();

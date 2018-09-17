@@ -5,7 +5,6 @@
 
 class NotificationNewGameCreated : public AbstractNotification
 {
-    Q_OBJECT
 public:
     explicit NotificationNewGameCreated(const QString& namePlayer, const QString &opponent);
     virtual ~NotificationNewGameCreated() override;
