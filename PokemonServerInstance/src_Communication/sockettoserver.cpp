@@ -7,6 +7,8 @@
 #include <QJsonObject>
 #include <QHostAddress>
 #include <QTcpSocket>
+#include <QThread>
+#include <QTime>
 #include <QTimer>
 
 #include "src_Log/log.h"
@@ -74,7 +76,7 @@ bool SocketToServer::tryToConnect()
 
 bool SocketToServer::write(QByteArray message)
 {
-    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " message: " + message);
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + QTime::currentTime().toString("hh:mm:ss.zzz").toLatin1() + " message: " + message);
 
     //init request
     QByteArray requestToSend;

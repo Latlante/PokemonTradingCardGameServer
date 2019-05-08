@@ -59,6 +59,7 @@ private:
 
     QJsonObject displayPacketResponse(const QJsonDocument &document);
 
+    void sendNotifNewGameCreated(int uid, const QString& nameGame, const QString &player1, const QString &player2);
     void sendNotifPlayerIsReady();
     void sendNotifEndOfTurn(const QString& oldPlayer, const QString& newPlayer);
     void sendNotifCardMoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, int idCard, bool showCardToEveryone);

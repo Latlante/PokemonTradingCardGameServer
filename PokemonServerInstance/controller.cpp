@@ -53,8 +53,7 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
         m_communication->write(notifAuthentification.messageJsonComplete());
 
         //Notification for the player 2
-        /*NotificationNewGameCreated notifNewGame(player2, player1);
-        m_communication->write(notifNewGame.messageJsonComplete());*/
+        sendNotifNewGameCreated(uidGame.toInt(), nameGame, player1, player2);
     }
     else
         Log::instance()->write("Error: Impossible to connect to the server");
@@ -865,6 +864,44 @@ QJsonObject Controller::displayPacketResponse(const QJsonDocument &document)
     }
 
     return jsonResponse;
+}
+
+void Controller::sendNotifNewGameCreated(int uid, const QString &nameGame, const QString& player1, const QString& player2)
+{
+    NotificationNewGameCreated *notif = new NotificationNewGameCreated(uid,
+                                                                       nameGame,
+                                                                       player1,
+                                                                       player2);
+
+    unsigned int readPoint = m_historicNotif.readPoint();
+    m_historicNotif.addNewNotification(notif);
+
+    //construction of the notification to send
+    QByteArray messageToRespond = player1.toLatin1() + ";";
+
+    //owner
+    QJsonObject objNotifOwner = m_historicNotif.buildJsonNotificationFrom(readPoint, player1);
+    if(objNotifOwner != QJsonObject())
+    {
+        QJsonObject objOwner;
+        objOwner["actions"] = objNotifOwner;
+        messageToRespond += QJsonDocument(objOwner).toJson(QJsonDocument::Compact) + ";";
+    }
+    else
+    {
+        messageToRespond += ";";
+    }
+
+    //others
+    QJsonObject objNotifOther = m_historicNotif.buildJsonNotificationFrom(readPoint);
+    if(objNotifOther != QJsonObject())
+    {
+        QJsonObject objOther;
+        objOther["actions"] = objNotifOther;
+        messageToRespond += QJsonDocument(objOther).toJson(QJsonDocument::Compact);
+    }
+
+    m_communication->write(messageToRespond);
 }
 
 void Controller::sendNotifPlayerIsReady()

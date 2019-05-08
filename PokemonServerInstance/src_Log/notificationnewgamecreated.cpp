@@ -1,7 +1,10 @@
 #include "notificationnewgamecreated.h"
 
-NotificationNewGameCreated::NotificationNewGameCreated(const QString &namePlayer, const QString &opponent) :
-    AbstractNotification(ConstantesShared::PHASE_NotifNewGameCreated, namePlayer)
+NotificationNewGameCreated::NotificationNewGameCreated(int uid, const QString &nameGame, const QString &namePlayer, const QString &opponent) :
+    AbstractNotification(ConstantesShared::PHASE_NotifNewGameCreated, namePlayer),
+    m_uid(uid),
+    m_nameGame(nameGame),
+    m_opponent(opponent)
 {
 
 }
@@ -16,14 +19,16 @@ NotificationNewGameCreated::~NotificationNewGameCreated()
 ************************************************************/
 QJsonObject NotificationNewGameCreated::messageJsonForOwner()
 {
-    QJsonObject jsonResponse = initObject();
-
-    jsonResponse["opponent"] = m_opponent;
-
-    return jsonResponse;
+    return QJsonObject();
 }
 
 QJsonObject NotificationNewGameCreated::messageJsonForOthers()
 {
-    return QJsonObject();
+    QJsonObject jsonResponse = initObject();
+
+    jsonResponse["uidGame"] = m_uid;
+    jsonResponse["nameGame"] = m_nameGame;
+    jsonResponse["opponent"] = namePlayer();
+
+    return jsonResponse;
 }

@@ -158,6 +158,7 @@ void ThreadClient::executeRequest(const QJsonDocument &jsonReceived)
     {
         jsonResponse = authentify(jsonReceived["name"].toString(),
                                   jsonReceived["password"].toString());
+        jsonResponse["phase"] = ConstantesShared::PHASE_Identification;
     }
     //authentification success
     else
@@ -258,6 +259,7 @@ void ThreadClient::executeRequest(const QJsonDocument &jsonReceived)
             qCritical() << m_user << error;
         }
 
+        jsonResponse["phase"] = jsonReceived["phase"];
     }
 
     if(hasToRepond == true)

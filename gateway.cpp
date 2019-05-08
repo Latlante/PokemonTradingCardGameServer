@@ -66,7 +66,11 @@ void Gateway::onWriteToClient_serverInstances(unsigned int uidGame, QByteArray m
     foreach(unsigned int uidPlayer, listUidPlayers)
     {
         if(Authentification::namePlayerFromUid(uidPlayer) == currentNamePlayer)
-            m_serverClients->newMessage(uidPlayer, messageSplit[1].toLatin1());
+        {
+            //security: does not send if the message is just "{}"
+            if(messageSplit[1].length() > 2)
+                m_serverClients->newMessage(uidPlayer, messageSplit[1].toLatin1());
+        }
         else if(messageSplit.count() >= 2)
         {
             if(messageSplit[2].length() > 2)

@@ -34,20 +34,32 @@ int HistoricalNotifications::count()
 
 QJsonObject HistoricalNotifications::buildJsonNotificationFrom(unsigned int index, const QString &namePlayer)
 {
-    Log::instance()->write(QString(__PRETTY_FUNCTION__) + QString::number(index) + " / " + QString::number(count()));
+    QJsonObject objToReturn = QJsonObject();
 
-    QJsonObject objToReturn;
-    objToReturn["indexBegin"] = static_cast<int>(index);
-    objToReturn["indexEnd"] = m_listNotifications.count();
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + QString::number(index) + " / " + QString::number(count()) + " for " + namePlayer.toLatin1());
 
     if(index < static_cast<unsigned int>(m_listNotifications.count()))
     {
         for(int i=index;i<m_listNotifications.count();++i)
         {
             if(m_listNotifications[i]->namePlayer() == namePlayer)
-                objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOwner();
+            {
+                //security, add info only there is something in
+                if(m_listNotifications[i]->messageJsonForOwner() != QJsonObject())
+                    objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOwner();
+            }
             else
-                objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOthers();
+            {
+                if(m_listNotifications[i]->messageJsonForOthers() != QJsonObject())
+                    objToReturn[QString::number(i)] = m_listNotifications[i]->messageJsonForOthers();
+            }
+        }
+
+        //add index only if necessary => if there is data to send
+        if(objToReturn.isEmpty() == false)
+        {
+            objToReturn["indexBegin"] = static_cast<int>(index);
+            objToReturn["indexEnd"] = m_listNotifications.count();
         }
     }
 

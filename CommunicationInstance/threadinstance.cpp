@@ -64,28 +64,31 @@ void ThreadInstance::onReadyRead_TcpSocket()
 {
     qDebug() << __PRETTY_FUNCTION__ << "data incoming (" << m_tcpSocket->bytesAvailable() << ")";
 
-    //init the answer
-    QByteArray responseSerialize;
-    QDataStream requestToRead(m_tcpSocket);
-
-    if(m_sizeAnswerAsynchrone == 0)
+    while(m_tcpSocket->bytesAvailable() > 0)
     {
-        //Check we have the minimum to start reading
-        if(m_tcpSocket->bytesAvailable() < sizeof(quint16))
+        //init the answer
+        QByteArray responseSerialize;
+        QDataStream requestToRead(m_tcpSocket);
+
+        if(m_sizeAnswerAsynchrone == 0)
+        {
+            //Check we have the minimum to start reading
+            if(m_tcpSocket->bytesAvailable() < sizeof(quint16))
+                return;
+
+            //Check we have all the answer
+            requestToRead >> m_sizeAnswerAsynchrone;
+        }
+
+        if(m_tcpSocket->bytesAvailable() < m_sizeAnswerAsynchrone)
             return;
 
-        //Check we have all the answer
-        requestToRead >> m_sizeAnswerAsynchrone;
+        //From here, we have everything, so we can get all the message
+        requestToRead >> responseSerialize;
+
+        executeRequest(responseSerialize);
+        m_sizeAnswerAsynchrone = 0;
     }
-
-    if(m_tcpSocket->bytesAvailable() < m_sizeAnswerAsynchrone)
-        return;
-
-    //From here, we have everything, so we can get all the message
-    requestToRead >> responseSerialize;
-
-    executeRequest(responseSerialize);
-    m_sizeAnswerAsynchrone = 0;
 }
 
 void ThreadInstance::onDisconnected_TcpSocket()
