@@ -10,6 +10,7 @@ public:
 
     static QJsonArray listOfAllUsers();
     static QString namePlayerFromUid(unsigned int uidPlayer);
+    static unsigned int uidPlayerFromName(const QString& name);
 
     bool checkUser(QString user, QString password);
     QString user() const;

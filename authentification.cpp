@@ -61,6 +61,29 @@ QString Authentification::namePlayerFromUid(unsigned int uidPlayer)
     return namePlayer;
 }
 
+unsigned int Authentification::uidPlayerFromName(const QString &name)
+{
+    QFile fileUsers(m_PATH_FILE_USERS);
+    fileUsers.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString content = fileUsers.readAll();
+    fileUsers.close();
+
+    QList<QString> listPlayers = content.split("\n");
+    QList<QString>::iterator itListPlayers = listPlayers.begin();
+    unsigned int uidPlayer = 0;
+
+    while((itListPlayers != listPlayers.end()) && (uidPlayer == 0))
+    {
+        const QString infoPlayer = *(itListPlayers);
+        if(infoPlayer.section(';', Position_Name, Position_Name) == name)
+            uidPlayer = infoPlayer.section(';', Position_Uid, Position_Uid).toUInt();
+
+        itListPlayers++;
+    }
+
+    return uidPlayer;
+}
+
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
