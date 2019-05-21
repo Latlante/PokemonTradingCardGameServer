@@ -115,6 +115,7 @@ void Controller::onMessageReceived_Communication(QByteArray message)
 
     if(!jsonReceived.isEmpty())
     {
+        QString nameCurrentPlayer = jsonReceived["namePlayer"].toString();
         QJsonObject jsonResponseOwner;
         unsigned int readPoint = m_historicNotif.readPoint();
         QJsonValue valuePhase = jsonReceived["phase"];
@@ -127,19 +128,19 @@ void Controller::onMessageReceived_Communication(QByteArray message)
             switch(static_cast<ConstantesShared::GamePhase>(phase))
             {
             case ConstantesShared::PHASE_GetAllInfoOnGame:
-                jsonResponseOwner = getAllInfoOnTheGame(jsonReceived["namePlayer"].toString());
+                jsonResponseOwner = getAllInfoOnTheGame(nameCurrentPlayer);
                 break;
             case ConstantesShared::PHASE_SelectCards:
-                jsonResponseOwner = selectCardPerPlayer(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = selectCardPerPlayer(nameCurrentPlayer,
                                                    jsonReceived["cards"].toArray());
                 break;
 
             case ConstantesShared::PHASE_InitReady:
-                jsonResponseOwner = setInitReadyForAPlayer(jsonReceived["namePlayer"].toString());
+                jsonResponseOwner = setInitReadyForAPlayer(nameCurrentPlayer);
                 break;
 
             case ConstantesShared::PHASE_MoveACard:
-                jsonResponseOwner = moveACard(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = moveACard(nameCurrentPlayer,
                                          static_cast<Player::EnumPacket>(jsonReceived["idPacketOrigin"].toInt()),
                                          static_cast<Player::EnumPacket>(jsonReceived["idPacketDestination"].toInt()),
                                          jsonReceived["idCardOrigin"].toInt(),
@@ -147,12 +148,15 @@ void Controller::onMessageReceived_Communication(QByteArray message)
                 break;
 
             case ConstantesShared::PHASE_Attack_Retreat:
-                jsonResponseOwner = attack_retreat(jsonReceived["namePlayer"].toString(),
+                jsonResponseOwner = attack_retreat(nameCurrentPlayer,
                                                    jsonReceived["indexAttack"].toInt());
                 break;
 
             case ConstantesShared::PHASE_SkipTheTurn:
-                jsonResponseOwner = skipTurn(jsonReceived["namePlayer"].toString());
+            {
+                jsonResponseOwner = skipTurn(nameCurrentPlayer);
+                nameCurrentPlayer = nameOfEnemy(nameCurrentPlayer);
+            }
                 break;
 
             case ConstantesShared::PHASE_DisplayPacketResponse:
@@ -183,20 +187,28 @@ void Controller::onMessageReceived_Communication(QByteArray message)
         if(jsonResponseOwner["success"] == "ok")
         {
             //owner
-            QJsonObject objOwner = m_historicNotif.buildJsonNotificationFrom(readPoint, jsonReceived["namePlayer"].toString());
+            QJsonObject objOwner = m_historicNotif.buildJsonNotificationFrom(readPoint, nameCurrentPlayer);
             jsonResponseOwner["actions"] = objOwner;
+
+            //opponent
+            QString nameOpponent = nameOfEnemy(nameCurrentPlayer);
+            QJsonObject objOpponent;
+            objOpponent["actions"] = m_historicNotif.buildJsonNotificationFrom(readPoint, nameOpponent);
 
             //others
             QJsonObject objOther;
             objOther["actions"] = m_historicNotif.buildJsonNotificationFrom(readPoint);
 
-            m_communication->write(jsonReceived["namePlayer"].toString().toLatin1() + ";" +
-                                    QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact) + ";" +
-                                    QJsonDocument(objOther).toJson(QJsonDocument::Compact));
+            m_communication->write(nameCurrentPlayer.toLatin1() + ";" +
+                                   QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact) + ";" +
+                                   nameOpponent.toLatin1() + ";" +
+                                   QJsonDocument(objOpponent).toJson(QJsonDocument::Compact) + ";" +
+                                   ";" +    //no name for all other players/viewers
+                                   QJsonDocument(objOther).toJson(QJsonDocument::Compact));
         }
         else
         {
-            m_communication->write(jsonReceived["namePlayer"].toString().toLatin1() + ";" +
+            m_communication->write(nameCurrentPlayer.toLatin1() + ";" +
                                     QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact));
         }
     }
@@ -877,9 +889,8 @@ void Controller::sendNotifNewGameCreated(int uid, const QString &nameGame, const
     m_historicNotif.addNewNotification(notif);
 
     //construction of the notification to send
-    QByteArray messageToRespond = player1.toLatin1() + ";";
-
     //owner
+    QByteArray messageToRespond = player1.toLatin1() + ";";
     QJsonObject objNotifOwner = m_historicNotif.buildJsonNotificationFrom(readPoint, player1);
     if(objNotifOwner != QJsonObject())
     {
@@ -892,7 +903,22 @@ void Controller::sendNotifNewGameCreated(int uid, const QString &nameGame, const
         messageToRespond += ";";
     }
 
+    //opponent
+    messageToRespond += player2.toLatin1() + ";";
+    QJsonObject objNotifOpponent = m_historicNotif.buildJsonNotificationFrom(readPoint, player2);
+    if(objNotifOpponent != QJsonObject())
+    {
+        QJsonObject objOpponent;
+        objOpponent["actions"] = objNotifOpponent;
+        messageToRespond += QJsonDocument(objOpponent).toJson(QJsonDocument::Compact) + ";";
+    }
+    else
+    {
+        messageToRespond += ";";
+    }
+
     //others
+    messageToRespond += ";";        //for all others players/viewers
     QJsonObject objNotifOther = m_historicNotif.buildJsonNotificationFrom(readPoint);
     if(objNotifOther != QJsonObject())
     {
@@ -1008,4 +1034,19 @@ void Controller::sendNotifDisplayPacket(const QString &namePlayer, QMap<int, int
                                                                  cards);
 
     m_historicNotif.addNewNotification(notif);
+}
+
+QString Controller::nameOfEnemy(const QString &nameCurrentPlayer)
+{
+    QString namePlayer = "";
+    Player* currentPlayer = m_gameManager->playerByName(nameCurrentPlayer);
+
+    if(currentPlayer)
+    {
+        Player* opponent = m_gameManager->enemyOf(currentPlayer);
+        if(opponent)
+            namePlayer = opponent->name();
+    }
+
+    return namePlayer;
 }

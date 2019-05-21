@@ -69,6 +69,8 @@ private:
     void sendNotifEnergyRemoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy);
 
     void sendNotifDisplayPacket(const QString &namePlayer, QMap<int,int> cards);
+
+    QString nameOfEnemy(const QString& nameCurrentPlayer);
 };
 
 #endif // CONTROLLER_H

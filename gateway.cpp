@@ -1,6 +1,7 @@
 #include "gateway.h"
 
 #include <QDebug>
+#include <QJsonDocument>
 
 #include "authentification.h"
 #include "instancemanager.h"
@@ -61,21 +62,35 @@ void Gateway::onWriteToClient_serverInstances(unsigned int uidGame, QByteArray m
 {
     qDebug() << __PRETTY_FUNCTION__ << uidGame << message;
     QList<QString> messageSplit = QString(message).split(";");
-    QList<unsigned int> listUidPlayers = InstanceManager::instance()->listUidPlayersFromUidGame(uidGame);
-    const QString currentNamePlayer = messageSplit[0];
 
-    foreach(unsigned int uidPlayer, listUidPlayers)
+    if(messageSplit.count() % 2 == 0)
     {
-        if(Authentification::namePlayerFromUid(uidPlayer) == currentNamePlayer)
+        //fill a map with all message
+        QMap<QString, QJsonDocument> mapMessagesJson;
+        for(int i=0;i<messageSplit.count();i+=2)
         {
-            //security: does not send if the message is just "{}"
-            if(messageSplit[1].length() > 2)
-                m_serverClients->newMessage(uidPlayer, messageSplit[1].toLatin1());
+            const QString namePlayer = messageSplit[i];
+            const QString jsonText = messageSplit[i+1];
+
+            QJsonDocument doc = QJsonDocument::fromJson(jsonText.toLatin1());
+            if(doc.isEmpty() == false)
+                mapMessagesJson.insert(namePlayer, doc);
         }
-        else if(messageSplit.count() >= 2)
+
+        //send the message corresponding to the player
+        QList<unsigned int> listUidPlayers = InstanceManager::instance()->listUidPlayersFromUidGame(uidGame);
+
+        foreach(unsigned int uidPlayer, listUidPlayers)
         {
-            if(messageSplit[2].length() > 2)
-                m_serverClients->newMessage(uidPlayer, messageSplit[2].toLatin1());
+            const QString namePlayer = Authentification::namePlayerFromUid(uidPlayer);
+
+            if(mapMessagesJson.contains(namePlayer))
+                m_serverClients->newMessage(uidPlayer, mapMessagesJson.value(namePlayer).toJson(QJsonDocument::Compact));
+            else
+                m_serverClients->newMessage(uidPlayer, mapMessagesJson.value("").toJson(QJsonDocument::Compact));
         }
     }
+    else
+        qCritical() << __PRETTY_FUNCTION__ << "structure of message is incorrect:" << messageSplit.count() << "elements found";
+
 }
