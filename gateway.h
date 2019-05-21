@@ -4,6 +4,7 @@
 #include <QObject>
 
 class TcpServerClients;
+class TcpServerClientMonoThread;
 class TcpServerInstance;
 
 class Gateway : public QObject
@@ -27,7 +28,8 @@ private slots:
     void onWriteToClient_serverInstances(unsigned int uidGame, QByteArray message);
 
 private:
-    TcpServerClients* m_serverClients;
+    //TcpServerClients* m_serverClients;
+    TcpServerClientMonoThread* m_serverClients;
     TcpServerInstance* m_serverInstance;
 };
 

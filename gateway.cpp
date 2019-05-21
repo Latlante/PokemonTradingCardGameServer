@@ -6,15 +6,16 @@
 #include "instancemanager.h"
 #include "tcpserverclients.h"
 #include "CommunicationInstance/tcpserverinstance.h"
+#include "Communications/tcpserverclientmonothread.h"
 
 Gateway::Gateway(QObject *parent) :
     QObject(parent),
-    m_serverClients(new TcpServerClients()),
+    m_serverClients(new TcpServerClientMonoThread()),
     m_serverInstance(new TcpServerInstance())
 {
-    connect(m_serverClients, &TcpServerClients::newUserConnected, this, &Gateway::newUserConnected);
-    connect(m_serverClients, &TcpServerClients::userDisconnected, this, &Gateway::userDisconnected);
-    connect(m_serverClients, &TcpServerClients::writeToInstance, this, &Gateway::onWriteToInstance_serverClients);
+    connect(m_serverClients, &TcpServerClientMonoThread::newUserConnected, this, &Gateway::newUserConnected);
+    connect(m_serverClients, &TcpServerClientMonoThread::userDisconnected, this, &Gateway::userDisconnected);
+    connect(m_serverClients, &TcpServerClientMonoThread::writeToInstance, this, &Gateway::onWriteToInstance_serverClients);
 
     connect(m_serverInstance, &TcpServerInstance::newInstanceConnected, this, &Gateway::newInstanceConnected);
     connect(m_serverInstance, &TcpServerInstance::instanceAuthentified, this, &Gateway::instanceAuthentified);

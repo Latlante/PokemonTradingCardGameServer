@@ -41,7 +41,8 @@ SOURCES += \
     Models/modellistusers.cpp \
     CommunicationInstance/tcpserverinstance.cpp \
     CommunicationInstance/threadinstance.cpp \
-    gateway.cpp
+    gateway.cpp \
+    Communications/tcpserverclientmonothread.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -54,7 +55,8 @@ HEADERS += \
     Models/modellistusers.h \
     CommunicationInstance/tcpserverinstance.h \
     CommunicationInstance/threadinstance.h \
-    gateway.h
+    gateway.h \
+    Communications/tcpserverclientmonothread.h
 
 FORMS += \
         mainwindow.ui
