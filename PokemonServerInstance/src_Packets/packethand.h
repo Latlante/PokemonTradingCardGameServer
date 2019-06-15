@@ -8,7 +8,7 @@ class PacketHand : public AbstractPacketDynamic
     Q_OBJECT
 
 public:
-    PacketHand(const QString& namePacket, QList<AbstractCard *> listCards = QList<AbstractCard*>());
+    PacketHand(QList<AbstractCard *> listCards = QList<AbstractCard*>());
     virtual ~PacketHand();
 	
     int maxCards() const override;

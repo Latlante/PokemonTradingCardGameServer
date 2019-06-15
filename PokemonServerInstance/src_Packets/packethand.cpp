@@ -3,9 +3,10 @@
 
 #include "src_Cards/abstractcard.h"
 #include "src_Cards/cardpokemon.h"
+#include "../Share/constantesshared.h"
 
-PacketHand::PacketHand(const QString &namePacket, QList<AbstractCard*> listCards) :
-    AbstractPacketDynamic(namePacket, listCards)
+PacketHand::PacketHand(QList<AbstractCard*> listCards) :
+    AbstractPacketDynamic(ConstantesShared::PACKET_Hand, NAME_HAND, listCards)
 {
 	
 }

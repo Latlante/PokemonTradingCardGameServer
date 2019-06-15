@@ -10,7 +10,7 @@ class FightArea : public AbstractPacketStatic
     Q_OBJECT
 
 public:
-    FightArea(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
+    FightArea(QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~FightArea();
 	
     int maxCards() const override;

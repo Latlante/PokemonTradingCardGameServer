@@ -10,7 +10,7 @@ class PacketDeck : public AbstractPacketDynamic
     Q_OBJECT
 
 public:
-    PacketDeck(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
+    PacketDeck(QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~PacketDeck();
 	
     int maxCards() const override;

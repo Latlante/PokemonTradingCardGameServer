@@ -3,7 +3,7 @@
 #include "src_Cards/abstractcard.h"
 
 PacketDynamicCustom::PacketDynamicCustom(const QString &namePacket, QList<AbstractCard *> listCards) :
-    AbstractPacketDynamic(namePacket, listCards),
+    AbstractPacketDynamic(0, namePacket, listCards),
     m_maxCards(-1)
 {
 

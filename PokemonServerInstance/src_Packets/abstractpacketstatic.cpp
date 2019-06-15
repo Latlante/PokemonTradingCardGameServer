@@ -4,8 +4,8 @@
 #include "src_Cards/cardpokemon.h"
 #include "src_Log/log.h"
 
-AbstractPacketStatic::AbstractPacketStatic(const QString &namePacket, QList<AbstractCard *> listCards) :
-    AbstractPacket(namePacket, listCards)
+AbstractPacketStatic::AbstractPacketStatic(int id, const QString &namePacket, QList<AbstractCard *> listCards) :
+    AbstractPacket(id, namePacket, listCards)
 {
 
 }

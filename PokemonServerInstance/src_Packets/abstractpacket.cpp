@@ -3,9 +3,10 @@
 #include <QDebug>
 #include "src_Cards/abstractcard.h"
 
-AbstractPacket::AbstractPacket(const QString &namePacket, QList<AbstractCard*> listCards) :
+AbstractPacket::AbstractPacket(int id, const QString &namePacket, QList<AbstractCard*> listCards) :
     QAbstractListModel(NULL),
     m_listCards(listCards),
+    m_id(id),
     m_name(namePacket)
 {
 }
@@ -22,6 +23,11 @@ AbstractPacket::~AbstractPacket()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
+int AbstractPacket::id()
+{
+    return m_id;
+}
+
 QString AbstractPacket::name()
 {
     return m_name;

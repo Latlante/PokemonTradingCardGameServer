@@ -16,7 +16,7 @@ public:
         PacStaticRole_ImageCard
     };
 
-    explicit AbstractPacketStatic(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
+    explicit AbstractPacketStatic(int id, const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
 
     //virtual int maxCards() const = 0;
     virtual int countCard() const override;

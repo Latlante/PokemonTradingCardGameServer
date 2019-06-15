@@ -1,9 +1,10 @@
 #include "packetdeck.h"
 
 #include "src_Cards/abstractcard.h"
+#include "../Share/constantesshared.h"
 
-PacketDeck::PacketDeck(const QString &namePacket, QList<AbstractCard*> listCards) :
-    AbstractPacketDynamic(namePacket, listCards)
+PacketDeck::PacketDeck(QList<AbstractCard*> listCards) :
+    AbstractPacketDynamic(ConstantesShared::PACKET_Deck, NAME_DECK, listCards)
 {
 #ifndef TESTS_UNITAIRES
     mixCards();

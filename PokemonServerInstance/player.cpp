@@ -18,12 +18,12 @@
 Player::Player(QString name, QObject *parent) :
 	QObject(parent),
     m_name(name),
-    m_bench(new BenchArea(NAME_BENCH)),
-    m_deck(new PacketDeck(NAME_DECK)),
-    m_fight(new FightArea(NAME_FIGHT)),
-    m_hand(new PacketHand(NAME_HAND)),
-    m_rewards(new PacketRewards(NAME_REWARDS)),
-    m_trash(new PacketTrash(NAME_TRASH)),
+    m_bench(new BenchArea()),
+    m_deck(new PacketDeck()),
+    m_fight(new FightArea()),
+    m_hand(new PacketHand()),
+    m_rewards(new PacketRewards()),
+    m_trash(new PacketTrash()),
     m_initReady(false),
     m_canPlay(true),
     m_energyPlayedForThisRound(false)

@@ -1,7 +1,9 @@
 #include "packetrewards.h"
 
-PacketRewards::PacketRewards(const QString &namePacket, QList<AbstractCard*> listCards) :
-    AbstractPacketDynamic(namePacket, listCards)
+#include "../Share/constantesshared.h"
+
+PacketRewards::PacketRewards(QList<AbstractCard*> listCards) :
+    AbstractPacketDynamic(ConstantesShared::PACKET_Rewards, NAME_REWARDS, listCards)
 {
 	
 }

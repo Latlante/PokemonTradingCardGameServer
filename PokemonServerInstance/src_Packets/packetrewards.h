@@ -8,7 +8,7 @@ class PacketRewards : public AbstractPacketDynamic
     Q_OBJECT
 
 public:
-    PacketRewards(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
+    PacketRewards(QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~PacketRewards();
 	
     int maxCards() const override;

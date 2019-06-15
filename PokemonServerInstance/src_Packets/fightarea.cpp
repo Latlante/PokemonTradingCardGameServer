@@ -4,9 +4,10 @@
 #include "src_Cards/cardpokemon.h"
 #include "src_Log/log.h"
 #include "common/utils.h"
+#include "../Share/constantesshared.h"
 
-FightArea::FightArea(const QString &namePacket, QList<AbstractCard*> listCards) :
-    AbstractPacketStatic(namePacket, listCards)
+FightArea::FightArea(QList<AbstractCard*> listCards) :
+    AbstractPacketStatic(ConstantesShared::PACKET_Fight, NAME_FIGHT, listCards)
 {
     connect(this, &FightArea::countChanged, this, &FightArea::onCountChanged);
 }

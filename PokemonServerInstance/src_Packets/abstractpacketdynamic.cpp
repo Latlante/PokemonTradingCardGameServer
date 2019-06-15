@@ -3,8 +3,8 @@
 #include "src_Cards/abstractcard.h"
 #include "src_Log/log.h"
 
-AbstractPacketDynamic::AbstractPacketDynamic(const QString &namePacket, QList<AbstractCard *> listCards) :
-    AbstractPacket(namePacket, listCards)
+AbstractPacketDynamic::AbstractPacketDynamic(int id, const QString &namePacket, QList<AbstractCard *> listCards) :
+    AbstractPacket(id, namePacket, listCards)
 {
 
 }

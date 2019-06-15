@@ -11,7 +11,7 @@ class BenchArea : public AbstractPacketStatic
     Q_OBJECT
 
 public:
-    BenchArea(const QString& namePacket, QList<AbstractCard*> listCards = QList<AbstractCard*>());
+    BenchArea(QList<AbstractCard*> listCards = QList<AbstractCard*>());
     virtual ~BenchArea();
 	
     int maxCards() const override;

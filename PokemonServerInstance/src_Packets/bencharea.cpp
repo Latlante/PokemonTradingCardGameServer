@@ -2,13 +2,14 @@
 
 #include <QDebug>
 #include <QVariant>
+#include "../Share/constantesshared.h"
 #include "src_Cards/abstractcard.h"
 #include "src_Cards/cardpokemon.h"
 #include "src_Log/log.h"
 #include "src_Models/modellistenergies.h"
 
-BenchArea::BenchArea(const QString &namePacket, QList<AbstractCard*> listCards) :
-    AbstractPacketStatic(namePacket, listCards)
+BenchArea::BenchArea(QList<AbstractCard*> listCards) :
+    AbstractPacketStatic(ConstantesShared::PACKET_Bench, NAME_BENCH, listCards)
 {
 	
 }
