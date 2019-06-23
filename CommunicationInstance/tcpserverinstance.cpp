@@ -34,7 +34,7 @@ bool TcpServerInstance::newMessage(unsigned int uid, QByteArray message)
 {
     bool success = false;
 
-    if((m_mapThreadInstance.key(uid, nullptr) != nullptr) && (message.length() > 0))
+    if(message.length() > 0)
     {
         ThreadInstance* instance = m_mapThreadInstance.key(uid, nullptr);
         if(instance != nullptr)
@@ -42,7 +42,11 @@ bool TcpServerInstance::newMessage(unsigned int uid, QByteArray message)
             instance->newMessage(message);
             success = true;
         }
+        else
+            qCritical() << __PRETTY_FUNCTION__ << "instance is nullptr";
     }
+    else
+        qWarning() << __PRETTY_FUNCTION__ << "message is empty";
 
     return success;
 }

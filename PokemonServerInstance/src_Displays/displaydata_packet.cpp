@@ -50,8 +50,11 @@ QJsonDocument DisplayData_Packet::messageInfoToClient()
             m_quantity = arrayCards.count();
         jsonDisplay["quantity"] = m_quantity;
 
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "count card" + QString::number(m_packet->countCard()) + " " + QJsonDocument(jsonDisplay).toJson(QJsonDocument::Compact));
         docToReturn = QJsonDocument(jsonDisplay);
     }
+    else
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " packet is nullptr");
 
     return docToReturn;
 }

@@ -26,6 +26,8 @@ ThreadInstance::ThreadInstance(int socketDescriptor, QObject *parent) :
 ************************************************************/
 void ThreadInstance::newMessage(QByteArray message)
 {
+    qDebug() << __PRETTY_FUNCTION__ << message;
+
     if(message.length() > 0)
         m_listMessageToSend.append(message);
 }
@@ -111,7 +113,11 @@ void ThreadInstance::onTimeOut_timerWritting()
         in << static_cast<quint16>(message.length());
         in << message;
 
-        m_tcpSocket->write(requestToSend);
+        qint64 bytesWritten = m_tcpSocket->write(requestToSend);
+        if(bytesWritten == requestToSend.length())
+            qDebug() << __PRETTY_FUNCTION__ << "message send" << requestToSend;
+        else
+            qCritical() << __PRETTY_FUNCTION__ << "error during the sent of the message" << requestToSend;
     }
 }
 

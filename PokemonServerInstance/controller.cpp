@@ -262,7 +262,7 @@ void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, Constant
 void Controller::onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
 {
 #ifdef TRACAGE_PRECIS
-    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + namePlayer + " " + QString::number(quantity) + " " + QString::number(typeOfCard));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + "player:" + namePlayer + ", packet:" + packet->name() + ", quantity:" + QString::number(quantity) + ", type:" + QString::number(typeOfCard));
 #endif
 
     m_displayData = new DisplayData_Packet(namePlayer, packet, quantity, typeOfCard);
