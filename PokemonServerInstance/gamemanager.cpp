@@ -500,7 +500,7 @@ bool GameManager::retreat(CardPokemon *pokemonToRetreat)
                 pokemonToRetreat->moveEnergiesInTrash(listEnergies);
             }
 
-            listCardsBench = displayPacket(playerAttacking->bench(), 1);
+            listCardsBench = displayPacket(playerAttacking->name(), playerAttacking->bench(), 1);
 
             if(listCardsBench.first()->type() == AbstractCard::TypeOfCard_Pokemon)
             {
@@ -579,7 +579,7 @@ Player* GameManager::gameIsFinished()
     return playWinner;
 }
 
-QList<AbstractCard *> GameManager::displayPacket(AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
+QList<AbstractCard *> GameManager::displayPacket(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
 {
 #ifdef TRACAGE_PRECIS
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
@@ -591,7 +591,7 @@ QList<AbstractCard *> GameManager::displayPacket(AbstractPacket *packet, unsigne
 
     return {packet->card(0)};
 #else
-    emit displayPacketAsked(currentPlayer()->name(), packet, quantity, typeOfCard);
+    emit displayPacketAsked(namePlayer, packet, quantity, typeOfCard);
 
     QEventLoop loop;
     connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
@@ -622,7 +622,7 @@ QList<AbstractCard::Enum_element> GameManager::displayAllElements(unsigned short
 #endif
 }
 
-QList<AbstractCard *> GameManager::displaySelectHiddenCard(PacketRewards *packet, unsigned short quantity)
+QList<AbstractCard *> GameManager::displaySelectHiddenCard(const QString& namePlayer, PacketRewards *packet, unsigned short quantity)
 {
 #ifdef TRACAGE_PRECIS
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
@@ -633,7 +633,7 @@ QList<AbstractCard *> GameManager::displaySelectHiddenCard(PacketRewards *packet
 
     return {rewards->card(0)};
 #else
-    emit displaySelectHiddenCardAsked(currentPlayer()->name(), packet, quantity);
+    emit displaySelectHiddenCardAsked(namePlayer, packet, quantity);
 
     QEventLoop loop;
     connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
@@ -952,7 +952,7 @@ void GameManager::checkPokemonDead()
 #ifdef TESTS_UNITAIRES
             play->moveCardFromBenchToFight(0);
 #else
-            QList<AbstractCard*> listPokemonToReplace = displayPacket(play->bench());
+            QList<AbstractCard*> listPokemonToReplace = displayPacket(play->name(), play->bench());
 
             if(listPokemonToReplace.first()->type() == AbstractCard::TypeOfCard_Pokemon)
                 play->moveCardFromBenchToFight(static_cast<CardPokemon*>(listPokemonToReplace.first()));
@@ -969,7 +969,7 @@ void GameManager::checkPokemonDead()
 
         if(numberRewards > 0)
         {
-            QList<AbstractCard*> listCardsRewards = displaySelectHiddenCard(play->rewards(), numberRewards);
+            QList<AbstractCard*> listCardsRewards = displaySelectHiddenCard(play->name(), play->rewards(), numberRewards);
 
             foreach(AbstractCard* abCard, listCardsRewards)
                 play->drawOneReward(abCard);        //Le joueur adverse pioche une récompense

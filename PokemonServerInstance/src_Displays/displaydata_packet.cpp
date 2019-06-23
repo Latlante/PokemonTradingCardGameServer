@@ -24,9 +24,10 @@ QJsonDocument DisplayData_Packet::messageInfoToClient()
     {
         QJsonObject jsonDisplay;
         jsonDisplay["phase"] = static_cast<int>(ConstantesShared::PHASE_NotifDisplayPacket);
-        jsonDisplay["quantity"] = static_cast<short>(m_quantity);
-        jsonDisplay["packet"] = m_packet->id();
+        //jsonDisplay["quantity"] = static_cast<short>(m_quantity);
+        //jsonDisplay["packet"] = m_packet->id();
 
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", count:" + QString::number(m_packet->countCard()));
         QJsonArray arrayCards;
         for(int i=0;i<m_packet->countCard();++i)
         {
@@ -35,15 +36,19 @@ QJsonDocument DisplayData_Packet::messageInfoToClient()
 
             if(abCard != nullptr)
             {
-                if((abCard->type() == m_typeOfCard) || (abCard->type() == AbstractCard::TypeOfCard_Whatever))
+                if((m_typeOfCard == abCard->type()) || (m_typeOfCard == AbstractCard::TypeOfCard_Whatever))
                 {
                     objCard["idCard"] = abCard->id();
                     objCard["indexPacket"] = i;
+
+                    arrayCards.push_back(objCard);
                 }
             }
             else
                 Log::instance()->write(QString(__PRETTY_FUNCTION__) + "abCard is nullptr");
         }
+
+        jsonDisplay["packet"] = arrayCards;
 
         //check quantity
         if(m_quantity > arrayCards.count())

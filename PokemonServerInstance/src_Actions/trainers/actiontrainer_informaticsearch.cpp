@@ -29,12 +29,12 @@ void ActionTrainer_InformaticSearch::actionBeforeAttack()
     if((gameManager() != nullptr) && (playerAttacking() != nullptr))
     {
         //On défausse 2 cartes de la main
-        QList<AbstractCard*> listCardsHand = gameManager()->displayPacket(playerAttacking()->hand(), 2);
+        QList<AbstractCard*> listCardsHand = gameManager()->displayPacket(playerAttacking()->name(), playerAttacking()->hand(), 2);
         foreach(AbstractCard* card, listCardsHand)
             playerAttacking()->moveCardFromHandToTrash(card);
 
         //On récupére une carte de notre deck
-        QList<AbstractCard*> listCardsDeck = gameManager()->displayPacket(playerAttacking()->deck(), 1);
+        QList<AbstractCard*> listCardsDeck = gameManager()->displayPacket(playerAttacking()->name(), playerAttacking()->deck(), 1);
         foreach(AbstractCard* card, listCardsDeck)
             playerAttacking()->moveCardFromDeckToHand(card);
 

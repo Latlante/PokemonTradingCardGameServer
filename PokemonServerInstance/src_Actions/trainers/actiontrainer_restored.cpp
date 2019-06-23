@@ -28,12 +28,12 @@ void ActionTrainer_Restored::actionBeforeAttack()
     if((gameManager() != nullptr) && (playerAttacking() != nullptr))
     {
         //On défausse 2 cartes de la main
-        QList<AbstractCard*> listCardsHand = gameManager()->displayPacket(playerAttacking()->hand(), 2);
+        QList<AbstractCard*> listCardsHand = gameManager()->displayPacket(playerAttacking()->name(), playerAttacking()->hand(), 2);
         foreach(AbstractCard* card, listCardsHand)
             playerAttacking()->moveCardFromHandToTrash(card);
 
         //On récupére une carte dresseur de la pile de défausse
-        QList<AbstractCard*> listCardsTrash = gameManager()->displayPacket(playerAttacking()->trash(), 1, AbstractCard::TypeOfCard_Action);
+        QList<AbstractCard*> listCardsTrash = gameManager()->displayPacket(playerAttacking()->name(), playerAttacking()->trash(), 1, AbstractCard::TypeOfCard_Action);
         foreach(AbstractCard* card, listCardsTrash)
             playerAttacking()->moveCardFromTrashToHand(card);
     }

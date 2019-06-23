@@ -249,6 +249,11 @@ void TcpServerClientMonoThread::executeRequest(QTcpSocket *client, const QJsonDo
             case ConstantesShared::PHASE_MoveACard:
             case ConstantesShared::PHASE_Attack_Retreat:
             case ConstantesShared::PHASE_SkipTheTurn:
+            case ConstantesShared::PHASE_DisplayPacketResponse:
+            case ConstantesShared::PHASE_DisplayAllElementsResponse:
+            case ConstantesShared::PHASE_DisplayHiddenPacketResponse:
+            case ConstantesShared::PHASE_DisplayEnergiesForAPokemonResponse:
+            case ConstantesShared::PHASE_DisplayAttakcsPokemonResponse:
             {
                 hasToRepond = false;
 

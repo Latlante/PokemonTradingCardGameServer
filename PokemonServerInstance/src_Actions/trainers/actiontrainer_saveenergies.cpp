@@ -29,12 +29,12 @@ void ActionTrainer_SaveEnergies::actionBeforeAttack()
     if((gameManager() != nullptr) && (playerAttacking() != nullptr))
     {
         //On défausse 1 carte de la main
-        QList<AbstractCard*> listCardsHand = gameManager()->displayPacket(playerAttacking()->hand(), 1);
+        QList<AbstractCard*> listCardsHand = gameManager()->displayPacket(playerAttacking()->name(), playerAttacking()->hand(), 1);
         foreach(AbstractCard* card, listCardsHand)
             playerAttacking()->moveCardFromHandToTrash(card);
 
         //On récupére 2 cartes énergies de la pile de défausse
-        QList<AbstractCard*> listCardsTrash = gameManager()->displayPacket(playerAttacking()->trash(), 2, AbstractCard::TypeOfCard_Energy);
+        QList<AbstractCard*> listCardsTrash = gameManager()->displayPacket(playerAttacking()->name(), playerAttacking()->trash(), 2, AbstractCard::TypeOfCard_Energy);
         foreach(AbstractCard* card, listCardsTrash)
             playerAttacking()->moveCardFromTrashToHand(card);
     }

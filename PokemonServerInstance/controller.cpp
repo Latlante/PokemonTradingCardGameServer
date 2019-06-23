@@ -155,7 +155,7 @@ void Controller::onMessageReceived_Communication(QByteArray message)
             case ConstantesShared::PHASE_SkipTheTurn:
             {
                 jsonResponseOwner = skipTurn(nameCurrentPlayer);
-                nameCurrentPlayer = nameOfEnemy(nameCurrentPlayer);
+                //nameCurrentPlayer = nameOfEnemy(nameCurrentPlayer);
             }
                 break;
 

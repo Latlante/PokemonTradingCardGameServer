@@ -55,9 +55,9 @@ public:
     //Fin de la game
     Player *gameIsFinished();
 
-    QList<AbstractCard *> displayPacket(AbstractPacket *packet, unsigned short quantity = 1, AbstractCard::Enum_typeOfCard typeOfCard = AbstractCard::TypeOfCard_Whatever);
+    QList<AbstractCard *> displayPacket(const QString& namePlayer, AbstractPacket *packet, unsigned short quantity = 1, AbstractCard::Enum_typeOfCard typeOfCard = AbstractCard::TypeOfCard_Whatever);
     QList<AbstractCard::Enum_element> displayAllElements(unsigned short quantity = 1);
-    QList<AbstractCard *> displaySelectHiddenCard(PacketRewards *packet, unsigned short quantity = 1);
+    QList<AbstractCard *> displaySelectHiddenCard(const QString& namePlayer, PacketRewards *packet, unsigned short quantity = 1);
     QList<CardEnergy *> displayEnergiesForAPokemon(CardPokemon* pokemon, unsigned short quantity, AbstractCard::Enum_element element);
     int displayAttacks(CardPokemon* card, bool blockRetreat = false);
     void displayMessage(QString message);
