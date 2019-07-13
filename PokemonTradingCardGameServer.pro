@@ -30,6 +30,7 @@ Release:OBJECTS_DIR = release/obj/
 Release:MOC_DIR = release/moc/
 
 SOURCES += \
+    Communications/tcpserverinstancemonothread.cpp \
         main.cpp \
         mainwindow.cpp \
     tcpserverclients.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
     Communications/tcpserverclientmonothread.cpp
 
 HEADERS += \
+    Communications/tcpserverinstancemonothread.h \
         mainwindow.h \
     tcpserverclients.h \
     threadclient.h \

@@ -5,7 +5,7 @@
 
 class TcpServerClients;
 class TcpServerClientMonoThread;
-class TcpServerInstance;
+class TcpServerInstanceMonoThread;
 
 class Gateway : public QObject
 {
@@ -30,7 +30,7 @@ private slots:
 private:
     //TcpServerClients* m_serverClients;
     TcpServerClientMonoThread* m_serverClients;
-    TcpServerInstance* m_serverInstance;
+    TcpServerInstanceMonoThread* m_serverInstance;
 };
 
 #endif // GATEWAY_H

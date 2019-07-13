@@ -59,14 +59,17 @@ void ModelTableGames::gameAuthentified(int socketDescriptor, unsigned int id, co
 {
     int indexList = indexListFromSocketDescriptor(socketDescriptor);
 
-    InfoGame info = m_listInfos[indexList];
-    info.id = id;
-    info.nameGame = nameGame;
-    info.playerCreator = creator;
-    info.playerOpponent = opponent;
-    m_listInfos.replace(indexList, info);
+    if(indexList >= 0)
+    {
+        InfoGame info = m_listInfos[indexList];
+        info.id = id;
+        info.nameGame = nameGame;
+        info.playerCreator = creator;
+        info.playerOpponent = opponent;
+        m_listInfos.replace(indexList, info);
 
-    emit dataChanged(index(indexList, 0), index(indexList, ROLE_COUNT));
+        emit dataChanged(index(indexList, 0), index(indexList, ROLE_COUNT));
+    }
 }
 
 void ModelTableGames::removeAGame(int socketDescriptor)
