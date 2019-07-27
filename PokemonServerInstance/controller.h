@@ -12,6 +12,7 @@
 class AbstractDisplayData;
 class GameManager;
 class SocketToServer;
+class LocalSocketToServer;
 
 class Controller : public QObject
 {
@@ -45,7 +46,7 @@ private slots:
     void onDisplayAttacksAsked(const QString& namePlayer, CardPokemon* pokemon, bool retreatEnable);
 
 private:
-    SocketToServer* m_communication;
+    LocalSocketToServer* m_communication;
     GameManager* m_gameManager;
     HistoricalNotifications m_historicNotif;
     AbstractDisplayData *m_displayData;

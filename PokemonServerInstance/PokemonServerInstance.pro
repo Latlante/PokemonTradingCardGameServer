@@ -77,6 +77,8 @@ SOURCES += \
     src_Cards/cardaction.cpp \
     src_Cards/cardenergy.cpp \
     src_Cards/cardpokemon.cpp \
+    src_Communication/localsockettoserver.cpp \
+    src_Communication/sockettoserverthreading.cpp \
     src_Models/modellistenergies.cpp \
     src_Packets/abstractpacket.cpp \
     src_Packets/abstractpacketdynamic.cpp \
@@ -168,6 +170,8 @@ HEADERS += \
     src_Cards/cardaction.h \
     src_Cards/cardenergy.h \
     src_Cards/cardpokemon.h \
+    src_Communication/localsockettoserver.h \
+    src_Communication/sockettoserverthreading.h \
     src_Models/modellistenergies.h \
     src_Packets/abstractpacket.h \
     src_Packets/abstractpacketdynamic.h \

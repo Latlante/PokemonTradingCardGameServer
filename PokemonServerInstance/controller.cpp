@@ -10,6 +10,7 @@
 #include "common/database.h"
 #include "common/utils.h"
 #include "src_Communication/sockettoserver.h"
+#include "src_Communication/localsockettoserver.h"
 #include "src_Displays/displaydata_allelements.h"
 #include "src_Displays/displaydata_attackspokemon.h"
 #include "src_Displays/displaydata_energiesforapokemon.h"
@@ -27,7 +28,7 @@
 
 Controller::Controller(const QString &uidGame, const QString &nameGame, const QString &player1, const QString &player2, QObject *parent) :
     QObject(parent),
-    m_communication(new SocketToServer()),
+    m_communication(new LocalSocketToServer()),
     m_gameManager(GameManager::createInstance()),
     m_historicNotif(HistoricalNotifications()),
     m_displayData(nullptr)
@@ -37,7 +38,7 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
 
     if(m_communication->tryToConnect())
     {
-        connect(m_communication, &SocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
+        connect(m_communication, &LocalSocketToServer::messageReceived, this, &Controller::onMessageReceived_Communication);
 
         //Authentification for the server
         /*QString requestBoot = "boot;";

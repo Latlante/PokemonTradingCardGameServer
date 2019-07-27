@@ -7,22 +7,23 @@
 #include "instancemanager.h"
 #include "tcpserverclients.h"
 //#include "CommunicationInstance/tcpserverinstance.h"
-#include "Communications/tcpserverinstancemonothread.h"
+//#include "Communications/tcpserverinstancemonothread.h"
+#include "Communications/localserverinstance.h"
 #include "Communications/tcpserverclientmonothread.h"
 
 Gateway::Gateway(QObject *parent) :
     QObject(parent),
     m_serverClients(new TcpServerClientMonoThread()),
-    m_serverInstance(new TcpServerInstanceMonoThread())
+    m_serverInstance(new LocalServerInstance())
 {
     connect(m_serverClients, &TcpServerClientMonoThread::newUserConnected, this, &Gateway::newUserConnected);
     connect(m_serverClients, &TcpServerClientMonoThread::userDisconnected, this, &Gateway::userDisconnected);
     connect(m_serverClients, &TcpServerClientMonoThread::writeToInstance, this, &Gateway::onWriteToInstance_serverClients);
 
-    connect(m_serverInstance, &TcpServerInstanceMonoThread::newInstanceConnected, this, &Gateway::newInstanceConnected);
-    connect(m_serverInstance, &TcpServerInstanceMonoThread::instanceAuthentified, this, &Gateway::instanceAuthentified);
-    connect(m_serverInstance, &TcpServerInstanceMonoThread::instanceDisconnected, this, &Gateway::instanceDisconnected);
-    connect(m_serverInstance, &TcpServerInstanceMonoThread::writeToClient, this, &Gateway::onWriteToClient_serverInstances);
+    connect(m_serverInstance, &LocalServerInstance::newInstanceConnected, this, &Gateway::newInstanceConnected);
+    connect(m_serverInstance, &LocalServerInstance::instanceAuthentified, this, &Gateway::instanceAuthentified);
+    connect(m_serverInstance, &LocalServerInstance::instanceDisconnected, this, &Gateway::instanceDisconnected);
+    connect(m_serverInstance, &LocalServerInstance::writeToClient, this, &Gateway::onWriteToClient_serverInstances);
 }
 
 Gateway::~Gateway()
