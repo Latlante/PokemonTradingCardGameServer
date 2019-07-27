@@ -11,6 +11,7 @@ public:
                                    ConstantesShared::EnumPacket packet,
                                    unsigned int indexCard,
                                    unsigned int lifeLeft,
+                                   short status,
                                    QMap<unsigned int, bool> mapAttacksAvailable,
                                    QList<unsigned int> listIdEnergies);
 
@@ -21,6 +22,7 @@ private:
     ConstantesShared::EnumPacket m_packet;
     unsigned int m_indexCard;
     unsigned int m_lifeLeft;
+    short m_status;
     QMap<unsigned int, bool> m_mapAttacksAvailable;
     QList<unsigned int> m_listIdEnergies;
 };

@@ -998,6 +998,7 @@ void Controller::sendNotifDataPokemonChanged(const QString &namePlayer, Constant
                                                                      packet,
                                                                      indexCard,
                                                                      pokemon->lifeLeft(),
+                                                                     static_cast<short>(pokemon->status()),
                                                                      mapAttackAvailable,
                                                                      listEnergies);
     m_historicNotif.addNewNotification(notif);

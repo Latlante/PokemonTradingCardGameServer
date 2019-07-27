@@ -1,10 +1,11 @@
 #include "notificationdatapokemonchanged.h"
 
-NotificationDataPokemonChanged::NotificationDataPokemonChanged(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int lifeLeft, QMap<unsigned int, bool> mapAttacksAvailable, QList<unsigned int> listIdEnergies) :
+NotificationDataPokemonChanged::NotificationDataPokemonChanged(const QString &namePlayer, ConstantesShared::EnumPacket packet, unsigned int indexCard, unsigned int lifeLeft, short status, QMap<unsigned int, bool> mapAttacksAvailable, QList<unsigned int> listIdEnergies) :
     AbstractNotification(ConstantesShared::PHASE_NotifDataPokemonChanged, namePlayer),
     m_packet(packet),
     m_indexCard(indexCard),
     m_lifeLeft(lifeLeft),
+    m_status(status),
     m_mapAttacksAvailable(mapAttacksAvailable),
     m_listIdEnergies(listIdEnergies)
 {
@@ -26,6 +27,7 @@ QJsonObject NotificationDataPokemonChanged::messageJsonForOthers()
     jsonResponse["idPacket"] = static_cast<int>(m_packet);
     jsonResponse["indexCard"] = static_cast<int>(m_indexCard);
     jsonResponse["lifeLeft"] = static_cast<int>(m_lifeLeft);
+    jsonResponse["status"] = static_cast<int>(m_status);
 
     QJsonArray arrayAttacks;
     for(QMap<unsigned int,bool>::iterator it=m_mapAttacksAvailable.begin();it!=m_mapAttacksAvailable.end();++it)
