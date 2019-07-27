@@ -33,6 +33,7 @@ private slots:
 private:
     struct InfoClient
     {
+        long socketDescriptor;
         QString user;
         unsigned int uid;
         QString token;

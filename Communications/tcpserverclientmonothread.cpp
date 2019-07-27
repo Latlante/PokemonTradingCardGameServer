@@ -61,6 +61,7 @@ bool TcpServerClientMonoThread::isRunning()
 bool TcpServerClientMonoThread::newMessage(unsigned int uid, QByteArray message)
 {
     QTcpSocket* client = socketFromUid(uid);
+    qDebug() << __PRETTY_FUNCTION__ << uid << message;
     return newMessage(client, message);
 }
 
@@ -95,12 +96,10 @@ void TcpServerClientMonoThread::onNewConnection_TcpServer()
 {
     qDebug() << __PRETTY_FUNCTION__;
     QTcpSocket* newClient = m_tcpServer->nextPendingConnection();
-    m_listClients.insert(newClient, { "", 0, "", 0 });
+    m_listClients.insert(newClient, { -1, "", 0, "", 0 });
 
     connect(newClient, &QTcpSocket::readyRead, this, &TcpServerClientMonoThread::onReadyRead_Client);
     connect(newClient, &QTcpSocket::disconnected, this, &TcpServerClientMonoThread::onDisconnected_Client);
-
-
 }
 
 void TcpServerClientMonoThread::onReadyRead_Client()
@@ -160,7 +159,7 @@ void TcpServerClientMonoThread::onDisconnected_Client()
     QTcpSocket* client = qobject_cast<QTcpSocket*>(sender());
     if(client)
     {
-        emit userDisconnected(client->socketDescriptor());
+        emit userDisconnected(m_listClients[client].socketDescriptor);
         m_listClients.remove(client);
         client->deleteLater();
     }
@@ -308,6 +307,7 @@ QJsonObject TcpServerClientMonoThread::authentify(QTcpSocket *client, QString us
     {
         //set data
         InfoClient info;
+        info.socketDescriptor = client->socketDescriptor();
         info.user = auth.user();
         info.uid = auth.uid();
         info.token = auth.token();
