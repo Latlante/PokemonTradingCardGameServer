@@ -25,6 +25,10 @@ bool ActionChangeEnemyStatus::checkElements()
 
 void ActionChangeEnemyStatus::actionAfterAttack()
 {
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", type=" + QString::number(type()) + ", status=" + QString::number(m_status));
+#endif
+
     if(pokemonAttacked() != nullptr)
         pokemonAttacked()->setStatus(m_status);
 }

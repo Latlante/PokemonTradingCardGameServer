@@ -175,6 +175,7 @@ void Controller::onMessageReceived_Communication(QByteArray message)
             }
 
             jsonResponseOwner["phase"] = jsonReceived["phase"];
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", return from gameManager:" + QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact));
         }
         else
         {
@@ -199,6 +200,8 @@ void Controller::onMessageReceived_Communication(QByteArray message)
             //others
             QJsonObject objOther;
             objOther["actions"] = m_historicNotif.buildJsonNotificationFrom(readPoint);
+
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", after notification:" + QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact));
 
             m_communication->write(nameCurrentPlayer.toLatin1() + ";" +
                                    QJsonDocument(jsonResponseOwner).toJson(QJsonDocument::Compact) + ";" +
@@ -283,7 +286,8 @@ void Controller::onDisplayAllElementsAsked(const QString &namePlayer, unsigned s
     QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
-    m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+    if(m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact)) == false)
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " error to send message");
 }
 
 void Controller::onDisplayHiddenPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity)
@@ -296,7 +300,8 @@ void Controller::onDisplayHiddenPacketAsked(const QString &namePlayer, AbstractP
     QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
-    m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+    if(m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact)) == false)
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " error to send message");
 }
 
 void Controller::onDisplayEnergiesForAPokemonAsked(const QString &namePlayer, CardPokemon* pokemon, unsigned short quantity, AbstractCard::Enum_element element)
@@ -309,7 +314,8 @@ void Controller::onDisplayEnergiesForAPokemonAsked(const QString &namePlayer, Ca
     QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
-    m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+    if(m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact)) == false)
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " error to send message");
 }
 
 void Controller::onDisplayAttacksAsked(const QString& namePlayer, CardPokemon* pokemon, bool retreatEnable)
@@ -324,7 +330,8 @@ void Controller::onDisplayAttacksAsked(const QString& namePlayer, CardPokemon* p
         QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
         Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
-        m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+        if(m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact)) == false)
+            Log::instance()->write(QString(__PRETTY_FUNCTION__) + " error to send message");
     }
     else
         Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + namePlayer + ", pokemon is nullptr");

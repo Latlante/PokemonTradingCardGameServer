@@ -16,6 +16,11 @@ AbstractNotification::~AbstractNotification()
 /************************************************************
 *****				FONCTIONS PUBLIQUES					*****
 ************************************************************/
+ConstantesShared::GamePhase AbstractNotification::phase()
+{
+    return m_phase;
+}
+
 const QString AbstractNotification::namePlayer()
 {
     return m_namePlayer;

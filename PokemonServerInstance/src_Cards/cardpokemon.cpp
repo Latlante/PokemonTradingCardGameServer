@@ -703,7 +703,7 @@ CardPokemon::Enum_StatusOfAttack CardPokemon::tryToAttack(int indexAttack, CardP
 void CardPokemon::takeDamage(unsigned short damage)
 {
 #ifdef TRACAGE_PRECIS
-    Log::instance()->write(QString(__PRETTY_FUNCTION__));
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", damage=" + QString::number(damage));
 #endif
 
     unsigned short damageRecalculated = damage;

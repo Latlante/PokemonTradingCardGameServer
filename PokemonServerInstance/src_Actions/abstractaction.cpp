@@ -1,7 +1,5 @@
 #include "abstractaction.h"
 
-#include "src_Log/log.h"
-
 AbstractAction::AbstractAction() :
     m_arg1(QVariant()),
     m_arg2(QVariant()),
@@ -77,6 +75,10 @@ QVariant AbstractAction::arg2()
 
 void AbstractAction::executeActionBeforeAttack(CardPokemon *pokemonAttached, short index)
 {
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", pokemonAttached=" + pokemonAttached->name() + ", index=" + QString::number(index));
+#endif
+
     m_pokemonAttached = pokemonAttached;
 
     //Vérifications
@@ -131,6 +133,10 @@ void AbstractAction::executeActionBeforeAttack(CardPokemon *pokemonAttached, sho
 
 void AbstractAction::executeActionAfterAttack(CardPokemon *pokemonAttached, short index)
 {
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", pokemonAttached=" + pokemonAttached->name() + ", index=" + QString::number(index));
+#endif
+
     m_pokemonAttached = pokemonAttached;
 
     //Vérifications

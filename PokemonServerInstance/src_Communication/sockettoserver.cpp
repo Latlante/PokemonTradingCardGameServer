@@ -76,7 +76,7 @@ bool SocketToServer::tryToConnect()
 
 bool SocketToServer::write(QByteArray message)
 {
-    Log::instance()->write(QString(__PRETTY_FUNCTION__) + QTime::currentTime().toString("hh:mm:ss.zzz").toLatin1() + " message: " + message);
+    Log::instance()->write(QString(__PRETTY_FUNCTION__)+ " message: " + message);
 
     //init request
     QByteArray requestToSend;
@@ -86,6 +86,7 @@ bool SocketToServer::write(QByteArray message)
 
     //send the request
     qint64 bytesWritten = m_socket->write(requestToSend);
+    Log::instance()->write(QString(__PRETTY_FUNCTION__)+ QString::number(bytesWritten) + " on " + QString::number(requestToSend.length()));
 
     return bytesWritten == requestToSend.length();
 }

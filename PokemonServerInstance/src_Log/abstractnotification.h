@@ -13,6 +13,8 @@ public:
     explicit AbstractNotification(ConstantesShared::GamePhase phase, const QString& namePlayer = "");
     virtual ~AbstractNotification();
 
+    ConstantesShared::GamePhase phase();
+
     const QString namePlayer();
     void setNamePlayer(const QString& namePlayer);
 

@@ -15,11 +15,18 @@ HistoricalNotifications::HistoricalNotifications()
 ************************************************************/
 int HistoricalNotifications::addNewNotification(AbstractNotification *notif)
 {
-    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + QString::number(count()));
+    int index = -1;
 
-    m_listNotifications.append(notif);
+    if(notif != nullptr)
+    {
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", phase=" + QString::number(notif->phase()) + ", index=" + QString::number(count()));
 
-    return m_listNotifications.indexOf(notif);
+        m_listNotifications.append(notif);
+
+        index = m_listNotifications.indexOf(notif);
+    }
+
+    return index;
 }
 
 unsigned int HistoricalNotifications::readPoint()
