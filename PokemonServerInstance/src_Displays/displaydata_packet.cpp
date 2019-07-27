@@ -83,7 +83,7 @@ bool DisplayData_Packet::messageResponseFromClient(const QJsonDocument &document
 
                     if(card != nullptr)
                     {
-                        bool hasGoodTypeOfCard = (card->type() == m_typeOfCard) || (card->type() == AbstractCard::TypeOfCard_Whatever);
+                        bool hasGoodTypeOfCard = (m_typeOfCard == card->type()) || (m_typeOfCard == AbstractCard::TypeOfCard_Whatever);
 
                         if(hasGoodTypeOfCard == true)
                             listCards.append(card);

@@ -76,7 +76,14 @@ QJsonObject DisplayData_HiddenPacket::messageResultToClient()
     jsonToReturn["phase"] = static_cast<int>(ConstantesShared::PHASE_DisplayHiddenPacketResponse);
 
     if(m_success)
+    {
+        QJsonArray array;
+        QList<AbstractCard*> listCards = m_argument.value<QList<AbstractCard*> >();
+        foreach(AbstractCard* abCard, listCards)
+            array.push_back(abCard->id());
+        jsonToReturn["idCards"] = array;
         jsonToReturn["success"] = "ok";
+    }
     else
     {
         jsonToReturn["success"] = "ok";
