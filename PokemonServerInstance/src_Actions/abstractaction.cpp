@@ -1,5 +1,7 @@
 #include "abstractaction.h"
 
+#include "src_Log/log.h"
+
 AbstractAction::AbstractAction() :
     m_arg1(QVariant()),
     m_arg2(QVariant()),
@@ -212,10 +214,16 @@ void AbstractAction::actionAfterAttack()
 //Pourra être utile plus tard pour les tests
 unsigned short AbstractAction::headOrTail()
 {
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
+#endif
+
     unsigned short coin = 0;
 
     if(gameManager() != nullptr)
         coin = gameManager()->headOrTail();
+    else
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", Error: gameManager is nullptr");
 
 #ifdef TESTS_UNITAIRES
     m_listCoins.append(coin);

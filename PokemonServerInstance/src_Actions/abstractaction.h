@@ -10,8 +10,6 @@
 #include "src_Packets/bencharea.h"
 #include "src_Packets/fightarea.h"
 
-#include "src_Log/log.h"
-
 class AbstractAction
 {
 public:

@@ -1,5 +1,7 @@
 #include "actionchangeenemystatusrandom.h"
 
+#include "src_Log/log.h"
+
 ActionChangeEnemyStatusRandom::ActionChangeEnemyStatusRandom(QVariant arg1, QVariant arg2) :
     AbstractAction(arg1, arg2)
 {
@@ -28,6 +30,10 @@ bool ActionChangeEnemyStatusRandom::checkElements()
 
 void ActionChangeEnemyStatusRandom::actionAfterAttack()
 {
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", type=" + QString::number(type()) + ", statusOnHead=" + QString::number(m_statusOnHead) + ", statusOnTail=" + QString::number(m_statusOnTail));
+#endif
+
     if(pokemonAttacked() != nullptr)
     {
         if(headOrTail() == 1)

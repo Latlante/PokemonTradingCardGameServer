@@ -1,5 +1,7 @@
 #include "actionchangeenemystatus.h"
 
+#include "src_Log/log.h"
+
 ActionChangeEnemyStatus::ActionChangeEnemyStatus(QVariant arg1) :
     AbstractAction(arg1)
 {
