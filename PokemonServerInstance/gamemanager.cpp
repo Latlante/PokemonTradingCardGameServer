@@ -769,6 +769,7 @@ unsigned short GameManager::headOrTail()
     unsigned short coin = Utils::headOrTail();
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " coin=" + QString::number(coin));
 
+    emit headOrTailDone(currentPlayer()->name(), coin);
     /*emit headOrTailAsked();
 
     QEventLoop loop;

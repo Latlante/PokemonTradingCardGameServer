@@ -79,8 +79,6 @@ signals:
     void displaySelectHiddenCardAsked(const QString&,AbstractPacket*, unsigned short);
     void displayEnergiesForAPokemonAsked(const QString&,CardPokemon*, unsigned short, AbstractCard::Enum_element);
     void displayAttacksAsked(const QString&,CardPokemon*, bool);
-    void displayMessageAsked(QString);
-    void headOrTailAsked();
     void selectionDisplayFinished();
 
     //void logReceived(QString);
@@ -92,6 +90,8 @@ signals:
     void pokemonSwitched(const QString&, ConstantesShared::EnumPacket, int, int, bool);
     void energyAdded(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
     void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
+    void headOrTailDone(const QString&, unsigned short);
+    void newMessage(const QString&, QString);
 
 private slots:
     void onEndOfTurn_Player();
