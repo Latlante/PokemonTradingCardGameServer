@@ -43,6 +43,7 @@ QJsonDocument DisplayData_EnergiesForAPokemon::messageInfoToClient()
                 }
             }
         }
+        jsonToReturn["elements"] = arrayPacket;
     }
 
     return QJsonDocument(jsonToReturn);
