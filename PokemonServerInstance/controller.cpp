@@ -68,7 +68,6 @@ Controller::Controller(const QString &uidGame, const QString &nameGame, const QS
     connect(m_gameManager, &GameManager::energyAdded, this, &Controller::onEnergyAdded_GameManager);
     connect(m_gameManager, &GameManager::energyRemoved, this, &Controller::onEnergyRemoved_GameManager);
     connect(m_gameManager, &GameManager::headOrTailDone, this, &Controller::onHeadOrTailDone_GameManager);
-    connect(m_gameManager, &GameManager::newMessage, this, &Controller::onNewMessage_GameManager);
 
     connect(m_gameManager, &GameManager::displayPacketAsked, this, &Controller::onDisplayPacketAsked);
     connect(m_gameManager, &GameManager::displayAllElementsAsked, this, &Controller::onDisplayAllElementsAsked);
@@ -268,11 +267,6 @@ void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, Constant
 void Controller::onHeadOrTailDone_GameManager(const QString& namePlayer, unsigned short coin)
 {
     sendNotifHeadOrTailDone(namePlayer, coin);
-}
-
-void Controller::onNewMessage_GameManager(const QString &namePlayer, const QString& message, bool showToEveryOne)
-{
-    sendNotifNewMessage(namePlayer, message, showToEveryOne);
 }
 
 void Controller::onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
@@ -1053,15 +1047,6 @@ void Controller::sendNotifHeadOrTailDone(const QString &namePlayer, unsigned sho
 {
     AbstractNotification* notif = new NotificationHeadOrTail(namePlayer,
                                                              coin);
-
-    m_historicNotif.addNewNotification(notif);
-}
-
-void Controller::sendNotifNewMessage(const QString &namePlayer, const QString &message, bool showToEveryOne)
-{
-    AbstractNotification* notif = new NotificationNewMessage(namePlayer,
-                                                             message,
-                                                             showToEveryOne);
 
     m_historicNotif.addNewNotification(notif);
 }

@@ -60,7 +60,6 @@ public:
     QList<AbstractCard *> displaySelectHiddenCard(const QString& namePlayer, PacketRewards *packet, unsigned short quantity = 1);
     QList<CardEnergy *> displayEnergiesForAPokemon(CardPokemon* pokemon, unsigned short quantity, AbstractCard::Enum_element element);
     int displayAttacks(CardPokemon* card, bool blockRetreat = false);
-    void displayMessage(QString message);
     void endOfSelectionDisplay(QVariant element = QVariant());
 
 #ifdef TESTS_UNITAIRES
@@ -91,7 +90,6 @@ signals:
     void energyAdded(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
     void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
     void headOrTailDone(const QString&, unsigned short);
-    void newMessage(const QString&, QString);
 
 private slots:
     void onEndOfTurn_Player();

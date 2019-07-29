@@ -11,7 +11,6 @@
 #include "src_Log/notificationenergyremoved.h"
 #include "src_Log/notificationheadortail.h"
 #include "src_Log/notificationnewgamecreated.h"
-#include "src_Log/notificationnewmessage.h"
 #include "src_Log/notificationplayerisready.h"
 #include "src_Log/notificationpokemonswitched.h"
 

@@ -432,7 +432,6 @@ void GameManager::startGame()
 #endif
 
     selectFirstPlayer();
-    displayMessage(currentPlayer()->name() + " commence à jouer");
     currentPlayer()->newTurn();
     currentPlayer()->drawOneCard();
 }
@@ -540,8 +539,6 @@ void GameManager::endOfTurn()
     {
         foreach(Player* play, m_listPlayers)
             play->turnFinished();
-
-        displayMessage("VICTOIRE DE " + playerWinner->name());
     }
     else
     {
@@ -719,19 +716,6 @@ int GameManager::displayAttacks(CardPokemon* card, bool blockRetreat)
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + QString::number(m_elementFromDisplays.toInt()));
 
     return m_elementFromDisplays.toInt();
-#endif
-}
-
-void GameManager::displayMessage(QString message)
-{
-#ifdef TRACAGE_PRECIS
-    Log::instance()->write(QString(__PRETTY_FUNCTION__));
-#endif
-
-#ifdef TESTS_UNITAIRES
-    Q_UNUSED(message)
-#else
-    emit displayMessageAsked(message);
 #endif
 }
 
