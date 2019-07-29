@@ -750,19 +750,38 @@ unsigned short GameManager::headOrTail()
     Log::instance()->write(QString(__PRETTY_FUNCTION__));
 #endif
 
-    unsigned short coin = Utils::headOrTail();
-    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " coin=" + QString::number(coin));
+    unsigned short coin = 0;
+    QList<unsigned short> listCoins = headsOrTails(1);
 
-    emit headOrTailDone(currentPlayer()->name(), coin);
-    /*emit headOrTailAsked();
+    if(listCoins.count() >= 1)
+        coin = listCoins.first();
+    else
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + ", error: listCoin is empty");
 
-    QEventLoop loop;
-    connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
-    loop.exec();
-
-    return m_elementFromDisplays.toInt();*/
     return coin;
 }
+
+QList<unsigned short> GameManager::headsOrTails(unsigned short number)
+{
+#ifdef TRACAGE_PRECIS
+    Log::instance()->write(QString(__PRETTY_FUNCTION__));
+#endif
+
+    QList<unsigned short> listCoins;
+    for(int i=0;i<number;++i)
+        listCoins.push_back(Utils::headOrTail());
+
+    QString strListCoins = "listCoins (" + QString::number(listCoins.count()) + "){ ";
+    foreach(unsigned short coin, listCoins)
+        strListCoins += QString::number(coin) + " ";
+    strListCoins += "}";
+    Log::instance()->write(QString(__PRETTY_FUNCTION__) + " coins=" + strListCoins);
+
+    emit headOrTailDone(currentPlayer()->name(), listCoins);
+
+    return listCoins;
+}
+
 #endif
 
 /************************************************************

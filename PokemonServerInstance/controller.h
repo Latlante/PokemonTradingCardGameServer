@@ -38,7 +38,7 @@ private slots:
     void onPokemonSwitched_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard, bool keepEnergy);
     void onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy);
     void onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy);
-    void onHeadOrTailDone_GameManager(const QString& namePlayer, unsigned short coin);
+    void onHeadOrTailDone_GameManager(const QString& namePlayer, QList<unsigned short> coins);
 
     void onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
     void onDisplayAllElementsAsked(const QString &namePlayer, unsigned short quantity);
@@ -69,7 +69,7 @@ private:
     void sendNotifPokemonSwitched(const QString& namePlayer, ConstantesShared::EnumPacket packet, int indexCard, int newIdCard, bool keepEnergy);
     void sendNotifEnergyAdded(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy);
     void sendNotifEnergyRemoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy);
-    void sendNotifHeadOrTailDone(const QString& namePlayer, unsigned short coin);
+    void sendNotifHeadOrTailDone(const QString& namePlayer, QList<unsigned short> coins);
 
     void sendNotifDisplayPacket(const QString &namePlayer, QMap<int,int> cards);
 

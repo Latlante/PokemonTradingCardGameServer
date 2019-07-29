@@ -64,8 +64,10 @@ public:
 
 #ifdef TESTS_UNITAIRES
     void setForcedValueHeadOrTail(bool forced, unsigned short value = 0);
-#endif
+#else
     unsigned short headOrTail();
+    QList<unsigned short> headsOrTails(unsigned short number);
+#endif
 
 
 signals:
@@ -89,7 +91,7 @@ signals:
     void pokemonSwitched(const QString&, ConstantesShared::EnumPacket, int, int, bool);
     void energyAdded(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
     void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
-    void headOrTailDone(const QString&, unsigned short);
+    void headOrTailDone(const QString&, QList<unsigned short>);
 
 private slots:
     void onEndOfTurn_Player();

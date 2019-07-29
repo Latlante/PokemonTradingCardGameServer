@@ -264,9 +264,9 @@ void Controller::onEnergyRemoved_GameManager(const QString& namePlayer, Constant
     sendNotifEnergyRemoved(namePlayer, packetOrigin, indexCardOrigin, packetDestination, indexCardDestination, indexEnergy);
 }
 
-void Controller::onHeadOrTailDone_GameManager(const QString& namePlayer, unsigned short coin)
+void Controller::onHeadOrTailDone_GameManager(const QString& namePlayer, QList<unsigned short> coins)
 {
-    sendNotifHeadOrTailDone(namePlayer, coin);
+    sendNotifHeadOrTailDone(namePlayer, coins);
 }
 
 void Controller::onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard)
@@ -1043,10 +1043,10 @@ void Controller::sendNotifEnergyRemoved(const QString &namePlayer, ConstantesSha
     m_historicNotif.addNewNotification(notif);
 }
 
-void Controller::sendNotifHeadOrTailDone(const QString &namePlayer, unsigned short coin)
+void Controller::sendNotifHeadOrTailDone(const QString &namePlayer, QList<unsigned short> coins)
 {
     AbstractNotification* notif = new NotificationHeadOrTail(namePlayer,
-                                                             coin);
+                                                             coins);
 
     m_historicNotif.addNewNotification(notif);
 }

@@ -1,8 +1,8 @@
 #include "notificationheadortail.h"
 
-NotificationHeadOrTail::NotificationHeadOrTail(const QString &namePlayer, bool headOrTail) :
+NotificationHeadOrTail::NotificationHeadOrTail(const QString &namePlayer, QList<unsigned short> headsOrTails) :
     AbstractNotification(ConstantesShared::PHASE_NotifHeadOrTail, namePlayer),
-    m_headOrTail(headOrTail)
+    m_headsOrTails(headsOrTails)
 {
 
 }
@@ -19,7 +19,11 @@ QJsonObject NotificationHeadOrTail::messageJsonForOwner()
 {
     QJsonObject jsonResponse = initObject();
 
-    jsonResponse["coin"] = m_headOrTail;
+    QJsonArray arrayCoins;
+    foreach(unsigned short coin, m_headsOrTails)
+        arrayCoins.push_back(coin);
+
+    jsonResponse["coins"] = arrayCoins;
 
     return jsonResponse;
 }
@@ -28,7 +32,11 @@ QJsonObject NotificationHeadOrTail::messageJsonForOthers()
 {
     QJsonObject jsonResponse = initObject();
 
-    jsonResponse["coin"] = m_headOrTail;
+    QJsonArray arrayCoins;
+    foreach(unsigned short coin, m_headsOrTails)
+        arrayCoins.push_back(coin);
+
+    jsonResponse["coins"] = arrayCoins;
 
     return jsonResponse;
 }

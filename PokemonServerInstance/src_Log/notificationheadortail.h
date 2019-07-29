@@ -5,16 +5,15 @@
 
 class NotificationHeadOrTail : public AbstractNotification
 {
-    Q_OBJECT
 public:
-    explicit NotificationHeadOrTail(const QString &namePlayer, bool headOrTail);
+    explicit NotificationHeadOrTail(const QString &namePlayer, QList<unsigned short> headsOrTails);
     virtual ~NotificationHeadOrTail() override;
 
     virtual QJsonObject messageJsonForOwner() override;
     virtual QJsonObject messageJsonForOthers() override;
 
 private:
-    bool m_headOrTail;
+    QList<unsigned short> m_headsOrTails;
 };
 
 #endif // NOTIFICATIONHEADORTAIL_H
