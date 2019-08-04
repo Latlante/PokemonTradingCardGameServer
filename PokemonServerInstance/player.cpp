@@ -472,25 +472,48 @@ bool Player::moveCardFromHandToFight(int indexHand)
                     //On récupére la carte Pokémon a laquelle l'associer
                     AbstractCard* cardToAssociate = fight()->pokemonFighter();
 
-                    if ((cardToAssociate != nullptr) && (cardToAssociate->type() == AbstractCard::TypeOfCard_Pokemon))
+                    if (cardToAssociate != nullptr)
                     {
-                        CardPokemon* pokemonToAssociate = static_cast<CardPokemon*>(cardToAssociate);
-
-                        if (pokemonToAssociate != nullptr)
+                        if(cardToAssociate->type() == AbstractCard::TypeOfCard_Pokemon)
                         {
-                            //On l'associe au Pokémon et on peut la supprimer du paquet d'origine
-                            //pour ne pas l'avoir en doublon
-                            if(pokemonToAssociate->addEnergy(cardEn))
-                            {
-                                hand()->removeFromPacketWithoutDelete(cardEn);
-                                emit energyAdded(name(), ConstantesShared::PACKET_Hand, indexHand, ConstantesShared::PACKET_Fight, 0, cardEn->id());
-                            }
+                            CardPokemon* pokemonToAssociate = static_cast<CardPokemon*>(cardToAssociate);
 
-                            m_energyPlayedForThisRound = true;
-                            moveSuccess = true;
+                            if (pokemonToAssociate != nullptr)
+                            {
+                                //On l'associe au Pokémon et on peut la supprimer du paquet d'origine
+                                //pour ne pas l'avoir en doublon
+                                if(pokemonToAssociate->addEnergy(cardEn))
+                                {
+                                    hand()->removeFromPacketWithoutDelete(cardEn);
+                                    emit energyAdded(name(), ConstantesShared::PACKET_Hand, indexHand, ConstantesShared::PACKET_Fight, 0, cardEn->id());
+                                }
+                                else
+                                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + "error to add energy to pokemonToAssociate" + pokemonToAssociate->name());
+
+                                m_energyPlayedForThisRound = true;
+                                moveSuccess = true;
+                            }
+                            else
+                                Log::instance()->write(QString(__PRETTY_FUNCTION__) + "pokemonToAssociate is nullptr");
                         }
+                        else
+                            Log::instance()->write(QString(__PRETTY_FUNCTION__) + "type of cardToAssociate is:" + cardToAssociate->type());
                     }
+                    else
+                        Log::instance()->write(QString(__PRETTY_FUNCTION__) + "cardToAssociate is nullptr");
                 }
+                else
+                    Log::instance()->write(QString(__PRETTY_FUNCTION__) + "cardEn is nullptr");
+            }
+            else
+            {
+                QString stateEnergyPlayedForThisRound = m_energyPlayedForThisRound == true ? "true" : "false";
+                QString stateInitReady = m_initReady == true ? "true" : "false";
+                Log::instance()->write(QString(__PRETTY_FUNCTION__) +
+                                       ", name:" + m_name +
+                                       ", type: Energy" +
+                                       ", m_energyPlayedForThisRound:" + stateEnergyPlayedForThisRound +
+                                       ", m_initReady:" + m_initReady);
             }
 
         }
