@@ -870,6 +870,7 @@ QJsonObject Controller::displayPacketResponse(const QJsonDocument &document)
         if(m_displayData->messageResponseFromClient(document) == true)
         {
             m_gameManager->endOfSelectionDisplay(m_displayData->argument());
+            emit selectionDisplayFinished();
         }
         else
         {
