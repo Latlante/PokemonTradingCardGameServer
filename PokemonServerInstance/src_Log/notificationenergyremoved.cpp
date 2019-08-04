@@ -23,10 +23,8 @@ QJsonObject NotificationEnergyRemoved::messageJsonForOthers()
 {
     QJsonObject jsonResponse = initObject();
 
-    jsonResponse["idPacketOrigin"] = static_cast<int>(m_packetOrigin);
-    jsonResponse["indexCardOrigin"] = static_cast<int>(m_indexCardOrigin);
-    jsonResponse["idPacketDestination"] = static_cast<int>(m_packetDestination);
-    jsonResponse["indexCardDestination"] = static_cast<int>(m_indexCardDestination);
+    jsonResponse["idPacket"] = static_cast<int>(m_packetOrigin);
+    jsonResponse["indexCard"] = static_cast<int>(m_indexCardOrigin);
     jsonResponse["indexEnergy"] = static_cast<int>(m_indexEnergy);
 
     return jsonResponse;
