@@ -539,6 +539,8 @@ void GameManager::endOfTurn()
     {
         foreach(Player* play, m_listPlayers)
             play->turnFinished();
+
+        emit endOfGame(playerWinner->name(), enemyOf(playerWinner)->name());
     }
     else
     {

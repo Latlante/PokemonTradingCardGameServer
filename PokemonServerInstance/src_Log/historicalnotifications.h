@@ -6,6 +6,7 @@
 #include "src_Log/notificationauthentificationserver.h"
 #include "src_Log/notificationcardmoved.h"
 #include "src_Log/notificationdatapokemonchanged.h"
+#include "src_Log/notificationendofgame.h"
 #include "src_Log/notificationendofturn.h"
 #include "src_Log/notificationenergyadded.h"
 #include "src_Log/notificationenergyremoved.h"

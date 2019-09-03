@@ -92,6 +92,7 @@ signals:
     void energyAdded(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
     void energyRemoved(const QString&, ConstantesShared::EnumPacket, int, ConstantesShared::EnumPacket, int, int);
     void headOrTailDone(const QString&, QList<unsigned short>);
+    void endOfGame(const QString&, const QString&);
 
 private slots:
     void onEndOfTurn_Player();

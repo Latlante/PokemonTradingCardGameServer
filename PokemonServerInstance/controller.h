@@ -26,6 +26,7 @@ public:
     ~Controller();
 
 signals:
+    void selectionDisplayFinished();
 
 private slots:
     void onMessageReceived_Communication(QByteArray message);
@@ -39,6 +40,7 @@ private slots:
     void onEnergyAdded_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy);
     void onEnergyRemoved_GameManager(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy);
     void onHeadOrTailDone_GameManager(const QString& namePlayer, QList<unsigned short> coins);
+    void onEndOfGame_GameManager(const QString& nameWinner, const QString& nameLoser);
 
     void onDisplayPacketAsked(const QString &namePlayer, AbstractPacket *packet, unsigned short quantity, AbstractCard::Enum_typeOfCard typeOfCard);
     void onDisplayAllElementsAsked(const QString &namePlayer, unsigned short quantity);
@@ -70,6 +72,7 @@ private:
     void sendNotifEnergyAdded(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int idEnergy);
     void sendNotifEnergyRemoved(const QString& namePlayer, ConstantesShared::EnumPacket packetOrigin, unsigned int indexCardOrigin, ConstantesShared::EnumPacket packetDestination, unsigned int indexCardDestination, int indexEnergy);
     void sendNotifHeadOrTailDone(const QString& namePlayer, QList<unsigned short> coins);
+    void sendNotifEndOfGame(const QString& nameWinner, const QString& nameLoser);
 
     void sendNotifDisplayPacket(const QString &namePlayer, QMap<int,int> cards);
 

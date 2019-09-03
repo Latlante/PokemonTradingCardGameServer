@@ -79,6 +79,7 @@ SOURCES += \
     src_Cards/cardpokemon.cpp \
     src_Communication/localsockettoserver.cpp \
     src_Communication/sockettoserverthreading.cpp \
+    src_Log/notificationendofgame.cpp \
     src_Log/notificationheadortail.cpp \
     src_Models/modellistenergies.cpp \
     src_Packets/abstractpacket.cpp \
@@ -173,6 +174,7 @@ HEADERS += \
     src_Cards/cardpokemon.h \
     src_Communication/localsockettoserver.h \
     src_Communication/sockettoserverthreading.h \
+    src_Log/notificationendofgame.h \
     src_Log/notificationheadortail.h \
     src_Models/modellistenergies.h \
     src_Packets/abstractpacket.h \
