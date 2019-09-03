@@ -588,11 +588,12 @@ QList<AbstractCard *> GameManager::displayPacket(const QString &namePlayer, Abst
 
     return {packet->card(0)};
 #else
+    m_elementFromDisplays = QVariant();
     emit displayPacketAsked(namePlayer, packet, quantity, typeOfCard);
 
-    QEventLoop loop;
-    connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
-    loop.exec();
+//    QEventLoop loop;
+//    connect(this, &GameManager::selectionDisplayFinished, &loop, &QEventLoop::quit);
+//    loop.exec();
 
     return m_elementFromDisplays.value<QList<AbstractCard*> >();
 #endif

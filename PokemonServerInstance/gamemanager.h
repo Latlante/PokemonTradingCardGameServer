@@ -114,6 +114,8 @@ private:
     Player* m_playerAttacking;
     Player* m_playerAttacked;
     ConstantesQML::StepGame m_gameStatus;
+
+    bool m_displayPacketReturned;
 	
 	bool m_gameIsReady;
     //QList<AbstractCard*> m_listSelectionCards;

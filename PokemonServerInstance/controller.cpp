@@ -279,7 +279,23 @@ void Controller::onDisplayPacketAsked(const QString &namePlayer, AbstractPacket 
     QJsonDocument docToSend = m_displayData->messageInfoToClient();
 
     Log::instance()->write(QString(__PRETTY_FUNCTION__) + " " + docToSend.toJson(QJsonDocument::Compact));
-    m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact));
+
+    if(m_communication->write(namePlayer.toLatin1() + ";" + docToSend.toJson(QJsonDocument::Compact)) == false)
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " error to send message");
+
+    QEventLoop loop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    connect(this, &Controller::selectionDisplayFinished, &loop, &QEventLoop::quit);
+    //timer.start(5000);
+    loop.exec();
+
+    /*if(timer.isActive() == false)
+    {
+        Log::instance()->write(QString(__PRETTY_FUNCTION__) + " timeOut " + QString::number(m_communication->bytesAvailables()) + ", message:" + m_communication->messageWaiting());
+
+    }*/
 }
 
 void Controller::onDisplayAllElementsAsked(const QString &namePlayer, unsigned short quantity)
